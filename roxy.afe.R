@@ -16,7 +16,9 @@ roxy.package(
 		Encoding = "UTF-8",
 		stringsAsFactors = FALSE),
 		actions = "roxy",
-		R.libs = "C:/Program Files/R/R-2.15.1/library", repo.root = "rp.tmp")
+		R.libs = "C:/Program Files/R/R-2.15.1/library", repo.root = "rp.tmp",
+		R.homes = R.home())
 		
 		
-
+options(error = recover)
+options(error = NULL)
