@@ -1,9 +1,11 @@
 
 require(roxyPackage)
 
+svn.number <- str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" pkg/afe", intern = TRUE)[2], "[[:digit:]]+$")
+
 roxy.package(
 	pck.source.dir = "pkg/afe",
-	pck.version = "0.1-0",
+	pck.version = str_c("0.1-", svn.number),
 	pck.description = data.frame(
 		Package = "afe",
 		Type = "Package",
