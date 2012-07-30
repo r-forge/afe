@@ -2,10 +2,10 @@
 # important to set the correct contrasts when using Type 3 sums of squares:
 options(contrasts=c('contr.sum','contr.poly')) 
 
-# exampel using OBrienKaiser
+# exampel using OBrienKaiser dataset from package car (see ?OBrienKaiser)
 
+# first step, convert OBrienKaiser from wide to long format and add a (random) covariate age.
 set.seed(1)
-
 OBrienKaiser2 <- within(OBrienKaiser, {
 		id <- factor(1:nrow(OBrienKaiser))
 		age <- scale(sample(18:35, nrow(OBrienKaiser), replace = TRUE), scale = FALSE)})
@@ -25,7 +25,6 @@ str(obk.long)
 ##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 
 # run univariate mixed ANCOVA for the full design:
-
 summary(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long), multivariate = FALSE)
 summary(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long), multivariate = FALSE)
 # both calls return the same:
@@ -186,11 +185,17 @@ ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", 
 ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
 
-# aggregating over one within-subjects factor (hour) with warning:
+# aggregating over one within-subjects factor (phase) with warning:
 
-aov.car(value ~ treatment * gender + age + Error(id/phase), data = obk.long)
+aov.car(value ~ treatment * gender + age + Error(id/hour), data = obk.long)
 
 ez.glm(id = "id", c("treatment", "gender"), c("hour"), "value", "age", data = obk.long, print.formula = TRUE)
+
+
+# runs with "numeric" factors
+obk.long$hour2 <- as.numeric(as.character(obk.long$hour))
+
+aov.car(value ~ treatment * gender + Error(id/hour2), data = obk.long, type = 2)
 
 
 
