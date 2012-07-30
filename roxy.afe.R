@@ -15,7 +15,7 @@ roxy.package(
 		License = "GPL (>=3)",
 		Encoding = "UTF-8",
 		stringsAsFactors = FALSE),
-		actions = c("roxy", "check"),
+		actions = c("roxy"),
 		R.libs = "C:/Program Files/R/R-2.15.1/library", 
 		repo.root = "rp.tmp")
 		

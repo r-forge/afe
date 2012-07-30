@@ -1,2 +1,2 @@
 export(aov.car)
-export(glm.long)
+export(ez.glm)

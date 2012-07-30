@@ -4,16 +4,19 @@ Title: Analysis of Factorial Experiments
 Author: Henrik Singmann <henrik.singmann@psychologie.uni-freiburg.de>
 Depends:
     R (>= 2.14.0),
-    car
+    car,
+    reshape2,
+    stringr
 Description: Provides convenience functions for analyzing factorial
-    experiments, namely provide convenience tools for ANOVA and ANCOVA analyses
-    with type 2 and type 3 sums of squares wrapping car::Anova().
+    experiments, namely provide convenience tools for repeated-measures ANOVA
+    and ANCOVA analysis with type 2 and type 3 sums of squares wrapping
+    car::Anova().
 License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")))
 Version: 0.1-0
-Date: 2012-07-27
+Date: 2012-07-30
 Collate:
     'afe-package.R'
-    'anova.R'
+    'aov.car.R'

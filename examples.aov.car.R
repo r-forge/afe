@@ -24,13 +24,110 @@ str(obk.long)
 ##  $ phase    : Factor w/ 3 levels "fup","post","pre": 3 3 3 3 3 3 3 3 3 3 ...
 ##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 
+# run univariate mixed ANCOVA for the full design:
+
+summary(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long), multivariate = FALSE)
+summary(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long), multivariate = FALSE)
+# both calls return the same:
+
+## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+## 
+##                               SS num Df Error SS den Df      F      Pr(>F)    
+## (Intercept)                 6454      1    215.7      9 269.35 0.000000052 ***
+## treatment                    171      2    215.7      9   3.58      0.0719 .  
+## gender                        95      1    215.7      9   3.95      0.0782 .  
+## age                           12      1    215.7      9   0.52      0.4902    
+## treatment:gender              62      2    215.7      9   1.28      0.3232    
+## phase                        135      2     59.7     18  20.28 0.000024485 ***
+## treatment:phase               81      4     59.7     18   6.07      0.0028 ** 
+## gender:phase                   2      2     59.7     18   0.25      0.7843    
+## age:phase                     21      2     59.7     18   3.10      0.0698 .  
+## treatment:gender:phase        21      4     59.7     18   1.60      0.2171    
+## hour                         109      4     47.6     36  20.52 0.000000007 ***
+## treatment:hour                 8      8     47.6     36   0.71      0.6779    
+## gender:hour                    4      4     47.6     36   0.71      0.5915    
+## age:hour                      15      4     47.6     36   2.82      0.0393 *  
+## treatment:gender:hour          6      8     47.6     36   0.59      0.7798    
+## phase:hour                    10      8     88.6     72   0.99      0.4501    
+## treatment:phase:hour           7     16     88.6     72   0.33      0.9915    
+## gender:phase:hour              9      8     88.6     72   0.90      0.5222    
+## age:phase:hour                 8      8     88.6     72   0.77      0.6339    
+## treatment:gender:phase:hour   13     16     88.6     72   0.65      0.8308    
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+## 
+## 
+## Mauchly Tests for Sphericity
+## 
+##                             Test statistic p-value
+## phase                                0.822   0.456
+## treatment:phase                      0.822   0.456
+## gender:phase                         0.822   0.456
+## age:phase                            0.822   0.456
+## treatment:gender:phase               0.822   0.456
+## hour                                 0.097   0.049
+## treatment:hour                       0.097   0.049
+## gender:hour                          0.097   0.049
+## age:hour                             0.097   0.049
+## treatment:gender:hour                0.097   0.049
+## phase:hour                           0.000   0.087
+## treatment:phase:hour                 0.000   0.087
+## gender:phase:hour                    0.000   0.087
+## age:phase:hour                       0.000   0.087
+## treatment:gender:phase:hour          0.000   0.087
+## 
+## 
+## Greenhouse-Geisser and Huynh-Feldt Corrections
+##  for Departure from Sphericity
+## 
+##                             GG eps Pr(>F[GG])    
+## phase                        0.849   0.000084 ***
+## treatment:phase              0.849     0.0052 ** 
+## gender:phase                 0.849     0.7494    
+## age:phase                    0.849     0.0807 .  
+## treatment:gender:phase       0.849     0.2280    
+## hour                         0.534   0.000013 ***
+## treatment:hour               0.534     0.6011    
+## gender:hour                  0.534     0.5137    
+## age:hour                     0.534     0.0816 .  
+## treatment:gender:hour        0.534     0.6844    
+## phase:hour                   0.436     0.4187    
+## treatment:phase:hour         0.436     0.9318    
+## gender:phase:hour            0.436     0.4652    
+## age:phase:hour               0.436     0.5395    
+## treatment:gender:phase:hour  0.436     0.7101    
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+## 
+##                             HF eps Pr(>F[HF])    
+## phase                        1.025  0.0000245 ***
+## treatment:phase              1.025     0.0028 ** 
+## gender:phase                 1.025     0.7843    
+## age:phase                    1.025     0.0698 .  
+## treatment:gender:phase       1.025     0.2171    
+## hour                         0.705  0.0000008 ***
+## treatment:hour               0.705     0.6343    
+## gender:hour                  0.705     0.5478    
+## age:hour                     0.705     0.0621 .  
+## treatment:gender:hour        0.705     0.7264    
+## phase:hour                   0.744     0.4402    
+## treatment:phase:hour         0.744     0.9788    
+## gender:phase:hour            0.744     0.5021    
+## age:phase:hour               0.744     0.5993    
+## treatment:gender:phase:hour  0.744     0.7878    
+## ---
+## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+## Warnmeldung:
+## In summary.Anova.mlm(aov.car(value ~ treatment * gender + age +  :
+##   HF eps > 1 treated as 1
+## 
 
 # replicating ?Anova using aov.car:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
 # in contrast to aov you do not need the within-subject factors outside Error()
 
-# replicating ?Anova using spss.glm:
-spss.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long, type = 2)
+# replicating ?Anova using ez.glm:
+ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long, type = 2)
 
 #both return:
 ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
@@ -59,7 +156,7 @@ spss.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data 
 
 aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, type = 2)
 
-spss.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
+ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
 # Formula send to aov.car: value ~ treatment * gender + age+ Error(id/phase * hour)
 
 # both return:
@@ -89,11 +186,11 @@ spss.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age"
 ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
 
-# aggregating over one within-subjects factor (hour):
+# aggregating over one within-subjects factor (hour) with warning:
 
-aov.car(value ~ treatment * gender + age + Error(id/phase), data = obk.long, type = 2)
+aov.car(value ~ treatment * gender + age + Error(id/phase), data = obk.long)
 
-spss.gl(value ~ treatment * gender + age + Error(id/phase), data = obk.long, type = 2)
+ez.glm(id = "id", c("treatment", "gender"), c("hour"), "value", "age", data = obk.long, print.formula = TRUE)
 
 
 
