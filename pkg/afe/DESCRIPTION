@@ -15,8 +15,10 @@ License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")))
-Version: 0.1-0
-Date: 2012-07-30
+Version: 0.1-10
+Date: 2012-07-31
 Collate:
     'afe-package.R'
     'aov.car.R'
+    'make.anova.table.R'
+    'zzz.R'

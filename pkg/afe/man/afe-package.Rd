@@ -8,7 +8,7 @@
 }
 \details{
   \tabular{ll}{ Package: \tab afe\cr Type: \tab Package\cr
-  Version: \tab 0.1-0\cr Date: \tab 2012-07-30\cr Depends:
+  Version: \tab 0.1-10\cr Date: \tab 2012-07-31\cr Depends:
   \tab R (>= 2.14.0), car, reshape2, stringr\cr Encoding:
   \tab UTF-8\cr License: \tab GPL (>=3)\cr }
 
