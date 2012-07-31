@@ -26,7 +26,7 @@ str(obk.long)
 
 # run univariate mixed ANCOVA for the full design:
 summary(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long), multivariate = FALSE)
-summary(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long), multivariate = FALSE)
+summary(ez.glm("id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long), multivariate = FALSE)
 # both calls return the same:
 
 ## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
