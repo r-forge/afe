@@ -6,6 +6,7 @@
 #'
 #' ez.glm(id, between, within, dv, covariate, data, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE)
 #' 
+#' univariate(object)
 #'
 #' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}}. Should include an error term (i.e., \code{Error( / )}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}).
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
@@ -17,25 +18,32 @@
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
 #' @param type The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param ... Further arguments passed to fun.aggregate.
+#' @param ... Further arguments passed to \code{fun.aggregate}.
+#' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}
 #'
-#' @return Same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"}.
+#' @return \code{aov.car} and \code{ez.glm}are wrappers and therfore return the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"}.
 #' 
-#' To obtain univariate results, the \code{summary} of the returned object with \code{multivariate = FALSE}, \cr e.g. \code{summary(aov.car(...), multivriate = FALSE)}.
-#' 
-#' @details Type 3 sums of squares are said to be dangerous and/or problematic. On the other side they are the default in in SPSS and SAS and recommended by e.g. Maxwell and Delaney (2003). For a brief discussion see \href{http://stats.stackexchange.com/q/6208/442}{here}. Type 3 sums of squares are the default in \pkg{afe}.
+#' \code{univariate} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed.
 #'
-#' However, note that Type 3 ANOVAs with interactions are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} via \code{options(contrasts=c('contr.sum','contr.poly'))}. This should be done automatically when loading \pkg{afe} and \pkg{afe} will issue a warning when running type 3 SS and \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{other coding schemes}. You can check the coding with \code{options("contrasts")}. 
+#' The elements of the list returned by \code{univariate} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
+#' 
+#' @details \strong{Type 3 sums of squares are default in \pkg{afe}.} Note that type 3 sums of squares are said to be dangerous and/or problematic. On the other side they are the default in in SPSS and SAS and recommended by e.g. Maxwell and Delaney (2003). For a brief discussion see \href{http://stats.stackexchange.com/q/6208/442}{here}. 
+#'
+#' However, note that lower order effects (e.g., main effects) in type 3 ANOVAs are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} via \code{options(contrasts=c('contr.sum','contr.poly'))}. This should be done automatically when loading \pkg{afe} and \pkg{afe} will issue a warning when running type 3 SS and \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{other coding schemes}. You can check the coding with \code{options("contrasts")}. 
 #' 
 #' Currently these functions are not very well tested for models with \strong{only} between or \strong{only} within subject factors.
 #'
 #' \code{ez.glm} will concatante all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
 #'
-#' @note Factors are silently converted to factors and unused levels dropped.
+#' @author \code{univariate} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
+#'
+#' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors and unused levels dropped.
+#'
+#' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 #'
 #' @name aov.car
-#' @aliases aov.car ez.glm
-#' @export aov.car ez.glm
+#' @aliases aov.car ez.glm univariate
+#' @export aov.car ez.glm univariate
 #' @examples
 #' 
 #' # exampel using OBrienKaiser dataset from package car (see ?OBrienKaiser)
@@ -60,102 +68,74 @@
 #' ##  $ phase    : Factor w/ 3 levels "fup","post","pre": 3 3 3 3 3 3 3 3 3 3 ...
 #' ##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 #' 
-#' # run univariate mixed ANCOVA for the full design:
-#' summary(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long), multivariate = FALSE)
-#' summary(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long), multivariate = FALSE)
+#' # obtain mixed ANCOVA for the full design:
+#' univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
+#' univariate(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long))
 #' # both calls return the same:
-#' 
-#' ## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+#'
+#' ## $anova
+#' ##                                      SS num Df  Error SS den Df           F       Pr(>F)
+#' ## (Intercept)                 6454.236987      1 215.65658      9 269.3547893 5.152317e-08
+#' ## treatment                    171.399953      2 215.65658      9   3.5765187 7.193619e-02
+#' ## gender                        94.598340      1 215.65658      9   3.9478742 7.818280e-02
+#' ## age                           12.398975      1 215.65658      9   0.5174466 4.901885e-01
+#' ## treatment:gender              61.531858      2 215.65658      9   1.2839551 3.231798e-01
+#' ## phase                        134.586005      2  59.72439     18  20.2810632 2.448505e-05
+#' ## treatment:phase               80.604542      4  59.72439     18   6.0732385 2.826803e-03
+#' ## gender:phase                   1.634246      2  59.72439     18   0.2462681 7.843036e-01
+#' ## age:phase                     20.553392      2  59.72439     18   3.0972362 6.982439e-02
+#' ## treatment:gender:phase        21.254421      4  59.72439     18   1.6014379 2.170946e-01
+#' ## hour                         108.513510      4  47.59543     36  20.5192290 7.001584e-09
+#' ## treatment:hour                 7.547869      8  47.59543     36   0.7136275 6.779072e-01
+#' ## gender:hour                    3.746135      4  47.59543     36   0.7083708 5.915285e-01
+#' ## age:hour                      14.904567      4  47.59543     36   2.8183608 3.926421e-02
+#' ## treatment:gender:hour          6.235198      8  47.59543     36   0.5895186 7.798264e-01
+#' ## phase:hour                     9.762579      8  88.62706     72   0.9913814 4.501348e-01
+#' ## treatment:phase:hour           6.579092     16  88.62706     72   0.3340505 9.915014e-01
+#' ## gender:phase:hour              8.851396      8  88.62706     72   0.8988515 5.222336e-01
+#' ## age:phase:hour                 7.539611      8  88.62706     72   0.7656409 6.339004e-01
+#' ## treatment:gender:phase:hour   12.822199     16  88.62706     72   0.6510416 8.307936e-01
 #' ## 
-#' ##                               SS num Df Error SS den Df      F      Pr(>F)    
-#' ## (Intercept)                 6454      1    215.7      9 269.35 0.000000052 ***
-#' ## treatment                    171      2    215.7      9   3.58      0.0719 .  
-#' ## gender                        95      1    215.7      9   3.95      0.0782 .  
-#' ## age                           12      1    215.7      9   0.52      0.4902    
-#' ## treatment:gender              62      2    215.7      9   1.28      0.3232    
-#' ## phase                        135      2     59.7     18  20.28 0.000024485 ***
-#' ## treatment:phase               81      4     59.7     18   6.07      0.0028 ** 
-#' ## gender:phase                   2      2     59.7     18   0.25      0.7843    
-#' ## age:phase                     21      2     59.7     18   3.10      0.0698 .  
-#' ## treatment:gender:phase        21      4     59.7     18   1.60      0.2171    
-#' ## hour                         109      4     47.6     36  20.52 0.000000007 ***
-#' ## treatment:hour                 8      8     47.6     36   0.71      0.6779    
-#' ## gender:hour                    4      4     47.6     36   0.71      0.5915    
-#' ## age:hour                      15      4     47.6     36   2.82      0.0393 *  
-#' ## treatment:gender:hour          6      8     47.6     36   0.59      0.7798    
-#' ## phase:hour                    10      8     88.6     72   0.99      0.4501    
-#' ## treatment:phase:hour           7     16     88.6     72   0.33      0.9915    
-#' ## gender:phase:hour              9      8     88.6     72   0.90      0.5222    
-#' ## age:phase:hour                 8      8     88.6     72   0.77      0.6339    
-#' ## treatment:gender:phase:hour   13     16     88.6     72   0.65      0.8308    
-#' ## ---
-#' ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+#' ## $mauchly
+#' ##                             Test statistic    p-value
+#' ## phase                         0.8217571566 0.45600959
+#' ## treatment:phase               0.8217571566 0.45600959
+#' ## gender:phase                  0.8217571566 0.45600959
+#' ## age:phase                     0.8217571566 0.45600959
+#' ## treatment:gender:phase        0.8217571566 0.45600959
+#' ## hour                          0.0966749877 0.04923980
+#' ## treatment:hour                0.0966749877 0.04923980
+#' ## gender:hour                   0.0966749877 0.04923980
+#' ## age:hour                      0.0966749877 0.04923980
+#' ## treatment:gender:hour         0.0966749877 0.04923980
+#' ## phase:hour                    0.0002379741 0.08651564
+#' ## treatment:phase:hour          0.0002379741 0.08651564
+#' ## gender:phase:hour             0.0002379741 0.08651564
+#' ## age:phase:hour                0.0002379741 0.08651564
+#' ## treatment:gender:phase:hour   0.0002379741 0.08651564
 #' ## 
+#' ## $sphericity.correction
+#' ##                                GG eps   Pr(>F[GG])    HF eps   Pr(>F[HF])
+#' ## phase                       0.8487215 8.383485e-05 1.0252867 2.448505e-05
+#' ## treatment:phase             0.8487215 5.159591e-03 1.0252867 2.826803e-03
+#' ## gender:phase                0.8487215 7.493990e-01 1.0252867 7.843036e-01
+#' ## age:phase                   0.8487215 8.073373e-02 1.0252867 6.982439e-02
+#' ## treatment:gender:phase      0.8487215 2.279698e-01 1.0252867 2.170946e-01
+#' ## hour                        0.5341747 1.302016e-05 0.7054545 8.046331e-07
+#' ## treatment:hour              0.5341747 6.010781e-01 0.7054545 6.342676e-01
+#' ## gender:hour                 0.5341747 5.137213e-01 0.7054545 5.478398e-01
+#' ## age:hour                    0.5341747 8.155027e-02 0.7054545 6.211130e-02
+#' ## treatment:gender:hour       0.5341747 6.843526e-01 0.7054545 7.263729e-01
+#' ## phase:hour                  0.4355822 4.186799e-01 0.7444364 4.402119e-01
+#' ## treatment:phase:hour        0.4355822 9.317848e-01 0.7444364 9.787985e-01
+#' ## gender:phase:hour           0.4355822 4.651930e-01 0.7444364 5.020890e-01
+#' ## age:phase:hour              0.4355822 5.395151e-01 0.7444364 5.992844e-01
+#' ## treatment:gender:phase:hour 0.4355822 7.100921e-01 0.7444364 7.878433e-01
 #' ## 
-#' ## Mauchly Tests for Sphericity
-#' ## 
-#' ##                             Test statistic p-value
-#' ## phase                                0.822   0.456
-#' ## treatment:phase                      0.822   0.456
-#' ## gender:phase                         0.822   0.456
-#' ## age:phase                            0.822   0.456
-#' ## treatment:gender:phase               0.822   0.456
-#' ## hour                                 0.097   0.049
-#' ## treatment:hour                       0.097   0.049
-#' ## gender:hour                          0.097   0.049
-#' ## age:hour                             0.097   0.049
-#' ## treatment:gender:hour                0.097   0.049
-#' ## phase:hour                           0.000   0.087
-#' ## treatment:phase:hour                 0.000   0.087
-#' ## gender:phase:hour                    0.000   0.087
-#' ## age:phase:hour                       0.000   0.087
-#' ## treatment:gender:phase:hour          0.000   0.087
-#' ## 
-#' ## 
-#' ## Greenhouse-Geisser and Huynh-Feldt Corrections
-#' ##  for Departure from Sphericity
-#' ## 
-#' ##                             GG eps Pr(>F[GG])    
-#' ## phase                        0.849   0.000084 ***
-#' ## treatment:phase              0.849     0.0052 ** 
-#' ## gender:phase                 0.849     0.7494    
-#' ## age:phase                    0.849     0.0807 .  
-#' ## treatment:gender:phase       0.849     0.2280    
-#' ## hour                         0.534   0.000013 ***
-#' ## treatment:hour               0.534     0.6011    
-#' ## gender:hour                  0.534     0.5137    
-#' ## age:hour                     0.534     0.0816 .  
-#' ## treatment:gender:hour        0.534     0.6844    
-#' ## phase:hour                   0.436     0.4187    
-#' ## treatment:phase:hour         0.436     0.9318    
-#' ## gender:phase:hour            0.436     0.4652    
-#' ## age:phase:hour               0.436     0.5395    
-#' ## treatment:gender:phase:hour  0.436     0.7101    
-#' ## ---
-#' ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
-#' ## 
-#' ##                             HF eps Pr(>F[HF])    
-#' ## phase                        1.025  0.0000245 ***
-#' ## treatment:phase              1.025     0.0028 ** 
-#' ## gender:phase                 1.025     0.7843    
-#' ## age:phase                    1.025     0.0698 .  
-#' ## treatment:gender:phase       1.025     0.2171    
-#' ## hour                         0.705  0.0000008 ***
-#' ## treatment:hour               0.705     0.6343    
-#' ## gender:hour                  0.705     0.5478    
-#' ## age:hour                     0.705     0.0621 .  
-#' ## treatment:gender:hour        0.705     0.7264    
-#' ## phase:hour                   0.744     0.4402    
-#' ## treatment:phase:hour         0.744     0.9788    
-#' ## gender:phase:hour            0.744     0.5021    
-#' ## age:phase:hour               0.744     0.5993    
-#' ## treatment:gender:phase:hour  0.744     0.7878    
-#' ## ---
-#' ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
-#' ## Warnmeldung:
-#' ## In summary.Anova.mlm(aov.car(value ~ treatment * gender + age +  :
+#' ## Warning message:
+#' ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 #' ##   HF eps > 1 treated as 1
-#' ## 
+#'   
 #' 
 #' # replicating ?Anova using aov.car:
 #' aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
@@ -236,7 +216,15 @@
 
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
-	#browser()
+	browser()
+	# stuff copied from aov:
+	Terms <- terms(formula, "Error", data = data)
+    indError <- attr(Terms, "specials")$Error
+    if (length(indError) > 1L) 
+        stop(sprintf(ngettext(length(indError), "there are %d Error terms: only 1 is allowed", 
+            "there are %d Error terms: only 1 is allowed"), length(indError)), 
+            domain = NA)
+	#
 	vars <- all.vars(formula)
 	dv <- vars[1]
 	vars <- vars[-1]
@@ -258,7 +246,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
 	}
 	# Is fun.aggregate NULL and aggregation necessary?
 	if (is.null(fun.aggregate)) {
-		if (any(xtabs(as.formula(str_c("~", id, "+", rh1)), data = data) > 1)) {
+		if (any(xtabs(as.formula(str_c("~", id, if (length(within) > 0) "+", rh1)), data = data) > 1)) {
 			warning("More than one observation per cell, aggregating the data using mean (i.e, fun.aggregate = mean)!")
 			fun.aggregate <- mean
 		}
@@ -266,7 +254,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
 	# Is Type = 3 and contrasts not contr.sum?
 	if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
 	# prepare the data:
-	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, rh1, sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
+	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
 	# make idata argument
 	if (length(within) > 1) {
 		within.levels <- lapply(lapply(data[,within], levels), factor)
@@ -292,6 +280,88 @@ ez.glm <- function(id, between, within, dv, covariate, data, fun.aggregate = NUL
 	formula <- str_c(dv, " ~ ", rh, error)
 	if (print.formula) message(str_c("Formula send to aov.car: ", formula))
 	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, ...)
+}
+
+
+univariate <- function(object) { 
+	# This function is basically a cropped copy of car::summary.Anova.mlm written by John Fox returning the output as a list (instead of printing it).
+	GG <- function(SSPE, P){ # Greenhouse-Geisser correction
+		p <- nrow(SSPE)
+		if (p < 2) return(NA) 
+		lambda <- eigen(SSPE %*% solve(t(P) %*% P))$values
+		lambda <- lambda[lambda > 0]
+		((sum(lambda)/p)^2)/(sum(lambda^2)/p)
+	}
+	HF <- function(gg, error.df, p){ # Huynh-Feldt correction
+		((error.df + 1)*p*gg - 2)/(p*(error.df - p*gg))
+	}
+	mauchly <- function (SSD, P, df) {
+		# most of this function borrowed from stats:::mauchly.test.SSD
+		if (nrow(SSD) < 2) return(c(NA, NA))
+		Tr <- function (X) sum(diag(X))
+		p <- nrow(P)
+		I <- diag(p)
+		Psi <- t(P) %*% I %*% P 
+		B <- SSD 
+		pp <- nrow(SSD) 
+		U <- solve(Psi, B)
+		n <- df 
+		logW <- log(det(U)) - pp * log(Tr(U/pp))
+		rho <- 1 - (2 * pp^2 + pp + 2)/(6 * pp * n)
+		w2 <- (pp + 2) * (pp - 1) * (pp - 2) * (2 * pp^3 + 6 * pp^2 + 
+					3 * p + 2)/(288 * (n * pp * rho)^2)
+		z <- -n * rho * logW
+		f <- pp * (pp + 1)/2 - 1
+		Pr1 <- pchisq(z, f, lower.tail = FALSE)
+		Pr2 <- pchisq(z, f + 4, lower.tail = FALSE)
+		pval <- Pr1 + w2 * (Pr2 - Pr1)
+		c(statistic = c(W = exp(logW)), p.value = pval)
+	}
+	nterms <- length(object$terms)
+	error.df <- object$error.df
+	table <- matrix(0, nterms, 6)
+	table2 <- matrix(0, nterms, 4)
+	table3 <- matrix(0, nterms, 2)
+	rownames(table3) <- rownames(table2) <- rownames(table) <- object$terms
+	colnames(table) <- c("SS", "num Df", "Error SS", "den Df", "F", "Pr(>F)")
+	colnames(table2) <- c("GG eps", "Pr(>F[GG])",  "HF eps", "Pr(>F[HF])")
+	colnames(table3) <- c("Test statistic", "p-value")
+	browser()
+	for (term in 1:nterms){
+		SSP <- object$SSP[[term]]
+		SSPE <- object$SSPE[[term]]
+		P <- object$P[[term]]
+		p <- ncol(P)
+		PtPinv <- solve(t(P) %*% P)
+		gg <- GG(SSPE, P)
+		table[term, "SS"] <- sum(diag(SSP %*% PtPinv))
+		table[term, "Error SS"] <- sum(diag(SSPE %*% PtPinv))
+		table[term, "num Df"] <- object$df[term] * p
+		table[term, "den Df"] <- error.df * p
+		table[term, "F"] <-  (table[term, "SS"]/table[term, "num Df"])/
+				(table[term, "Error SS"]/table[term, "den Df"])
+		table[term, "Pr(>F)"] <- pf(table[term, "F"], table[term, "num Df"],
+				table[term, "den Df"], lower.tail=FALSE)
+		table2[term, "GG eps"] <- gg
+		table2[term, "HF eps"] <- HF(gg, error.df, p)
+		table3[term,] <- mauchly(SSPE, P, object$error.df)
+	}
+	results <- list(anova = table)
+	table3 <- na.omit(table3)
+	if (nrow(table3) > 0){
+		table2[,"Pr(>F[GG])"] <- pf(table[,"F"], table2[,"GG eps"]*table[,"num Df"],
+				table2[,"GG eps"]*table[,"den Df"], lower.tail=FALSE)
+		table2[,"Pr(>F[HF])"] <- pf(table[,"F"], 
+				pmin(1, table2[,"HF eps"])*table[,"num Df"],
+				pmin(1, table2[,"HF eps"])*table[,"den Df"], lower.tail=FALSE)
+		table2 <- na.omit(table2)
+		if (any(table2[,"HF eps"] > 1)) 
+			warning("HF eps > 1 treated as 1")
+		attributes(table2)[["na.action"]] <- NULL
+		attributes(table3)[["na.action"]] <- NULL
+		results <- c(results, mauchly = list(table3), sphericity.correction = list(table2))
+	}
+	results
 }
 
 

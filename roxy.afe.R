@@ -2,6 +2,9 @@
 require(roxyPackage)
 require(stringr)
 
+R.libs <- "C:/Program Files/R/R-2.15.1/library"
+R.libs <- "C:/Program Files/R/R-2.15.0/library"
+
 svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" pkg/afe", intern = TRUE)[2], "[[:digit:]]+$")) + 1
 
 roxy.package(
@@ -18,8 +21,8 @@ roxy.package(
 		License = "GPL (>=3)",
 		Encoding = "UTF-8",
 		stringsAsFactors = FALSE),
-		actions = c("roxy", "package", "html"),
-		R.libs = "C:/Program Files/R/R-2.15.1/library", 
+		actions = c("roxy", "package", "html", "check"),
+		R.libs = R.libs, 
 		repo.root = "rp.tmp")
 system("rmdir pkg/afe/inst")
 

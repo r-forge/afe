@@ -1,3 +1,4 @@
 export(.Last.lib)
 export(aov.car)
 export(ez.glm)
+export(univariate)
