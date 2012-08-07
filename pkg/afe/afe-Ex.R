@@ -167,6 +167,22 @@ univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, 
 
 
 
+cleanEx()
+nameEx("nice.anova")
+### * nice.anova
+
+flush(stderr()); flush(stdout())
+
+### Name: nice.anova
+### Title: Make nice ANOVA table for printing.
+### Aliases: nice.anova
+
+### ** Examples
+
+TRUE
+
+
+
 ### * <FOOTER>
 ###
 cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
