@@ -7,9 +7,9 @@
   aov.car(formula, data, fun.aggregate = NULL, type = 3,
     ...)
 
-  ez.glm(id, between, within, dv, covariate, data,
-    fun.aggregate = NULL, type = 3, ..., print.formula =
-    FALSE)
+  ez.glm(id, dv, data, between = NULL, within = NULL,
+    covariate = NULL, fun.aggregate = NULL, type = 3, ...,
+    print.formula = FALSE)
 
   univariate(object)
 }
@@ -18,26 +18,30 @@
   similar to \code{\link{aov}}. Should include an error
   term (i.e., \code{Error( / )}). Note that the
   within-subject factors do not need to be outside the
-  Error term (this contrasts with \code{aov}).}
+  Error term (this contrasts with \code{aov}). See
+  Details.}
 
   \item{id}{\code{character} vector (of length 1)
   indicating the subject identifier column in \code{data}.}
-
-  \item{between}{\code{character} vector indicating the
-  \strong{between}-subject(s) factor(s)/column(s) in
-  \code{data}.}
-
-  \item{within}{\code{character} vector indicating the
-  \strong{within}-subject(s) factor(s)/column(s) in
-  \code{data}.}
 
   \item{dv}{\code{character} vector (of length 1)
   indicating the column containing the \strong{dependent
   variable} in \code{data}.}
 
+  \item{between}{\code{character} vector indicating the
+  \strong{between}-subject(s) factor(s)/column(s) in
+  \code{data}. Default is \code{NULL} indicating no
+  between-subjects factors.}
+
+  \item{within}{\code{character} vector indicating the
+  \strong{within}-subject(s) factor(s)/column(s) in
+  \code{data}.  Default is \code{NULL} indicating no
+  within-subjects factors.}
+
   \item{covariate}{\code{character} vector indicating the
   between-subject(s) covariate(s) (i.e., column(s)) in
-  \code{data}.}
+  \code{data}. Default is \code{NULL} indicating no
+  covariates.}
 
   \item{data}{A \code{data.frame} containing the data.
   Mandatory.}
@@ -63,12 +67,14 @@
 
   \item{object}{An object of class \code{Anova.mlm} as
   returned by \code{aov.car}, \code{ez.glm}, or
-  \code{\link[car]{Anova}}}
+  \code{\link[car]{Anova}}.}
 }
 \value{
-  \code{aov.car} and \code{ez.glm}are wrappers and therfore
-  return the same as \code{\link[car]{Anova}}. Usually an
-  object of class \code{"Anova.mlm"}.
+  \code{aov.car} and \code{ez.glm} are wrappers and
+  therfore return the same as \code{\link[car]{Anova}}.
+  Usually an object of class \code{"Anova.mlm"} (with
+  within-subjects factors) or \code{c("anova",
+  "data.frame")}.
 
   \code{univariate} returns a \code{list} of
   \code{data.frame}s containing the univariate results
@@ -76,7 +82,10 @@
   class \code{"Anova.mlm"}. This is essentially the output
   from \code{summary.Anova.mlm} with \code{multivariate =
   FALSE}, e.g. \code{summary(aov.car(...), multivriate =
-  FALSE)}, as a list instead of printed.
+  FALSE)}, as a list instead of printed to the console.\cr
+  For objects of class \code{"anova"} (i.e., the object
+  returned by \code{car::Anova} for a purely
+  between-subjects ANOVA) the object is returned unaltered.
 
   The elements of the list returned by \code{univariate}
   are: \code{anova}, \code{mauchly}, and
@@ -117,9 +126,22 @@
   coding schemes}. You can check the coding with
   \code{options("contrasts")}.
 
-  Currently these functions are not very well tested for
-  models with \strong{only} between or \strong{only} within
-  subject factors.
+  The \code{formula} for \code{aov.car} must contain a
+  single \code{Error} term specyfying the \code{ID} column
+  and potential within-subject factors. Factors outside the
+  \code{Error} term are treated as between-subject factors
+  (the within-subject factors specified in the \code{Error}
+  term are ignored outside the \code{Error} term, i.e., it
+  is not necessary to specify them outside the \code{Error}
+  term, see Examples). Suppressing the intercept (i.e, via
+  \code{0 +} or \code{- 1}) is ignored. Specific
+  specifications of effects (e.g., excluding terms with
+  \code{-} or using \code{^}) should be functional. Using
+  the \code{\link{I}} or \code{\link{poly}} function within
+  the formula is not tested and not supported!
+
+  For \code{ez.glm} either \code{between} or \code{within}
+  must not be \code{NULL}.
 
   \code{ez.glm} will concatante all between-subject factors
   using \code{*} (i.e., producing all main effects and
@@ -161,9 +183,10 @@ str(obk.long)
 ##  $ phase    : Factor w/ 3 levels "fup","post","pre": 3 3 3 3 3 3 3 3 3 3 ...
 ##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 
-# obtain mixed ANCOVA for the full design:
+# run univariate mixed ANCOVA for the full design:
 univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-univariate(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long))
+univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+
 # both calls return the same:
 
 ## $anova
@@ -229,13 +252,12 @@ univariate(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "valu
 ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 ##   HF eps > 1 treated as 1
 
-
 # replicating ?Anova using aov.car:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
 # in contrast to aov you do not need the within-subject factors outside Error()
 
 # replicating ?Anova using ez.glm:
-ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long, type = 2)
+ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), type = 2)
 
 #both return:
 ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
@@ -260,51 +282,31 @@ ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = 
 ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
-# adding age as a covariate:
-
-aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, type = 2)
-
-ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
-# Formula send to aov.car: value ~ treatment * gender + age+ Error(id/phase * hour)
-
-# both return:
-## Type II Repeated Measures MANOVA Tests: Pillai test statistic
-##                             Df test stat approx F num Df den Df      Pr(>F)
-## (Intercept)                  1     0.971    303.0      1      9 0.000000031 ***
-## treatment                    2     0.490      4.3      2      9      0.0483 *
-## gender                       1     0.323      4.3      1      9      0.0681 .
-## age                          1     0.054      0.5      1      9      0.4902
-## treatment:gender             2     0.222      1.3      2      9      0.3232
-## phase                        1     0.851     22.8      2      8      0.0005 ***
-## treatment:phase              2     0.763      2.8      4     18      0.0586 .
-## gender:phase                 1     0.064      0.3      2      8      0.7665
-## age:phase                    1     0.393      2.6      2      8      0.1358
-## treatment:gender:phase       2     0.545      1.7      4     18      0.1967
-## hour                         1     0.935     21.7      4      6      0.0010 **
-## treatment:hour               2     0.534      0.6      8     14      0.7345
-## gender:hour                  1     0.316      0.7      4      6      0.6237
-## age:hour                     1     0.508      1.5      4      6      0.3008
-## treatment:gender:hour        2     0.707      1.0      8     14      0.5043
-## phase:hour                   1     0.721      0.6      8      2      0.7299
-## treatment:phase:hour         2     1.076      0.4     16      6      0.9133
-## gender:phase:hour            1     0.695      0.6      8      2      0.7665
-## age:phase:hour               1     0.974      9.4      8      2      0.0997 .
-## treatment:gender:phase:hour  2     1.314      0.7     16      6      0.7225
-## ---
-## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-
 # aggregating over one within-subjects factor (phase) with warning:
 
 aov.car(value ~ treatment * gender + age + Error(id/hour), data = obk.long)
 
-ez.glm(id = "id", c("treatment", "gender"), c("hour"), "value", "age", data = obk.long, print.formula = TRUE)
+ez.glm("id", "value", obk.long, c("treatment", "gender"), "hour", "age")
 
 
 # runs with "numeric" factors
 obk.long$hour2 <- as.numeric(as.character(obk.long$hour))
 
 aov.car(value ~ treatment * gender + Error(id/hour2), data = obk.long, type = 2)
+
+# only between
+aov.car(value ~ treatment * gender + age + Error(id), data = obk.long, type = 2)
+aov.car(value ~ treatment * gender + Error(id), data = obk.long, type = 2)
+
+ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, covariate = "age", type = 2, print.formula = TRUE)
+
+ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 2, print.formula = TRUE)
+
+# only within
+
+univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+
+univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 }
 \author{
   \code{univariate} is basically a copy of

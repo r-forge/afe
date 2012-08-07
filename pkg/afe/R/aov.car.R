@@ -4,26 +4,27 @@
 #'
 #' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, ...)
 #'
-#' ez.glm(id, between, within, dv, covariate, data, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE)
+#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE)
 #' 
 #' univariate(object)
 #'
-#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}}. Should include an error term (i.e., \code{Error( / )}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}).
+#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}}. Should include an error term (i.e., \code{Error( / )}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
-#' @param between \code{character} vector indicating the \strong{between}-subject(s) factor(s)/column(s) in \code{data}.
-#' @param within \code{character} vector indicating the \strong{within}-subject(s) factor(s)/column(s) in \code{data}.
 #' @param dv \code{character} vector (of length 1) indicating the column containing the \strong{dependent variable} in \code{data}.
-#' @param covariate \code{character} vector indicating the between-subject(s) covariate(s) (i.e., column(s)) in \code{data}.
+#' @param between \code{character} vector indicating the \strong{between}-subject(s) factor(s)/column(s) in \code{data}. Default is \code{NULL} indicating no between-subjects factors.
+#' @param within \code{character} vector indicating the \strong{within}-subject(s) factor(s)/column(s) in \code{data}.  Default is \code{NULL} indicating no within-subjects factors.
+#' @param covariate \code{character} vector indicating the between-subject(s) covariate(s) (i.e., column(s)) in \code{data}. Default is \code{NULL} indicating no covariates.
 #' @param data A \code{data.frame} containing the data. Mandatory.
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
 #' @param type The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
 #' @param ... Further arguments passed to \code{fun.aggregate}.
-#' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}
+#' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
 #'
-#' @return \code{aov.car} and \code{ez.glm}are wrappers and therfore return the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"}.
+#' @return \code{aov.car} and \code{ez.glm} are wrappers and therfore return the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or \code{c("anova", "data.frame")}.
 #' 
-#' \code{univariate} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed.
+#' \code{univariate} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
+#' For objects of class \code{"anova"} (i.e., the object returned by \code{car::Anova} for a purely between-subjects ANOVA) the object is returned unaltered.
 #'
 #' The elements of the list returned by \code{univariate} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
 #' 
@@ -31,7 +32,9 @@
 #'
 #' However, note that lower order effects (e.g., main effects) in type 3 ANOVAs are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} via \code{options(contrasts=c('contr.sum','contr.poly'))}. This should be done automatically when loading \pkg{afe} and \pkg{afe} will issue a warning when running type 3 SS and \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{other coding schemes}. You can check the coding with \code{options("contrasts")}. 
 #' 
-#' Currently these functions are not very well tested for models with \strong{only} between or \strong{only} within subject factors.
+#' The \code{formula} for \code{aov.car} must contain a single \code{Error} term specyfying the \code{ID} column and potential within-subject factors. Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term, i.e., it is not necessary to specify them outside the \code{Error} term, see Examples). Suppressing the intercept (i.e, via \code{0 +} or \code{- 1}) is ignored. Specific specifications of effects (e.g., excluding terms with \code{-} or using \code{^}) should be functional. Using the \code{\link{I}} or \code{\link{poly}} function within the formula is not tested and not supported!
+#'
+#' For \code{ez.glm} either \code{between} or \code{within} must not be \code{NULL}.
 #'
 #' \code{ez.glm} will concatante all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
 #'
@@ -68,11 +71,12 @@
 #' ##  $ phase    : Factor w/ 3 levels "fup","post","pre": 3 3 3 3 3 3 3 3 3 3 ...
 #' ##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 #' 
-#' # obtain mixed ANCOVA for the full design:
+#' # run univariate mixed ANCOVA for the full design:
 #' univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-#' univariate(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long))
+#' univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+#' 
 #' # both calls return the same:
-#'
+#' 
 #' ## $anova
 #' ##                                      SS num Df  Error SS den Df           F       Pr(>F)
 #' ## (Intercept)                 6454.236987      1 215.65658      9 269.3547893 5.152317e-08
@@ -135,14 +139,13 @@
 #' ## Warning message:
 #' ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 #' ##   HF eps > 1 treated as 1
-#'   
 #' 
 #' # replicating ?Anova using aov.car:
 #' aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
 #' # in contrast to aov you do not need the within-subject factors outside Error()
 #' 
 #' # replicating ?Anova using ez.glm:
-#' ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long, type = 2)
+#' ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), type = 2)
 #' 
 #' #both return:
 #' ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
@@ -167,56 +170,37 @@
 #' ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 #' 
 #' 
-#' # adding age as a covariate:
-#' 
-#' aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, type = 2)
-#' 
-#' ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
-#' # Formula send to aov.car: value ~ treatment * gender + age+ Error(id/phase * hour)
-#' 
-#' # both return:
-#' ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
-#' ##                             Df test stat approx F num Df den Df      Pr(>F)    
-#' ## (Intercept)                  1     0.971    303.0      1      9 0.000000031 ***
-#' ## treatment                    2     0.490      4.3      2      9      0.0483 *  
-#' ## gender                       1     0.323      4.3      1      9      0.0681 .  
-#' ## age                          1     0.054      0.5      1      9      0.4902    
-#' ## treatment:gender             2     0.222      1.3      2      9      0.3232    
-#' ## phase                        1     0.851     22.8      2      8      0.0005 ***
-#' ## treatment:phase              2     0.763      2.8      4     18      0.0586 .  
-#' ## gender:phase                 1     0.064      0.3      2      8      0.7665    
-#' ## age:phase                    1     0.393      2.6      2      8      0.1358    
-#' ## treatment:gender:phase       2     0.545      1.7      4     18      0.1967    
-#' ## hour                         1     0.935     21.7      4      6      0.0010 ** 
-#' ## treatment:hour               2     0.534      0.6      8     14      0.7345    
-#' ## gender:hour                  1     0.316      0.7      4      6      0.6237    
-#' ## age:hour                     1     0.508      1.5      4      6      0.3008    
-#' ## treatment:gender:hour        2     0.707      1.0      8     14      0.5043    
-#' ## phase:hour                   1     0.721      0.6      8      2      0.7299    
-#' ## treatment:phase:hour         2     1.076      0.4     16      6      0.9133    
-#' ## gender:phase:hour            1     0.695      0.6      8      2      0.7665    
-#' ## age:phase:hour               1     0.974      9.4      8      2      0.0997 .  
-#' ## treatment:gender:phase:hour  2     1.314      0.7     16      6      0.7225    
-#' ## ---
-#' ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
-#' 
-#' 
 #' # aggregating over one within-subjects factor (phase) with warning:
 #' 
 #' aov.car(value ~ treatment * gender + age + Error(id/hour), data = obk.long)
 #' 
-#' ez.glm(id = "id", c("treatment", "gender"), c("hour"), "value", "age", data = obk.long, print.formula = TRUE)
+#' ez.glm("id", "value", obk.long, c("treatment", "gender"), "hour", "age")
 #' 
 #' 
 #' # runs with "numeric" factors
 #' obk.long$hour2 <- as.numeric(as.character(obk.long$hour))
 #' 
 #' aov.car(value ~ treatment * gender + Error(id/hour2), data = obk.long, type = 2)
-#'
+#' 
+#' # only between
+#' aov.car(value ~ treatment * gender + age + Error(id), data = obk.long, type = 2)
+#' aov.car(value ~ treatment * gender + Error(id), data = obk.long, type = 2)
+#' 
+#' ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, covariate = "age", type = 2, print.formula = TRUE)
+#' 
+#' ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 2, print.formula = TRUE)
+#' 
+#' # only within
+#' 
+#' univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+#' 
+#' univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+#' 
+#' 
 
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
-	browser()
+	#browser()
 	# stuff copied from aov:
 	Terms <- terms(formula, "Error", data = data)
     indError <- attr(Terms, "specials")$Error
@@ -224,7 +208,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
         stop(sprintf(ngettext(length(indError), "there are %d Error terms: only 1 is allowed", 
             "there are %d Error terms: only 1 is allowed"), length(indError)), 
             domain = NA)
-	#
+	# from here, code by Henrik Singmann:
 	vars <- all.vars(formula)
 	dv <- vars[1]
 	vars <- vars[-1]
@@ -235,8 +219,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
 	between <- vars[!(vars %in% c(id, within))]
 	effect.parts <- parts[!str_detect(parts, "^Error\\(")]
 	effect.parts.no.within <- effect.parts[!str_detect(effect.parts, str_c("\\<",within,"\\>", collapse = "|"))]
-	rh2 <- str_c(effect.parts.no.within, collapse = "+")
-	lh1 <- str_c(id, str_c(between, collapse = "+"), sep = "+")
+	rh2 <- if (length(between) > 0) str_c(effect.parts.no.within, collapse = "+") else "1"
+	lh1 <- str_c(id, if (length(between) > 0) str_c(between, collapse = "+") else NULL, sep = "+")
 	rh1 <- str_c(within, collapse = "+")
 	rh3 <- str_c(within, collapse = "*")
 	# converting all within subject factors to factors and adding a leading charcter (x) if starting with a digit.
@@ -255,28 +239,34 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, ...) {
 	if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
 	# prepare the data:
 	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
-	# make idata argument
-	if (length(within) > 1) {
-		within.levels <- lapply(lapply(data[,within], levels), factor)
-		idata <- rev(expand.grid(rev(within.levels)))
-	} else {
-		idata <- data.frame(levels(data[,within]))
-		colnames(idata) <- within
+	# branching based on type of ANOVA
+	if (length(within) > 0) {  # if within-subject factors are present:
+		# make idata argument
+		if (length(within) > 1) {
+			within.levels <- lapply(lapply(data[,within], levels), factor)
+			idata <- rev(expand.grid(rev(within.levels)))
+		} else {
+			idata <- data.frame(levels(data[,within]))
+			colnames(idata) <- within
+		}
+		# print(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)))
+		tmp.lm <- lm(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)), data = tmp.dat)
+		Anova(tmp.lm, idata = idata, idesign = as.formula(str_c("~", rh3)), type = type)
+	} else { # if NO within-subjetc factors are present (i.e., purley between ANOVA):
+		colnames(tmp.dat)[ncol(tmp.dat)] <- "dv"
+		tmp.lm <- lm(as.formula(str_c("dv ~ ", rh2)), data = tmp.dat)
+		Anova(tmp.lm, type = type)
 	}
-	# print(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)))
-	tmp.lm <- lm(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)), data = tmp.dat)
-	Anova(tmp.lm, idata = idata, idesign = as.formula(str_c("~", rh3)), type = type)
 }
 
 
 
-ez.glm <- function(id, between, within, dv, covariate, data, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE) {
-	if (missing(covariate)) {
-		covariate <- NULL
-		covariates <- NULL
-	} else covariates <- str_c(covariate, collapse = "+")
-	rh <- str_c(str_c(between, collapse = " * "), covariates, sep = " + ")
-	error <- str_c("+ Error(", id, "/", str_c(within, collapse = " * "), ")")
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE) {
+	if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
+	if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
+	#browser()
+	rh <- if (!is.null(between) || !is.null(covariate)) str_c(if (!is.null(between)) str_c(between, collapse = " * ") else NULL, covariate, sep = " + ") else "1"
+	error <- str_c(" + Error(", id, if (!is.null(within)) "/" else "", str_c(within, collapse = " * "), ")")
 	formula <- str_c(dv, " ~ ", rh, error)
 	if (print.formula) message(str_c("Formula send to aov.car: ", formula))
 	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, ...)
@@ -284,6 +274,7 @@ ez.glm <- function(id, between, within, dv, covariate, data, fun.aggregate = NUL
 
 
 univariate <- function(object) { 
+	if (all(class(object) == c("anova", "data.frame"))) return(object)
 	# This function is basically a cropped copy of car::summary.Anova.mlm written by John Fox returning the output as a list (instead of printing it).
 	GG <- function(SSPE, P){ # Greenhouse-Geisser correction
 		p <- nrow(SSPE)
@@ -326,7 +317,7 @@ univariate <- function(object) {
 	colnames(table) <- c("SS", "num Df", "Error SS", "den Df", "F", "Pr(>F)")
 	colnames(table2) <- c("GG eps", "Pr(>F[GG])",  "HF eps", "Pr(>F[HF])")
 	colnames(table3) <- c("Test statistic", "p-value")
-	browser()
+	#browser()
 	for (term in 1:nterms){
 		SSP <- object$SSP[[term]]
 		SSPE <- object$SSPE[[term]]

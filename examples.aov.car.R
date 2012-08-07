@@ -26,7 +26,7 @@ str(obk.long)
 
 # run univariate mixed ANCOVA for the full design:
 univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-univariate(ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long))
+univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
 # both calls return the same:
 
@@ -98,7 +98,7 @@ aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type
 # in contrast to aov you do not need the within-subject factors outside Error()
 
 # replicating ?Anova using ez.glm:
-ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = obk.long, type = 2)
+ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), type = 2)
 
 #both return:
 ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
@@ -123,45 +123,11 @@ ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", data = 
 ## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
 
-# adding age as a covariate:
-
-aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, type = 2)
-
-ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
-# Formula send to aov.car: value ~ treatment * gender + age+ Error(id/phase * hour)
-
-# both return:
-## Type II Repeated Measures MANOVA Tests: Pillai test statistic
-##                             Df test stat approx F num Df den Df      Pr(>F)    
-## (Intercept)                  1     0.971    303.0      1      9 0.000000031 ***
-## treatment                    2     0.490      4.3      2      9      0.0483 *  
-## gender                       1     0.323      4.3      1      9      0.0681 .  
-## age                          1     0.054      0.5      1      9      0.4902    
-## treatment:gender             2     0.222      1.3      2      9      0.3232    
-## phase                        1     0.851     22.8      2      8      0.0005 ***
-## treatment:phase              2     0.763      2.8      4     18      0.0586 .  
-## gender:phase                 1     0.064      0.3      2      8      0.7665    
-## age:phase                    1     0.393      2.6      2      8      0.1358    
-## treatment:gender:phase       2     0.545      1.7      4     18      0.1967    
-## hour                         1     0.935     21.7      4      6      0.0010 ** 
-## treatment:hour               2     0.534      0.6      8     14      0.7345    
-## gender:hour                  1     0.316      0.7      4      6      0.6237    
-## age:hour                     1     0.508      1.5      4      6      0.3008    
-## treatment:gender:hour        2     0.707      1.0      8     14      0.5043    
-## phase:hour                   1     0.721      0.6      8      2      0.7299    
-## treatment:phase:hour         2     1.076      0.4     16      6      0.9133    
-## gender:phase:hour            1     0.695      0.6      8      2      0.7665    
-## age:phase:hour               1     0.974      9.4      8      2      0.0997 .  
-## treatment:gender:phase:hour  2     1.314      0.7     16      6      0.7225    
-## ---
-## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
-
-
 # aggregating over one within-subjects factor (phase) with warning:
 
 aov.car(value ~ treatment * gender + age + Error(id/hour), data = obk.long)
 
-ez.glm(id = "id", c("treatment", "gender"), c("hour"), "value", "age", data = obk.long, print.formula = TRUE)
+ez.glm("id", "value", obk.long, c("treatment", "gender"), "hour", "age")
 
 
 # runs with "numeric" factors
@@ -171,10 +137,18 @@ aov.car(value ~ treatment * gender + Error(id/hour2), data = obk.long, type = 2)
 
 # only between
 aov.car(value ~ treatment * gender + age + Error(id), data = obk.long, type = 2)
+aov.car(value ~ treatment * gender + Error(id), data = obk.long, type = 2)
 
-ez.glm(id = "id", c("treatment", "gender"), c("phase", "hour"), "value", "age", data = obk.long, type = 2, print.formula = TRUE)
+ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, covariate = "age", type = 2, print.formula = TRUE)
+
+ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 2, print.formula = TRUE)
 
 # only within
+
+univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+
+univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+
 
 
 
