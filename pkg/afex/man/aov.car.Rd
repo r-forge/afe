@@ -1,23 +1,167 @@
-pkgname <- "afe"
-source(file.path(R.home("share"), "R", "examples-header.R"))
-options(warn = 1)
-options(pager = "console")
-library('afe')
+\name{aov.car}
+\alias{aov.car}
+\alias{ez.glm}
+\alias{univariate}
+\title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
+\usage{
+  aov.car(formula, data, fun.aggregate = NULL, type = 3,
+    ...)
 
-assign(".oldSearch", search(), pos = 'CheckExEnv')
-cleanEx()
-nameEx("aov.car")
-### * aov.car
+  ez.glm(id, dv, data, between = NULL, within = NULL,
+    covariate = NULL, fun.aggregate = NULL, type = 3, ...,
+    print.formula = FALSE)
 
-flush(stderr()); flush(stdout())
+  univariate(object)
+}
+\arguments{
+  \item{formula}{A formula specifying the ANOVA model
+  similar to \code{\link{aov}}. Should include an error
+  term (i.e., \code{Error( / )}). Note that the
+  within-subject factors do not need to be outside the
+  Error term (this contrasts with \code{aov}). See
+  Details.}
 
-### Name: aov.car
-### Title: Convenience wrappers for car::Anova using either a formula or
-###   factor based interface.
-### Aliases: aov.car ez.glm univariate
+  \item{id}{\code{character} vector (of length 1)
+  indicating the subject identifier column in \code{data}.}
 
-### ** Examples
+  \item{dv}{\code{character} vector (of length 1)
+  indicating the column containing the \strong{dependent
+  variable} in \code{data}.}
 
+  \item{between}{\code{character} vector indicating the
+  \strong{between}-subject(s) factor(s)/column(s) in
+  \code{data}. Default is \code{NULL} indicating no
+  between-subjects factors.}
+
+  \item{within}{\code{character} vector indicating the
+  \strong{within}-subject(s) factor(s)/column(s) in
+  \code{data}.  Default is \code{NULL} indicating no
+  within-subjects factors.}
+
+  \item{covariate}{\code{character} vector indicating the
+  between-subject(s) covariate(s) (i.e., column(s)) in
+  \code{data}. Default is \code{NULL} indicating no
+  covariates.}
+
+  \item{data}{A \code{data.frame} containing the data.
+  Mandatory.}
+
+  \item{fun.aggregate}{The function for aggregating the
+  data before running the ANOVA if there is more than one
+  obervation per individuum and cell of the design. The
+  default \code{NULL} issues a warning if aggregation is
+  necessary and uses \code{\link{mean}}.}
+
+  \item{type}{The type of sums of squares for the ANOVA.
+  \strong{Defaults to 3}. Passed to
+  \code{\link[car]{Anova}}. Possible values are
+  \code{"II"}, \code{"III"}, \code{2}, or \code{3}.}
+
+  \item{print.formula}{\code{ez.glm} is a wrapper for
+  \code{aov.car}. This boolean argument indicates whether
+  the formula in the call to \code{car.aov} should be
+  printed.}
+
+  \item{...}{Further arguments passed to
+  \code{fun.aggregate}.}
+
+  \item{object}{An object of class \code{Anova.mlm} as
+  returned by \code{aov.car}, \code{ez.glm}, or
+  \code{\link[car]{Anova}}.}
+}
+\value{
+  \code{aov.car} and \code{ez.glm} are wrappers and
+  therfore return the same as \code{\link[car]{Anova}}.
+  Usually an object of class \code{"Anova.mlm"} (with
+  within-subjects factors) or \code{c("anova",
+  "data.frame")}.
+
+  \code{univariate} returns a \code{list} of
+  \code{data.frame}s containing the univariate results
+  (i.e., the classical ANOVA results) from an object of
+  class \code{"Anova.mlm"}. This is essentially the output
+  from \code{summary.Anova.mlm} with \code{multivariate =
+  FALSE}, e.g. \code{summary(aov.car(...), multivriate =
+  FALSE)}, as a list instead of printed to the console.\cr
+  For objects of class \code{"anova"} (i.e., the object
+  returned by \code{car::Anova} for a purely
+  between-subjects ANOVA) the object is returned unaltered.
+
+  The elements of the list returned by \code{univariate}
+  are: \code{anova}, \code{mauchly}, and
+  \code{spehricity.correction} (containing both,
+  Greenhouse-Geisser and Hyundt-Feldt correction).
+}
+\description{
+  These functions allow convenient access to
+  \code{\link[car]{Anova}} (from the \pkg{car} package) for
+  data in the \strong{long} format (i.e., one observation
+  per row), possibly aggregating the data if there is more
+  than one obersvation per individuum and cell. Hence,
+  mixed between-within ANOVAs can be calculated
+  conveniently without using the rather unhandy format of
+  \code{car::Anova}. \code{aov.car} can be called using a
+  formula similar to \code{\link{aov}} specifying an error
+  strata for the within-subject factor(s). \code{ez.glm} is
+  called specifying the factors as character vectors.
+}
+\details{
+  \strong{Type 3 sums of squares are default in
+  \pkg{afex}.} Note that type 3 sums of squares are said to
+  be dangerous and/or problematic. On the other side they
+  are the default in in SPSS and SAS and recommended by
+  e.g. Maxwell and Delaney (2003). For a brief discussion
+  see
+  \href{http://stats.stackexchange.com/q/6208/442}{here}.
+
+  However, note that lower order effects (e.g., main
+  effects) in type 3 ANOVAs are only meaningful with
+  \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects
+  coding}. That is, contrasts should be set to
+  \code{\link{contr.sum}} via
+  \code{options(contrasts=c('contr.sum','contr.poly'))}.
+  This should be done automatically when loading \pkg{afex}
+  and \pkg{afex} will issue a warning when running type 3
+  SS and
+  \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{other
+  coding schemes}. You can check the coding with
+  \code{options("contrasts")}.
+
+  The \code{formula} for \code{aov.car} must contain a
+  single \code{Error} term specyfying the \code{ID} column
+  and potential within-subject factors. Factors outside the
+  \code{Error} term are treated as between-subject factors
+  (the within-subject factors specified in the \code{Error}
+  term are ignored outside the \code{Error} term, i.e., it
+  is not necessary to specify them outside the \code{Error}
+  term, see Examples). Suppressing the intercept (i.e, via
+  \code{0 +} or \code{- 1}) is ignored. Specific
+  specifications of effects (e.g., excluding terms with
+  \code{-} or using \code{^}) should be functional. Using
+  the \code{\link{I}} or \code{\link{poly}} function within
+  the formula is not tested and not supported!
+
+  For \code{ez.glm} either \code{between} or \code{within}
+  must not be \code{NULL}.
+
+  \code{ez.glm} will concatante all between-subject factors
+  using \code{*} (i.e., producing all main effects and
+  interactions) and all covariates by \code{+} (i.e.,
+  adding only the main effects to the existing
+  between-subject factors). The within-subject factors do
+  fully interact with all between-subject factors and
+  covariates. This is essentially identical to the behavior
+  of SPSS's \code{glm} function.
+}
+\note{
+  Variables entered as within-subjects (i.e., repeated
+  measures) factors are silently converted to factors and
+  unused levels dropped.
+
+  Contrasts attached to a factor as an attribute are
+  probably not preserved and not supported.
+}
+\examples{
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 data(obk.long)
 
@@ -169,104 +313,19 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 
 univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 
 univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+}
+\author{
+  \code{univariate} is basically a copy of
+  \code{\link[car]{summary.Anova.mlm}} written by John
+  Fox.\cr The other functions were written by Henrik
+  Singmann.
+}
+\seealso{
+  \code{\link{nice.anova}} is a function for creating nice
+  ANOVA tables (including sphercitiy corrections) from
+  objects returned by \code{ez.glm} and \code{aov.car}.
 
+  \code{\link{obk.long}} describes the long version of the
+  \code{OBrienKaiser} dataset used in the examples.
+}
 
-
-cleanEx()
-nameEx("nice.anova")
-### * nice.anova
-
-flush(stderr()); flush(stdout())
-
-### Name: nice.anova
-### Title: Make nice ANOVA table for printing.
-### Aliases: nice.anova
-
-### ** Examples
-
-# exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
-
-data(obk.long)
-
-# run univariate mixed ANCOVA for the full design:
-nice.anova(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-
-nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
-
-# no between
-nice.anova(ez.glm("id", "value", obk.long, NULL, c("phase", "hour")))
-
-# no within
-nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender")))
-
-nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender")), sig.symbol = rep("", 4))
-
-## Not run: 
-##D # use package ascii or xtable for formatting of tables ready for printing.
-##D 
-##D full <- nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
-##D 
-##D require(ascii)
-##D print(ascii(full, include.rownames = FALSE, caption = "ANOVA 1"), type = "org")
-##D 
-##D require(xtable)
-##D print.xtable(xtable(full, caption = "ANOVA 2"), include.rownames = FALSE)
-## End(Not run)
-
-
-
-cleanEx()
-nameEx("obk.long")
-### * obk.long
-
-flush(stderr()); flush(stdout())
-
-### Name: obk.long
-### Title: O'Brien Kaiser's Repeated-Measures Dataset with Covariate
-### Aliases: obk.long
-### Keywords: dataset datasets
-
-### ** Examples
-
-# The dataset is constructed as follows:
-set.seed(1)
-OBrienKaiser2 <- within(OBrienKaiser, {
-		id <- factor(1:nrow(OBrienKaiser))
-		age <- scale(sample(18:35, nrow(OBrienKaiser), replace = TRUE), scale = FALSE)})
-attributes(OBrienKaiser2$age) <- NULL # needed or resahpe2::melt throws an error.
-OBrienKaiser2$age <- as.numeric(OBrienKaiser2$age)
-obk.long <- melt(OBrienKaiser2, id.vars = c("id", "treatment", "gender", "age"))
-obk.long[,c("phase", "hour")] <- lapply(as.data.frame(do.call(rbind,strsplit(as.character(obk.long$variable), "\\."),)), factor)
-obk.long <- obk.long[,c("id", "treatment", "gender", "age", "phase", "hour", "value")]
-obk.long <- obk.long[order(obk.long$id),]
-rownames(obk.long) <- NULL
-str(obk.long)
-## 'data.frame':   240 obs. of  7 variables:
-##  $ id       : Factor w/ 16 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ treatment: Factor w/ 3 levels "control","A",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ gender   : Factor w/ 2 levels "F","M": 2 2 2 2 2 2 2 2 2 2 ...
-##  $ age      : num  -4.75 -4.75 -4.75 -4.75 -4.75 -4.75 -4.75 -4.75 -4.75 -4.75 ...
-##  $ phase    : Factor w/ 3 levels "fup","post","pre": 3 3 3 3 3 2 2 2 2 2 ...
-##  $ hour     : Factor w/ 5 levels "1","2","3","4",..: 1 2 3 4 5 1 2 3 4 5 ...
-##  $ value    : num  1 2 4 2 1 3 2 5 3 2 ...
-head(obk.long)
-##    id treatment gender   age phase hour value
-## 1  1   control      M -4.75   pre    1     1
-## 2  1   control      M -4.75   pre    2     2
-## 3  1   control      M -4.75   pre    3     4
-## 4  1   control      M -4.75   pre    4     2
-## 5  1   control      M -4.75   pre    5     1
-## 6  1   control      M -4.75  post    1     3
-
-
-
-### * <FOOTER>
-###
-cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
-grDevices::dev.off()
-###
-### Local variables: ***
-### mode: outline-minor ***
-### outline-regexp: "\\(> \\)?### [*]+" ***
-### End: ***
-quit('no')

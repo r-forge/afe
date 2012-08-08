@@ -1,0 +1,34 @@
+Package: afex
+Type: Package
+Title: Analysis of Factorial Experiments
+Author: Henrik Singmann <henrik.singmann@psychologie.uni-freiburg.de>
+Depends:
+    R (>= 2.14.0),
+    car,
+    reshape2,
+    stringr
+Suggests:
+    ascii,
+    xtable
+Description: Provides convenience functions for analyzing factorial experiments
+    with ANOVA or ANCOVA replicating the behavior of commercial statisical
+    packages (i.e., Type 3 sums of squares are the default). Specifically, afex
+    provides the two functions aov.car and ez.glm for pure-between, pure-within
+    (i.e., repeated-measures), and mixed between-within (i.e., split-plot)
+    ANOVAs and ANCOVAs with type 2 and type 3 sums of squares for data in the
+    long format (i.e., one obersvation per row) wrapping car::Anova(). If there
+    is more than one obersvation per cell and subject, afex aggregates the
+    data. Finally, function nice.anova produces publication ready ANOVA tables.
+URL: http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex
+License: GPL (>=3)
+Encoding: UTF-8
+Authors@R: c(person(given="Henrik", family="Singmann",
+    email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")))
+Version: 0.2-19
+Date: 2012-08-08
+Collate:
+    'afex-package.R'
+    'aov.car.R'
+    'nice.anova.R'
+    'obk.long-data.R'
+    'zzz.R'

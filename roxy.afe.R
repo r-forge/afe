@@ -17,6 +17,7 @@ roxy.package(
 		Author = "Henrik Singmann <henrik.singmann@psychologie.uni-freiburg.de>",
 		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"henrik.singmann@psychologie.uni-freiburg.de\", role=c(\"aut\", \"cre\")))",
 		Depends = "R (>= 2.14.0), car, reshape2, stringr",
+		Suggests = "ascii, xtable",
 		Description = "Provides convenience functions for analyzing factorial experiments, namely provide convenience tools for repeated-measures ANOVA and ANCOVA analysis with type 2 and type 3 sums of squares wrapping car::Anova().",
 		License = "GPL (>=3)",
 		Encoding = "UTF-8",

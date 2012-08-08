@@ -1,11 +1,11 @@
 
+
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 
 data(obk.long)
 
 # run univariate mixed ANCOVA for the full design:
 nice.anova(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-
 
 nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
@@ -17,11 +17,8 @@ nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender")))
 
 nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender")), sig.symbol = rep("", 4))
 
-# using aov.car:
-nice.anova(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long), MSE = FALSE)
-
 \dontrun{
-# use package asciis or xtable for nice formatting in manuscripts.
+# use package ascii or xtable for formatting of tables ready for printing.
 
 full <- nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
@@ -31,5 +28,3 @@ print(ascii(full, include.rownames = FALSE, caption = "ANOVA 1"), type = "org")
 require(xtable)
 print.xtable(xtable(full, caption = "ANOVA 2"), include.rownames = FALSE)
 }
-
-

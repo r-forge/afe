@@ -233,6 +233,30 @@ univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", 
 ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 ##   HF eps > 1 treated as 1
 
+# To get a nicer ANOVA table use function nice.anova (see ?noce.anova):
+nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+
+##                         Effect          df   MSE         F     p
+## 1                    treatment        2, 9 23.96    3.58 +   .07
+## 2                       gender        1, 9 23.96    3.95 +   .08
+## 3                          age        1, 9 23.96      0.52   .49
+## 4             treatment:gender        2, 9 23.96      1.28   .32
+## 5                        phase  1.7, 15.28  3.91 20.28 *** <.001
+## 6              treatment:phase 3.39, 15.28  3.91   6.07 **  .005
+## 7                 gender:phase  1.7, 15.28  3.91      0.25   .75
+## 8                    age:phase  1.7, 15.28  3.91    3.10 +   .08
+## 9       treatment:gender:phase 3.39, 15.28  3.91      1.60   .23
+## 10                        hour 2.14, 19.23  2.48 20.52 *** <.001
+## 11              treatment:hour 4.27, 19.23  2.48      0.71   .60
+## 12                 gender:hour 2.14, 19.23  2.48      0.71   .51
+## 13                    age:hour 2.14, 19.23  2.48    2.82 +   .08
+## 14       treatment:gender:hour 4.27, 19.23  2.48      0.59   .68
+## 15                  phase:hour 3.48, 31.36  2.83      0.99   .42
+## 16        treatment:phase:hour 6.97, 31.36  2.83      0.33   .93
+## 17           gender:phase:hour 3.48, 31.36  2.83      0.90   .47
+## 18              age:phase:hour 3.48, 31.36  2.83      0.77   .54
+## 19 treatment:gender:phase:hour 6.97, 31.36  2.83      0.65   .71
+
 # replicating ?Anova using aov.car:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
 # in contrast to aov you do not need the within-subject factors outside Error()
@@ -294,5 +318,13 @@ univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, 
   \code{\link[car]{summary.Anova.mlm}} written by John
   Fox.\cr The other functions were written by Henrik
   Singmann.
+}
+\seealso{
+  \code{\link{nice.anova}} is a function for creating nice
+  ANOVA tables (including sphercitiy corrections) from
+  objects returned by \code{ez.glm} and \code{aov.car}.
+
+  \code{\link{obk.long}} describes the long version of the
+  \code{OBrienKaiser} dataset used in the examples.
 }
 
