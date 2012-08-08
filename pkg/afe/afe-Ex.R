@@ -173,6 +173,43 @@ univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, 
 
 
 cleanEx()
+nameEx("mixed")
+### * mixed
+
+flush(stderr()); flush(stdout())
+
+### Name: mixed
+### Title: Obtain p-values for a mixed-model from lmer().
+### Aliases: mixed
+
+### ** Examples
+
+## Not run: 
+##D # example data from package languageR:
+##D # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word.
+##D data(lexdec, package = "languageR")
+##D 
+##D # using the simplest model
+##D m1 <- mixed("Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length",  "(1|Subject) + (1|Word)", "RT", data = lexdec)
+##D 
+##D anova(m1)
+##D # gives:
+##D ##                   Effect df1     df2      Fstat p.value
+##D ## 1            (Intercept)   1   96.64 13573.0985   0.000
+##D ## 2                Correct   1 1627.73     8.1452   0.004
+##D ## 3                  Trial   1 1592.43     7.5738   0.006
+##D ## 4               PrevType   1 1605.39     0.1700   0.680
+##D ## 5             meanWeight   1   75.39    14.8545   0.000
+##D ## 6              Frequency   1   76.08    56.5348   0.000
+##D ## 7         NativeLanguage   1   27.12     0.6953   0.412
+##D ## 8                 Length   1   75.83     8.6959   0.004
+##D ## 9    PrevType:meanWeight   1 1601.18     6.1823   0.013
+##D ## 10 NativeLanguage:Length   1 1555.49    14.2445   0.000
+## End(Not run)
+
+
+
+cleanEx()
 nameEx("nice.anova")
 ### * nice.anova
 

@@ -8,9 +8,10 @@
 }
 \details{
   \tabular{ll}{ Package: \tab afe\cr Type: \tab Package\cr
-  Version: \tab 0.1-19\cr Date: \tab 2012-08-08\cr Depends:
-  \tab R (>= 2.14.0), car, reshape2, stringr\cr Encoding:
-  \tab UTF-8\cr License: \tab GPL (>=3)\cr }
+  Version: \tab 0.1-20\cr Date: \tab 2012-08-08\cr Depends:
+  \tab R (>= 2.14.0), car, lme4, pbkrtest, reshape2,
+  stringr\cr Encoding: \tab UTF-8\cr License: \tab GPL
+  (>=3)\cr }
 
   Provides convenience functions for analyzing factorial
   experiments, namely provide convenience tools for
