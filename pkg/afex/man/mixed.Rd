@@ -2,19 +2,13 @@
 \alias{mixed}
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
-  mixed(fixed, random, dv, data, type = 3, method = c("KR",
-    "PB"), ...)
+  mixed(formula, data, type = 3, method = c("KR", "PB"),
+    ...)
 }
 \arguments{
-  \item{fixed}{character vector specifying the fixed part
-  of the model.}
-
-  \item{random}{character vector specifying the random part
-  of the model (in the current implementation this random
-  part is fit with all models).}
-
-  \item{dv}{character vector specifying the dependent
-  variable}
+  \item{formula}{a formula describing the full mixed-model
+  to be fitted. As this formula is passed to \code{lmer},
+  it needs at least one random term.}
 
   \item{data}{data.frame containing the data. Should have
   all the variables present in \code{fixed}, \code{random},
@@ -27,7 +21,7 @@
   \item{method}{character vector indicating which methods
   for obtaining p-values should be used. Currently only
   \code{"KR"} is implemented corresponding to the
-  Kenward-Rogers approximation for degrees-of-freedom.}
+  Kenward-Rogers approximation for degrees of freedom.}
 
   \item{...}{further arguments passed to \code{lmer}.}
 }
@@ -52,7 +46,8 @@
 
   The following methods exist for objects of class
   \code{"mixed"}: \code{print}, \code{summary}, and
-  \code{anova} (all return the same data.frame).
+  \code{anova} (all return the same data.frame, and
+  \code{print} uses rounding).
 }
 \description{
   Fits and calculates p-values for all effects in a mixed
@@ -76,6 +71,10 @@
 \note{
   This functions may take some time especially with complex
   random structures.
+
+  This function calls \code{lme4:::nobars} for dealing with
+  the formula. So any significant changes to \pkg{lme4} and
+  this function may disrupt its functionality.
 }
 \examples{
 \dontrun{
@@ -84,21 +83,21 @@
 data(lexdec, package = "languageR")
 
 # using the simplest model
-m1 <- mixed("Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length",  "(1|Subject) + (1|Word)", "RT", data = lexdec)
+m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec)
 
-anova(m1)
+m1
 # gives:
-##                   Effect df1     df2      Fstat p.value
-## 1            (Intercept)   1   96.64 13573.0985   0.000
-## 2                Correct   1 1627.73     8.1452   0.004
-## 3                  Trial   1 1592.43     7.5738   0.006
-## 4               PrevType   1 1605.39     0.1700   0.680
-## 5             meanWeight   1   75.39    14.8545   0.000
-## 6              Frequency   1   76.08    56.5348   0.000
-## 7         NativeLanguage   1   27.12     0.6953   0.412
-## 8                 Length   1   75.83     8.6959   0.004
-## 9    PrevType:meanWeight   1 1601.18     6.1823   0.013
-## 10 NativeLanguage:Length   1 1555.49    14.2445   0.000
+##                   Effect df1       df2      Fstat p.value
+## 1            (Intercept)   1   96.6379 13573.1410  0.0000
+## 2                Correct   1 1627.7303     8.1452  0.0044
+## 3                  Trial   1 1592.4301     7.5738  0.0060
+## 4               PrevType   1 1605.3939     0.1700  0.6802
+## 5             meanWeight   1   75.3919    14.8545  0.0002
+## 6              Frequency   1   76.0821    56.5348  0.0000
+## 7         NativeLanguage   1   27.1213     0.6953  0.4117
+## 8                 Length   1   75.8259     8.6959  0.0042
+## 9    PrevType:meanWeight   1 1601.1850     6.1823  0.0130
+## 10 NativeLanguage:Length   1 1555.4858    14.2445  0.0002
 }
 }
 \author{

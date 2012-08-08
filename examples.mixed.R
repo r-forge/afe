@@ -27,7 +27,8 @@ mixed("n.cond * validity * (n.bel1 + n.bel2)", "(1|id) + (1|content)", "resp", a
 data(lexdec, package = "languageR")
 
 # using the simplest model
-m1 <- mixed("Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length",  "(1|Subject) + (1|Word)", "RT", data = lexdec)
+m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec)
+
 
 anova(m1)
 # gives:

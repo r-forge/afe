@@ -2,6 +2,8 @@
 require(car)
 require(reshape2)
 require(stringr)
+require(lme4)
+require(pbkrtest)
 
 options(contrasts=c('contr.sum','contr.poly')) 
 
