@@ -70,9 +70,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	# prepare fitting
 	formula.f <- as.formula(formula)
 	dv <- as.character(formula.f)[[2]]
-	rh1 <- str_c(deparse(formula.f[[3]]), collapse = "")
-	single.rh1 <- str_split(rh1, "[\\+\\-\\*:]")[[1]]
-	random <- str_c(single.rh1[grepl("\\|", single.rh1)], collapse = "+")
+	all.terms <- attr(terms(formula.f), "term.labels")
+	random <- str_c(str_c("(", all.terms[grepl("\\|", all.terms)], ")"), collapse = " + ")
 	rh2 <- lme4:::nobars(formula.f)
 	rh2[[2]] <- NULL
 	m.matrix <- model.matrix(rh2, data = data)
@@ -80,18 +79,29 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
 	mapping <- attr(m.matrix, "assign")
 	# obtain the lmer fits
+	#browser()
+	cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
 	if (type == 3 | type == "III") {
 		full.model <- lmer(formula.f, data = data, ...)
+		cat(".")
 		fits <- vector("list", length(fixed.effects))
 		for (c in c(seq_along(fixed.effects))) {
 			tmp.columns <- str_c(deparse(which(mapping != (c-1))), collapse = "")
 			fits[[c]] <- lmer(as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random)), data = data, ...)
+			cat(".")
 		}
+		cat("]\n")
 	} else stop('Only type 3 tests currently implemented.')
 	names(fits) <- fixed.effects
-	# obtain Kenward-Roger tests:
+	# obtain p-values:
+	cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
 	if (method[1] == "KR") {
-		tests <- lapply(fits, function(x) KRmodcomp(full.model, x))
+		tests <- lapply(fits, function(x) {
+			tmp <- KRmodcomp(full.model, x)
+			cat(".")
+			tmp
+			})
+		cat("]\n")
 		names(tests) <- fixed.effects
 		df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
 		df.out <- cbind(df.out, t(vapply(tests, "[[", tests[[1]][[1]], i =1)))
