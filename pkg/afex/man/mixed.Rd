@@ -64,17 +64,24 @@
   Type 3 sums of squares are obtained by fitting a model in
   which only the corresponding effect is missing.
 
-  See Judd, Westfall, and Kenny (2012) for examples of how
-  to specify the random effects structure for factorial
-  experiments.
+  For an introduction to mixed-modeling for experimental
+  designs using p-values see Judd, Westfall, and Kenny
+  (2012). Further introductions to mixed-modeling for
+  experimental designs are given by Baayen and colleagues
+  (Baaye, 2008; Baayen, Davidson & Bates, 2008; Baayen &
+  Milin, 2010).
 }
 \note{
+  This function is not thoroughly tested so please report
+  all bugs to henrik.singmann (at)
+  psychologie.uni-freiburg.de
+
   This functions may take some time especially with complex
   random structures.
 
   This function calls \code{lme4:::nobars} for dealing with
-  the formula. So any significant changes to \pkg{lme4} and
-  this function may disrupt its functionality.
+  the formula. So any significant changes to \pkg{lme4} or
+  \code{lme4:::nobars} may disrupt its functionality.
 }
 \examples{
 \dontrun{
@@ -106,10 +113,29 @@ m1
   Bolker and Joshua Wiley}.
 }
 \references{
+  Baayen, R. H. (2008). \emph{Analyzing linguistic data: a
+  practical introduction to statistics using R}. Cambridge,
+  UK; New York: Cambridge University Press.
+
+  Baayen, R. H., Davidson, D. J., & Bates, D. M. (2008).
+  Mixed-effects modeling with crossed random effects for
+  subjects and items. \emph{Journal of Memory and
+  Language}, 59(4), 390-412. doi:10.1016/j.jml.2007.12.005
+
+  Baayen, R. H., & Milin, P. (2010). Analyzing Reaction
+  Times. \emph{International Journal of Psychological
+  Research}, 3(2), 12-28.
+
   Judd, C. M., Westfall, J., & Kenny, D. A. (2012).
   Treating stimuli as a random factor in social psychology:
   A new and comprehensive solution to a pervasive but
   largely ignored problem. \emph{Journal of Personality and
   Social Psychology}, 103(1), 54–69. doi:10.1037/a0028347
+}
+\seealso{
+  \code{\link{ez.glm}} and \code{\link{aov.car}} for
+  convenience functions to analyze experimental deisgns
+  with classical ANOVA or ANCOVA wrapping
+  \code{\link[car]{Anova}}.
 }
 

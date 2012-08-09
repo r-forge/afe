@@ -73,7 +73,7 @@
   \code{aov.car} and \code{ez.glm} are wrappers and
   therfore return the same as \code{\link[car]{Anova}}.
   Usually an object of class \code{"Anova.mlm"} (with
-  within-subjects factors) or \code{c("anova",
+  within-subjects factors) or of class \code{c("anova",
   "data.frame")}.
 
   \code{univariate} returns a \code{list} of
@@ -110,7 +110,7 @@
   \pkg{afex}.} Note that type 3 sums of squares are said to
   be dangerous and/or problematic. On the other side they
   are the default in in SPSS and SAS and recommended by
-  e.g. Maxwell and Delaney (2003). For a brief discussion
+  e.g. Maxwell and Delaney (2004). For a brief discussion
   see
   \href{http://stats.stackexchange.com/q/6208/442}{here}.
 
@@ -129,17 +129,21 @@
 
   The \code{formula} for \code{aov.car} must contain a
   single \code{Error} term specyfying the \code{ID} column
-  and potential within-subject factors. Factors outside the
-  \code{Error} term are treated as between-subject factors
-  (the within-subject factors specified in the \code{Error}
-  term are ignored outside the \code{Error} term, i.e., it
-  is not necessary to specify them outside the \code{Error}
-  term, see Examples). Suppressing the intercept (i.e, via
-  \code{0 +} or \code{- 1}) is ignored. Specific
-  specifications of effects (e.g., excluding terms with
-  \code{-} or using \code{^}) should be functional. Using
-  the \code{\link{I}} or \code{\link{poly}} function within
-  the formula is not tested and not supported!
+  and potential within-subject factors (you may use
+  \code{\link{mixed}} with multiple error terms). Factors
+  outside the \code{Error} term are treated as
+  between-subject factors (the within-subject factors
+  specified in the \code{Error} term are ignored outside
+  the \code{Error} term, i.e., it is not necessary to
+  specify them outside the \code{Error} term, see
+  Examples).
+
+  Suppressing the intercept (i.e, via \code{0 +} or \code{-
+  1}) is ignored. Specific specifications of effects (e.g.,
+  excluding terms with \code{-} or using \code{^}) could be
+  okay but is not tested. Using the \code{\link{I}} or
+  \code{\link{poly}} function within the formula is not
+  tested and not supported!
 
   For \code{ez.glm} either \code{between} or \code{within}
   must not be \code{NULL}.
@@ -319,11 +323,22 @@ univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, 
   \code{\link[car]{summary.Anova.mlm}} written by John
   Fox.\cr The other functions were written by Henrik
   Singmann.
+
+  The design of these functions is heavily influenced by
+  \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
+}
+\references{
+  Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing
+  Experiments and Analyzing Data: A Model-Comparisons
+  Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 }
 \seealso{
   \code{\link{nice.anova}} is a function for creating nice
   ANOVA tables (including sphercitiy corrections) from
   objects returned by \code{ez.glm} and \code{aov.car}.
+
+  \code{\link{mixed}} provides a (formula) interface for
+  obtaining p-values for mixed-models via \pkg{lme4}.
 
   \code{\link{obk.long}} describes the long version of the
   \code{OBrienKaiser} dataset used in the examples.
