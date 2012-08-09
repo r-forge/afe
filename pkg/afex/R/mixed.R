@@ -86,7 +86,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 		cat(".")
 		fits <- vector("list", length(fixed.effects))
 		for (c in c(seq_along(fixed.effects))) {
-			tmp.columns <- str_c(deparse(which(mapping != (c-1))), collapse = "")
+			tmp.columns <- str_c(deparse(-which(mapping == (c-1))), collapse = "")
 			fits[[c]] <- lmer(as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random)), data = data, ...)
 			cat(".")
 		}
