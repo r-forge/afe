@@ -1,5 +1,6 @@
 export(.Last.lib)
 export(aov.car)
+export(compare.2.vectors)
 export(ez.glm)
 export(mixed)
 export(nice.anova)

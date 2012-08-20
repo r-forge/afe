@@ -6,6 +6,7 @@
 					Released August/September 2012
 
 	Significant User Visible Changes and New Features
+	o	added function compare.2.vectors().
 	
 	o	Name of function univariate() changed to univ(), as
 		a function with this name is part of package multcomp.

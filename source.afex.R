@@ -4,6 +4,7 @@ require(reshape2)
 require(stringr)
 require(lme4)
 require(pbkrtest)
+require(coin)
 
 options(contrasts=c('contr.sum','contr.poly')) 
 
