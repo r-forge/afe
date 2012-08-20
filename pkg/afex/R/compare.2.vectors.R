@@ -45,7 +45,7 @@ compare.2.vectors <- function(x, y, paired = FALSE, na.rm = FALSE, permutation =
 			id <- factor(rep(1:length(x), 2))
 			res.perm <- oneway_test(dv ~ iv | id, distribution=perm.distribution)
 		} else res.perm <- oneway_test(dv ~ iv, distribution=perm.distribution)
-		res.out <- rbind(res.out, data.frame(test = "permutation", test.statistic = "Z", test.value = statistic(res.perm), test.df = NA, p = pvalue(res.perm), stringsAsFactors = FALSE))
+		res.out <- rbind(res.out, data.frame(test = "permutation", test.statistic = "Z", test.value = statistic(res.perm), test.df = NA, p = pvalue(res.perm)[1], stringsAsFactors = FALSE))
 	}
 	res.out
 }
