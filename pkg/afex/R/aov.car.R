@@ -6,7 +6,7 @@
 #'
 #' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, ..., print.formula = FALSE)
 #' 
-#' univariate(object)
+#' univ(object)
 #'
 #' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}}. Should include an error term (i.e., \code{Error( / )}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
@@ -23,10 +23,10 @@
 #'
 #' @return \code{aov.car} and \code{ez.glm} are wrappers and therfore return the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}.
 #' 
-#' \code{univariate} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
+#' \code{univ} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
 #' For objects of class \code{"anova"} (i.e., the object returned by \code{car::Anova} for a purely between-subjects ANOVA) the object is returned unaltered.
 #'
-#' The elements of the list returned by \code{univariate} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
+#' The elements of the list returned by \code{univ} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
 #' 
 #' @details \strong{Type 3 sums of squares are default in \pkg{afex}.} Note that type 3 sums of squares are said to be dangerous and/or problematic. On the other side they are the default in in SPSS and SAS and recommended by e.g. Maxwell and Delaney (2004). For a brief discussion see \href{http://stats.stackexchange.com/q/6208/442}{here}. 
 #'
@@ -40,13 +40,15 @@
 #'
 #' \code{ez.glm} will concatante all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
 #'
-#' @author \code{univariate} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
+#' @author \code{univ} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
 #'
 #' The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 #'
 #' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors and unused levels dropped.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
+#'
+#' Function \code{univ} was called \code{univariate} in prior versions, but there was a function with similar name in package \pkg{multcomp} leading to bugs and unexpected behavior.
 #'
 #' @seealso \code{\link{nice.anova}} is a function for creating nice ANOVA tables (including sphercitiy corrections) from objects returned by \code{ez.glm} and \code{aov.car}.
 #'
@@ -57,16 +59,16 @@
 #' @references Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
 #' @name aov.car
-#' @aliases aov.car ez.glm univariate
-#' @export aov.car ez.glm univariate
+#' @aliases aov.car ez.glm univ
+#' @export aov.car ez.glm univ
 #' @examples
 #' 
 #' # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 #' data(obk.long)
 #'
 #' # run univariate mixed ANCOVA for the full design:
-#' univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-#' univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+#' univ(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
+#' univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 #' 
 #' # both calls return the same:
 #' 
@@ -130,7 +132,7 @@
 #' ## treatment:gender:phase:hour 0.4355822 7.100921e-01 0.7444364 7.878433e-01
 #' ## 
 #' ## Warning message:
-#' ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
+#' ## In univ(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 #' ##   HF eps > 1 treated as 1
 #' 
 #' # To get a nicer ANOVA table use function nice.anova (see ?noce.anova):
@@ -209,9 +211,9 @@
 #' 
 #' # only within
 #' 
-#' univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+#' univ(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 #' 
-#' univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+#' univ(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 #' 
 #' 
 
@@ -290,7 +292,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 }
 
 
-univariate <- function(object) { 
+univ <- function(object) { 
 	if (all(class(object) == c("anova", "data.frame"))) return(object)
 	# This function is basically a cropped copy of car::summary.Anova.mlm written by John Fox returning the output as a list (instead of printing it).
 	GG <- function(SSPE, P){ # Greenhouse-Geisser correction

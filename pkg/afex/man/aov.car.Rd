@@ -1,7 +1,7 @@
 \name{aov.car}
 \alias{aov.car}
 \alias{ez.glm}
-\alias{univariate}
+\alias{univ}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
   aov.car(formula, data, fun.aggregate = NULL, type = 3,
@@ -11,7 +11,7 @@
     covariate = NULL, fun.aggregate = NULL, type = 3, ...,
     print.formula = FALSE)
 
-  univariate(object)
+  univ(object)
 }
 \arguments{
   \item{formula}{A formula specifying the ANOVA model
@@ -76,19 +76,19 @@
   within-subjects factors) or of class \code{c("anova",
   "data.frame")}.
 
-  \code{univariate} returns a \code{list} of
-  \code{data.frame}s containing the univariate results
-  (i.e., the classical ANOVA results) from an object of
-  class \code{"Anova.mlm"}. This is essentially the output
-  from \code{summary.Anova.mlm} with \code{multivariate =
+  \code{univ} returns a \code{list} of \code{data.frame}s
+  containing the univariate results (i.e., the classical
+  ANOVA results) from an object of class
+  \code{"Anova.mlm"}. This is essentially the output from
+  \code{summary.Anova.mlm} with \code{multivariate =
   FALSE}, e.g. \code{summary(aov.car(...), multivriate =
   FALSE)}, as a list instead of printed to the console.\cr
   For objects of class \code{"anova"} (i.e., the object
   returned by \code{car::Anova} for a purely
   between-subjects ANOVA) the object is returned unaltered.
 
-  The elements of the list returned by \code{univariate}
-  are: \code{anova}, \code{mauchly}, and
+  The elements of the list returned by \code{univ} are:
+  \code{anova}, \code{mauchly}, and
   \code{spehricity.correction} (containing both,
   Greenhouse-Geisser and Hyundt-Feldt correction).
 }
@@ -164,14 +164,19 @@
 
   Contrasts attached to a factor as an attribute are
   probably not preserved and not supported.
+
+  Function \code{univ} was called \code{univariate} in
+  prior versions, but there was a function with similar
+  name in package \pkg{multcomp} leading to bugs and
+  unexpected behavior.
 }
 \examples{
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 data(obk.long)
 
 # run univariate mixed ANCOVA for the full design:
-univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+univ(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
+univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
 # both calls return the same:
 
@@ -235,7 +240,7 @@ univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", 
 ## treatment:gender:phase:hour 0.4355822 7.100921e-01 0.7444364 7.878433e-01
 ##
 ## Warning message:
-## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
+## In univ(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 ##   HF eps > 1 treated as 1
 
 # To get a nicer ANOVA table use function nice.anova (see ?noce.anova):
@@ -314,12 +319,12 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 
 
 # only within
 
-univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+univ(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 
-univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+univ(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 }
 \author{
-  \code{univariate} is basically a copy of
+  \code{univ} is basically a copy of
   \code{\link[car]{summary.Anova.mlm}} written by John
   Fox.\cr The other functions were written by Henrik
   Singmann.

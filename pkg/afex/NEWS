@@ -1,0 +1,17 @@
+					************************
+					** afex VERSION 0.3-x **
+					************************
+					
+					Changes in afex Version 0.3-x
+					Released August/September 2012
+
+	Significant User Visible Changes and New Features
+	
+	o	Name of function univariate() changed to univ(), as
+		a function with this name is part of package multcomp.
+		This may leed to problems. Thanks to Florent Duyme for
+		spotting this.
+	
+	Bugfixes
+	
+	o	
