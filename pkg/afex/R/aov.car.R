@@ -288,12 +288,13 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 			colnames(idata) <- within
 		}
 		# print(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)))
-		tmp.lm <- lm(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)), data = tmp.dat)
+		# browser()
+		tmp.lm <- do.call("lm", list(formula = as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)), data = tmp.dat))
 		Anova.out <- Anova(tmp.lm, idata = idata, idesign = as.formula(str_c("~", rh3)), type = type)
 		data.l <- c(data.l, idata = list(idata))
 	} else { # if NO within-subjetc factors are present (i.e., purley between ANOVA):
 		colnames(tmp.dat)[ncol(tmp.dat)] <- "dv"
-		tmp.lm <- lm(as.formula(str_c("dv ~ ", rh2)), data = tmp.dat)
+		tmp.lm <- do.call("lm", list(formula = as.formula(str_c("dv ~ ", rh2)), data = tmp.dat))
 		Anova.out <- Anova(tmp.lm, type = type)
 	}
 	if (return == "Anova") Anova.out
