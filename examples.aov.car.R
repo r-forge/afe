@@ -4,7 +4,7 @@ options(contrasts=c('contr.sum','contr.poly'))
 
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 
-data(obk.long)
+data(obk.long, package = "afex")
 
 # run univariate mixed ANCOVA for the full design:
 univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
@@ -156,9 +156,17 @@ univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 
 univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 
+# using the return argument:
 
+str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = ""), 1)
 
-
+## List of 4
+##  $ Anova:List of 14
+##   ..- attr(*, "class")= chr "Anova.mlm"
+##  $ lm   :List of 11
+##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
+##  $ data :'data.frame':  16 obs. of  16 variables:
+##  $ idata:'data.frame':  15 obs. of  2 variables:
 
 
  

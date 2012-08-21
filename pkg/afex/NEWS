@@ -13,6 +13,8 @@
 		This may leed to problems. Thanks to Florent Duyme for
 		spotting this.
 	
+	o	added return argument to aov.car() and ez.glm().
+	
 	Bugfixes
 	
 	o	

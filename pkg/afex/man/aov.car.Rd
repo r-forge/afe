@@ -5,11 +5,11 @@
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
   aov.car(formula, data, fun.aggregate = NULL, type = 3,
-    ...)
+    return = "Anova", ...)
 
   ez.glm(id, dv, data, between = NULL, within = NULL,
-    covariate = NULL, fun.aggregate = NULL, type = 3, ...,
-    print.formula = FALSE)
+    covariate = NULL, fun.aggregate = NULL, type = 3,
+    return = "Anova", ..., print.formula = FALSE)
 
   univ(object)
 }
@@ -62,6 +62,11 @@
   the formula in the call to \code{car.aov} should be
   printed.}
 
+  \item{return}{What should be returned? If \code{"Anova"}
+  (the default) will return the object returned by
+  \code{car::Anova}, anything else will return a list (see
+  section Value).}
+
   \item{...}{Further arguments passed to
   \code{fun.aggregate}.}
 
@@ -70,11 +75,22 @@
   \code{\link[car]{Anova}}.}
 }
 \value{
-  \code{aov.car} and \code{ez.glm} are wrappers and
-  therfore return the same as \code{\link[car]{Anova}}.
-  Usually an object of class \code{"Anova.mlm"} (with
-  within-subjects factors) or of class \code{c("anova",
-  "data.frame")}.
+  \code{aov.car} and \code{ez.glm} are wrappers to
+  \code{\link[car]{Anova}}. When argument \code{return} is
+  \code{"Anova"} (the default) they return the same as
+  \code{\link[car]{Anova}}. Usually an object of class
+  \code{"Anova.mlm"} (with within-subjects factors) or of
+  class \code{c("anova", "data.frame")}. If \code{return}
+  is something different they return a \code{list} with the
+  following elements:
+
+  \describe{ \item{"Anova"}{the object returned by
+  \code{Anova}} \item{"lm"}{the object fitted with
+  \code{lm} and passed to \code{Anova} (i.e., an object of
+  class \code{"lm"} or \code{"mlm"}).} \item{"data"}{the
+  data used to fit the \code{lm} object.} \item{"idata"}{if
+  within-subject factors are present, the \code{idata}
+  argument passed to \code{Anova}.} }
 
   \code{univ} returns a \code{list} of \code{data.frame}s
   containing the univariate results (i.e., the classical
@@ -322,6 +338,17 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 
 univ(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 
 univ(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+
+# using the return argument:
+str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = ""), 1)
+
+## List of 4
+##  $ Anova:List of 14
+##   ..- attr(*, "class")= chr "Anova.mlm"
+##  $ lm   :List of 11
+##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
+##  $ data :'data.frame':  16 obs. of  16 variables:
+##  $ idata:'data.frame':  15 obs. of  2 variables:
 }
 \author{
   \code{univ} is basically a copy of
