@@ -25,11 +25,11 @@
 #'
 #' @details Type 3 sums of squares are obtained by fitting a model in which only the corresponding effect is missing.
 #'
-#' For an introduction to mixed-modeling for experimental designs using p-values see Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baaye, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). 
+#' For an introduction to mixed-modeling for experimental designs using p-values see Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). 
 #'
 #' @note This function is not thoroughly tested so please report all bugs to henrik.singmann (at) psychologie.uni-freiburg.de
 #'
-#' This functions may take some time especially with complex random structures.
+#' This functions needs a lot of RAM and rather long time especially with complex random structures. The RAM demand is a problem especially on 32 bit Windows which only supports up to 2GB (maximum 3GB, see \url{http://cran.r-project.org/bin/windows/base/rw-FAQ.html#There-seems-to-be-a-limit-on-the-memory-it-uses_0021}).
 #'
 #' This function calls \code{lme4:::nobars} for dealing with the formula. So any significant changes to \pkg{lme4} or \code{lme4:::nobars} may disrupt its functionality.
 #'
