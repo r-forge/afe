@@ -92,8 +92,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	# obtain the lmer fits
 	# browser() 
 	# prepare lmer call:
-    m <- match(c("type", "method"), names(mc), 0L)
-	mf <- mc[-m]
+	mf <- mc[!names(mc) %in% c("type", "method")]
 	mf[[1]] <- as.name("lmer")
 	cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
 	full.model <- eval(mf)	

@@ -44,3 +44,11 @@ anova(m1)
 ## 9    PrevType:meanWeight   1 1601.18     6.1823   0.013
 ## 10 NativeLanguage:Length   1 1555.49    14.2445   0.000
 
+# using weights:
+lex2 <- within(lexdec, weight.orig <- runif(nrow(lexdec)))
+
+m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), data = lex2, weights = weight.orig)
+
+m1 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 3, method = "KR")
+
+m1 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 3)

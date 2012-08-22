@@ -3,7 +3,7 @@
 #' \tabular{ll}{
 #' Package: \tab afex\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.3-34\cr
+#' Version: \tab 0.3-35\cr
 #' Date: \tab 2012-08-22\cr
 #' Depends: \tab R (>= 2.14.0), car, lme4, pbkrtest, reshape2, stringr, coin\cr
 #' Encoding: \tab UTF-8\cr
