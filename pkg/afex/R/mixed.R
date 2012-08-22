@@ -78,6 +78,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
 	# browser()
 	# prepare fitting
+	mc <- match.call()
 	formula.f <- as.formula(formula)
 	dv <- as.character(formula.f)[[2]]
 	all.terms <- attr(terms(formula.f), "term.labels")
@@ -89,15 +90,20 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
 	mapping <- attr(m.matrix, "assign")
 	# obtain the lmer fits
-	#browser()
+	# browser() 
+	# prepare lmer call:
+    m <- match(c("type", "method"), names(mc), 0L)
+	mf <- mc[-m]
+	mf[[1]] <- as.name("lmer")
 	cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
+	full.model <- eval(mf)	
 	if (type == 3 | type == "III") {
-		full.model <- lmer(formula.f, data = data, ...)
 		cat(".")
 		fits <- vector("list", length(fixed.effects))
 		for (c in c(seq_along(fixed.effects))) {
 			tmp.columns <- str_c(deparse(-which(mapping == (c-1))), collapse = "")
-			fits[[c]] <- lmer(as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random)), data = data, ...)
+			mf[[2]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
+			fits[[c]] <- eval(mf)
 			cat(".")
 		}
 		cat("]\n")

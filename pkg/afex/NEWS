@@ -20,3 +20,7 @@
 	o	aov.car now uses do.call when calling lm() to avoid local
 		variables in the call to lm() which could led to problems when
 		working with the lm model.
+	
+	o	mixed() now passes ... (further arguments to lmer) correctly.
+		Now uses match.call and eval on the call instead of invoking lmer
+		directly.
