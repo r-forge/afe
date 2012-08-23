@@ -1,6 +1,6 @@
 #' Compare two vectors using various tests.
 #'
-#' Compares two vectors \code{x} and \code{y} using t-test, Welch-test (also known as Statterwaithe), Wilcoxon-test, and a permutation test implemented in \pkg{coin}.
+#' Compares two vectors \code{x} and \code{y} using t-test, Welch-test (also known as Satterthwaite), Wilcoxon-test, and a permutation test implemented in \pkg{coin}.
 #'
 #' @usage compare.2.vectors(x, y, paired = FALSE, na.rm = FALSE, permutation = TRUE, perm.distribution = if (!paired) "exact" else approximate(100000), wilcox.exact = NULL, wilcox.correct = TRUE)
 #'

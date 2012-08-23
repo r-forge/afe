@@ -27,7 +27,7 @@ mixed("n.cond * validity * (n.bel1 + n.bel2)", "(1|id) + (1|content)", "resp", a
 data(lexdec, package = "languageR")
 
 # using the simplest model
-m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec)
+m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec, type = 2)
 
 
 anova(m1)
@@ -49,6 +49,10 @@ lex2 <- within(lexdec, weight.orig <- runif(nrow(lexdec)))
 
 m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), data = lex2, weights = weight.orig)
 
-m1 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 3, method = "KR")
+m1.type3 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 3, method = "KR")
 
-m1 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 3)
+m1.type2 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject), weights = weight.orig, type = 2)
+
+m2.type3 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType + Frequency + NativeLanguage  + (1|Subject), weights = weight.orig, type = 3, method = "KR")
+
+m2.type2 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType + Frequency + NativeLanguage + (1|Subject), weights = weight.orig, type = 2)

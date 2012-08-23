@@ -30,8 +30,8 @@ License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")))
-Version: 0.3-35
-Date: 2012-08-22
+Version: 0.3-36
+Date: 2012-08-23
 Collate:
     'afex-package.R'
     'aov.car.R'

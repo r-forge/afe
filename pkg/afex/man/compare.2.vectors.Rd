@@ -41,7 +41,7 @@
 }
 \description{
   Compares two vectors \code{x} and \code{y} using t-test,
-  Welch-test (also known as Statterwaithe), Wilcoxon-test,
+  Welch-test (also known as Satterthwaite), Wilcoxon-test,
   and a permutation test implemented in \pkg{coin}.
 }
 \examples{

@@ -7,8 +7,8 @@ options(contrasts=c('contr.sum','contr.poly'))
 data(obk.long, package = "afex")
 
 # run univariate mixed ANCOVA for the full design:
-univariate(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
-univariate(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
+univ(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
+univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
 # both calls return the same:
 
