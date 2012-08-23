@@ -16,15 +16,7 @@
 #' @return a \code{data.frame} containing the following columns: \code{test}, \code{test.statistic}, \code{test.value}, \code{test.df}, \code{p}.
 #'
 #' @export compare.2.vectors
-#' @examples
-#' with(sleep, compare.2.vectors(extra[group == 1], extra[group == 2]))
-#'
-#' # gives:
-#' ##          test test.statistic test.value  test.df          p
-#' ## 1           t              t  -1.860813 18.00000 0.07918671
-#' ## 2       welch              t  -1.860813 17.77647 0.07939414
-#' ## 3    wilcoxon              W  25.500000       NA 0.06932758
-#' ## A permutation              Z  -1.750807       NA 0.08144796
+#' @example examples/examples.compare.R
 #'
 
 compare.2.vectors <- function(x, y, paired = FALSE, na.rm = FALSE, permutation = TRUE, perm.distribution = if (!paired) "exact" else approximate(100000), wilcox.exact = NULL, wilcox.correct = TRUE) {

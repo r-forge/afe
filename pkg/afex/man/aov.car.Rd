@@ -187,8 +187,10 @@
   unexpected behavior.
 }
 \examples{
+
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
-data(obk.long)
+
+data(obk.long, package = "afex")
 
 # run univariate mixed ANCOVA for the full design:
 univ(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long))
@@ -218,7 +220,7 @@ univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"
 ## gender:phase:hour              8.851396      8  88.62706     72   0.8988515 5.222336e-01
 ## age:phase:hour                 7.539611      8  88.62706     72   0.7656409 6.339004e-01
 ## treatment:gender:phase:hour   12.822199     16  88.62706     72   0.6510416 8.307936e-01
-##
+## 
 ## $mauchly
 ##                             Test statistic    p-value
 ## phase                         0.8217571566 0.45600959
@@ -236,7 +238,7 @@ univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"
 ## gender:phase:hour             0.0002379741 0.08651564
 ## age:phase:hour                0.0002379741 0.08651564
 ## treatment:gender:phase:hour   0.0002379741 0.08651564
-##
+## 
 ## $sphericity.correction
 ##                                GG eps   Pr(>F[GG])    HF eps   Pr(>F[HF])
 ## phase                       0.8487215 8.383485e-05 1.0252867 2.448505e-05
@@ -254,12 +256,12 @@ univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"
 ## gender:phase:hour           0.4355822 4.651930e-01 0.7444364 5.020890e-01
 ## age:phase:hour              0.4355822 5.395151e-01 0.7444364 5.992844e-01
 ## treatment:gender:phase:hour 0.4355822 7.100921e-01 0.7444364 7.878433e-01
-##
+## 
 ## Warning message:
-## In univ(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
+## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 ##   HF eps > 1 treated as 1
 
-# To get a nicer ANOVA table use function nice.anova (see ?noce.anova):
+# To get a nicer ANOVA table use function nice.anova (see ?nice.anova):
 nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
 ##                         Effect          df   MSE         F     p
@@ -283,6 +285,7 @@ nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", 
 ## 18              age:phase:hour 3.48, 31.36  2.83      0.77   .54
 ## 19 treatment:gender:phase:hour 6.97, 31.36  2.83      0.65   .71
 
+
 # replicating ?Anova using aov.car:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2)
 # in contrast to aov you do not need the within-subject factors outside Error()
@@ -292,25 +295,25 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), ty
 
 #both return:
 ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
-##                             Df test stat approx F num Df den Df       Pr(>F)
+##                             Df test stat approx F num Df den Df       Pr(>F)    
 ## (Intercept)                  1     0.970      318      1     10 0.0000000065 ***
-## treatment                    2     0.481        5      2     10      0.03769 *
-## gender                       1     0.204        3      1     10      0.14097
-## treatment:gender             2     0.364        3      2     10      0.10447
+## treatment                    2     0.481        5      2     10      0.03769 *  
+## gender                       1     0.204        3      1     10      0.14097    
+## treatment:gender             2     0.364        3      2     10      0.10447    
 ## phase                        1     0.851       26      2      9      0.00019 ***
-## treatment:phase              2     0.685        3      4     20      0.06674 .
-## gender:phase                 1     0.043        0      2      9      0.82000
-## treatment:gender:phase       2     0.311        1      4     20      0.47215
+## treatment:phase              2     0.685        3      4     20      0.06674 .  
+## gender:phase                 1     0.043        0      2      9      0.82000    
+## treatment:gender:phase       2     0.311        1      4     20      0.47215    
 ## hour                         1     0.935       25      4      7      0.00030 ***
-## treatment:hour               2     0.301        0      8     16      0.92952
-## gender:hour                  1     0.293        1      4      7      0.60237
-## treatment:gender:hour        2     0.570        1      8     16      0.61319
-## phase:hour                   1     0.550        0      8      3      0.83245
-## treatment:phase:hour         2     0.664        0     16      8      0.99144
-## gender:phase:hour            1     0.695        1      8      3      0.62021
-## treatment:gender:phase:hour  2     0.793        0     16      8      0.97237
+## treatment:hour               2     0.301        0      8     16      0.92952    
+## gender:hour                  1     0.293        1      4      7      0.60237    
+## treatment:gender:hour        2     0.570        1      8     16      0.61319    
+## phase:hour                   1     0.550        0      8      3      0.83245    
+## treatment:phase:hour         2     0.664        0     16      8      0.99144    
+## gender:phase:hour            1     0.695        1      8      3      0.62021    
+## treatment:gender:phase:hour  2     0.793        0     16      8      0.97237    
 ## ---
-## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
 
 # aggregating over one within-subjects factor (phase) with warning:
@@ -340,6 +343,7 @@ univ(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 univ(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 
 # using the return argument:
+
 str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = ""), 1)
 
 ## List of 4
@@ -349,6 +353,7 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = ""), 1)
 ##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
 ##  $ data :'data.frame':  16 obs. of  16 variables:
 ##  $ idata:'data.frame':  15 obs. of  2 variables:
+
 }
 \author{
   \code{univ} is basically a copy of

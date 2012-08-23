@@ -1,7 +1,4 @@
 
-# important to set the correct contrasts when using Type 3 sums of squares:
-options(contrasts=c('contr.sum','contr.poly')) 
-
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 
 data(obk.long, package = "afex")
@@ -75,7 +72,7 @@ univ(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"
 ## In univariate(aov.car(value ~ treatment * gender + age + Error(id/phase *  :
 ##   HF eps > 1 treated as 1
 
-# To get a nicer ANOVA table use function nice.anova (see ?noce.anova):
+# To get a nicer ANOVA table use function nice.anova (see ?nice.anova):
 nice.anova(ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), "age"))
 
 ##                         Effect          df   MSE         F     p
@@ -127,7 +124,7 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), ty
 ## gender:phase:hour            1     0.695        1      8      3      0.62021    
 ## treatment:gender:phase:hour  2     0.793        0     16      8      0.97237    
 ## ---
-## Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
 
 # aggregating over one within-subjects factor (phase) with warning:
@@ -152,9 +149,9 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 
 
 # only within
 
-univariate(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
+univ(aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2))
 
-univariate(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
+univ(ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE))
 
 # using the return argument:
 
@@ -168,5 +165,3 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = ""), 1)
 ##  $ data :'data.frame':  16 obs. of  16 variables:
 ##  $ idata:'data.frame':  15 obs. of  2 variables:
 
-
- 

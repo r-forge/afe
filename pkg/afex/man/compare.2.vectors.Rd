@@ -45,6 +45,7 @@
   and a permutation test implemented in \pkg{coin}.
 }
 \examples{
+
 with(sleep, compare.2.vectors(extra[group == 1], extra[group == 2]))
 
 # gives:
