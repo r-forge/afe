@@ -3,9 +3,9 @@
 \title{Compare two vectors using various tests.}
 \usage{
   compare.2.vectors(x, y, paired = FALSE, na.rm = FALSE,
-    permutation = TRUE, perm.distribution = if (!paired)
-    "exact" else approximate(100000), wilcox.exact = NULL,
-    wilcox.correct = TRUE)
+    tests = c("parametric", "nonparametric"), coin = TRUE,
+    perm.distribution = approximate(100000), wilcox.exact =
+    NULL, wilcox.correct = TRUE)
 }
 \arguments{
   \item{x}{a (non-empty) numeric vector of data values.}
@@ -18,15 +18,26 @@
   \item{na.rm}{logical. Should \code{NA} be removed?
   Default is \code{FALSE}.}
 
-  \item{permutation}{logical. Should a permutation test be
-  calculated using \code{\link[coin]{oneway_test}}? Default
-  is \code{TRUE}.}
+  \item{tests}{Which tests to report, parametric or
+  nonparamteric? The default \code{c("parametric",
+  "nonparametric")} reports both. See details. (Arguments
+  may be abbreviated).}
+
+  \item{coin}{logical or character. Should (permutation)
+  tests from the \pkg{coin} package be reported? Default is
+  \code{TRUE} corresponding to all implemented tests.
+  \code{FALSE} calculates no tests from \pkg{coin}. A
+  character vector may include any of the following
+  (potentially abbreviated) implemented tests (see also
+  Details): \code{c("permutation", "Wilcoxon", "median")}}
 
   \item{perm.distribution}{\code{distribution} argument to
-  \code{\link[coin]{oneway_test}}, see there. Defaults to
-  the exact distribution for non-paired data and an
-  approximated distribution with 100.000 samples for paired
-  data.}
+  \pkg{coin}, see \code{\link[coin]{Distribution}} or ,
+  \code{\link[coin]{IndependenceTest}}. Defaults to
+  \code{approximate(100000)} indicating an approximation of
+  the excat conditional distribution with 100.000 Monte
+  Carlo samples. One can use \code{"exact"} for small
+  samples and if \code{paired = FALSE}.}
 
   \item{wilcox.exact}{\code{exact} argument to
   \code{\link{wilcox.test}}.}
@@ -35,7 +46,9 @@
   \code{\link{wilcox.test}}.}
 }
 \value{
-  a \code{data.frame} containing the following columns:
+  a list with up to two elements (i.e., \code{paramteric}
+  and/or \code{nonparamteric}) each containing a
+  \code{data.frame} with the following columns:
   \code{test}, \code{test.statistic}, \code{test.value},
   \code{test.df}, \code{p}.
 }
@@ -44,15 +57,47 @@
   Welch-test (also known as Satterthwaite), Wilcoxon-test,
   and a permutation test implemented in \pkg{coin}.
 }
+\details{
+  The \code{parametric} tests (currently) only contain the
+  \emph{t}-test and Welch/Statterwaithe/Smith/unequal
+  variance \emph{t}-test implemented in
+  \code{\link{t.test}}. The latter one is only displayed if
+  \code{paired = FALSE}.
+
+  The \code{nonparametric} tests (currently) contain the
+  Wilcoxon test implemented in \code{\link{wilcox.test}}
+  (\code{stats::Wilcoxon}) and (if \code{coin = TRUE}) the
+  following tests implemented in \pkg{coin}:
+
+  \itemize{ \item a \code{permutation} test
+  \code{\link{oneway_test}} (the only test in this selction
+  not using a rank transformation), \item the
+  \code{Wilcoxon} test \code{\link{wilcox_test}}
+  (\code{coin::Wilcoxon}), and \item the \code{median} test
+  \code{median_test}. } Note that the two implementations
+  of the Wilcoxon test probably differ. This is due to
+  differences in the calculation of the Null distributions.
+}
 \examples{
 
 with(sleep, compare.2.vectors(extra[group == 1], extra[group == 2]))
 
 # gives:
-##          test test.statistic test.value  test.df          p
-## 1           t              t  -1.860813 18.00000 0.07918671
-## 2       welch              t  -1.860813 17.77647 0.07939414
-## 3    wilcoxon              W  25.500000       NA 0.06932758
-## A permutation              Z  -1.750807       NA 0.08144796
+## $parametric
+##    test test.statistic test.value test.df       p
+## 1     t              t     -1.861   18.00 0.07919
+## 2 Welch              t     -1.861   17.78 0.07939
+## 
+## $nonparametric
+##              test test.statistic test.value test.df       p
+## 1 stats::Wilcoxon              W     25.500      NA 0.06933
+## 2     permutation              Z     -1.751      NA 0.08154
+## 3  coin::Wilcoxon              Z     -1.854      NA 0.06487
+## 4          median              Z      1.744      NA 0.17867
+
+
+
+# doesn't make much sense as the data is not paired, but whatever:
+with(sleep, compare.2.vectors(extra[group == 1], extra[group == 2], paired = TRUE))
 }
 
