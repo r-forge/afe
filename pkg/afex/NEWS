@@ -26,3 +26,8 @@
 	o	mixed() now passes ... (further arguments to lmer) correctly.
 		(Now mixed uses match.call and eval on the call instead of 
 		invoking lmer directly.)
+	
+	o	corrected bug that was introduced by pbkrtest v3.2 when 
+		invoking the print method to an object of class mixed 
+		(again thanks to Florent Duyme for spotting this).
+	

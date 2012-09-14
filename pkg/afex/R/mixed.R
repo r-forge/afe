@@ -21,7 +21,7 @@
 #' \item \code{method} The \code{method} argument used when calling this function.
 #' }
 #'
-#' The following methods exist for objects of class \code{"mixed"}: \code{print}, \code{summary}, and \code{anova} (all return the same data.frame, and \code{print} uses rounding).
+#' The following methods exist for objects of class \code{"mixed"}: \code{print} (which uses rounding and only returns the results wiuth \code{F.scaling = 1}), \code{summary}, and \code{anova} (the latter two return the same data.frame).
 #'
 #' @details Type 3 tests are obtained by comparing a model in which only the corresponding effect is missing with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"mer"} models (from version 2.0-13).
 #'
@@ -113,20 +113,6 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 		}
 		cat("]\n")
 		names(fits) <- fixed.effects
-		# obtain p-values:
-		cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
-		if (method[1] == "KR") {
-			tests <- lapply(fits, function(x) {
-				tmp <- KRmodcomp(full.model, x)
-				cat(".")
-				tmp
-				})
-			cat("]\n")
-			names(tests) <- fixed.effects
-			df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-			df.out <- cbind(df.out, t(vapply(tests, "[[", tests[[1]][[1]], i =1)))
-			rownames(df.out) <- NULL
-		} else stop('Only method "KR" currently implemented.')
 	} else if (type == 2 | type == "II") {
 		cat(str_c("Fitting ", length(fixed.effects) + max.effect.order, " lmer() models:\n["))
 		full.model <- vector("list", max.effect.order)
@@ -149,22 +135,26 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 		}
 		cat("]\n")
 		names(fits) <- fixed.effects
-		# obtain p-values:
-		cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
-		if (method[1] == "KR") {
-			tests <- vector("list", length(fixed.effects))
-			for (c in seq_along(fixed.effects)) {
-				order.c <- effect.order[c]
-				tests[[c]] <- KRmodcomp(full.model[[order.c]], fits[[c]])
-				cat(".")
-			}
-			cat("]\n")
-			names(tests) <- fixed.effects
-			df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-			df.out <- cbind(df.out, t(vapply(tests, "[[", tests[[1]][[1]], i =1)))
-			rownames(df.out) <- NULL
-		} else stop('Only method "KR" currently implemented.')
 	} else stop('Only type 3 and type 2 tests implemented.')
+	# obtain p-values:
+	cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
+	if (method[1] == "KR") {
+		tests <- vector("list", length(fixed.effects))
+		for (c in seq_along(fixed.effects)) {
+			if (type == 3 | type == "III") tests[[c]] <- KRmodcomp(full.model, fits[[c]])
+			else if (type == 2 | type == "II") tests[[c]] <- KRmodcomp(full.model[[order.c]], fits[[c]])
+			cat(".")
+		}
+		cat("]\n")
+		names(tests) <- fixed.effects
+		df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
+		df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
+		FtestU <- vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))
+		row.names(FtestU) <- str_c(row.names(FtestU), ".U")
+		df.out <- cbind(df.out, t(FtestU))
+		rownames(df.out) <- NULL
+		#browser()
+	} else stop('Only method "KR" currently implemented.')
 	#prepare output object
 	list.out <- list(anova.table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
 	class(list.out) <- "mixed"
@@ -177,8 +167,8 @@ print.mixed <- function(x, ...) {
 	print(tmp)
 }
 
-summary.mixed <- function(object, ...) object[[1]][,1:5]
+summary.mixed <- function(object, ...) object[[1]]
 
-anova.mixed <- function(object, ...) object[[1]][,1:5]
+anova.mixed <- function(object, ...) object[[1]]
 
 # is.mixed <- function(x) inherits(x, "mixed")

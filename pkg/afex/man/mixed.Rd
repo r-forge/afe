@@ -46,9 +46,10 @@
   calling this function. }
 
   The following methods exist for objects of class
-  \code{"mixed"}: \code{print}, \code{summary}, and
-  \code{anova} (all return the same data.frame, and
-  \code{print} uses rounding).
+  \code{"mixed"}: \code{print} (which uses rounding and
+  only returns the results wiuth \code{F.scaling = 1}),
+  \code{summary}, and \code{anova} (the latter two return
+  the same data.frame).
 }
 \description{
   Fits and calculates p-values for all effects in a mixed

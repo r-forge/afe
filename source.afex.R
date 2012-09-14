@@ -5,6 +5,7 @@ require(stringr)
 require(lme4)
 require(pbkrtest)
 require(coin)
+# require(R2WinBUGS)
 
 options(contrasts=c('contr.sum','contr.poly')) 
 
