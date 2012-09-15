@@ -33,4 +33,6 @@
     o   corrected bug that was introduced by pbkrtest v3.2 when 
         invoking the print method to an object of class mixed 
         (again thanks to Florent Duyme for spotting this).
-        
+    
+    o   removed bug when factor levels of within-subject factors
+        were non-legal names (solution uses make.names).

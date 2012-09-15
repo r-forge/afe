@@ -98,8 +98,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 	rh3 <- str_c(within, collapse = "*")
 	# converting all within subject factors to factors and adding a leading charcter (x) if starting with a digit.
 	for (within.factor in within) {
-		data[,within.factor] <- factor(data[,within.factor])
-		levels(data[,within.factor])[grep("^[[:digit:]]", levels(data[,within.factor]))] <- str_c("x", levels(data[,within.factor])[grep("^[[:digit:]]", levels(data[,within.factor]))])
+		data[,within.factor] <- factor(make.names(as.character(data[,within.factor])))
 	}
     # Check if each id is in only one between subjects cell.
     if (length(between) > 0) {
