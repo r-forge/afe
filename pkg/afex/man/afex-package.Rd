@@ -8,7 +8,7 @@
 }
 \details{
   \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-  Version: \tab 0.3-40\cr Date: \tab 2012-09-14\cr Depends:
+  Version: \tab 0.3-41\cr Date: \tab 2012-09-16\cr Depends:
   \tab R (>= 2.14.0), car, lme4, pbkrtest (>= 0.3-2),
   reshape2, stringr, coin\cr Encoding: \tab UTF-8\cr
   License: \tab GPL (>=3)\cr URL: \tab

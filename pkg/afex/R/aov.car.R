@@ -101,6 +101,13 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 		data[,within.factor] <- factor(data[,within.factor])
 		levels(data[,within.factor])[grep("^[[:digit:]]", levels(data[,within.factor]))] <- str_c("x", levels(data[,within.factor])[grep("^[[:digit:]]", levels(data[,within.factor]))])
 	}
+    # Check if each id is in only one between subjects cell.
+    if (length(between) > 0) {
+        split.data <- split(data, lapply(between, function(x) data[,x]))
+        ids.per.condition <- lapply(split.data, function(x) unique(as.character(x[,id])))
+        ids.in.more.condition <- unique(unlist(lapply(seq_along(ids.per.condition), function(x) unique(unlist(lapply(ids.per.condition[-x], function(y, z = ids.per.condition[[x]]) intersect(z, y)))))))
+        if (length(ids.in.more.condition) > 0) stop(str_c("Following ids are in more than one between subjects condition:\n", str_c(ids.in.more.condition, collapse = ", ")))
+    }
 	# Is fun.aggregate NULL and aggregation necessary?
 	if (is.null(fun.aggregate)) {
 		if (any(xtabs(as.formula(str_c("~", id, if (length(within) > 0) "+", rh1)), data = data) > 1)) {
