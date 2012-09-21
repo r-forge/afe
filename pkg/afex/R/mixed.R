@@ -98,11 +98,13 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), ...) {
 	#browser() 
 	mf <- mc[!names(mc) %in% c("type", "method")]
 	mf[[1]] <- as.name("lmer")
+    mf[["data"]] <- as.name("data")
 	if (type == 3 | type == "III") {
 		if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
 		# prepare lmer call:
 		cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
-		full.model <- eval(mf)	
+        full.model <- eval(mf)
+		#full.model <- eval(mf, data, parent.frame())
 		cat(".")
 		fits <- vector("list", length(fixed.effects))
 		for (c in seq_along(fixed.effects)) {

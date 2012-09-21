@@ -1,4 +1,24 @@
                     ************************
+                    ** afex VERSION 0.4-x **
+                    ************************
+                    
+                    Changes in afex Version 0.4-x
+                    Released September/October 2012
+
+    Significant User Visible Changes and New Features
+    
+    o   
+    
+    Bugfixes
+    
+    o   Bug when running mixed() inside a function and
+        handing the data.frame over as an argument fixed
+        (thanks, again, to Florent Duyme). See
+        bugs/eval.scoping.bug.R
+    
+
+
+                    ************************
                     ** afex VERSION 0.3-x **
                     ************************
                     
@@ -6,6 +26,7 @@
                     Released August/September 2012
 
     Significant User Visible Changes and New Features
+    
     o   added function compare.2.vectors().
     
     o   Name of function univariate() changed to univ(), as
