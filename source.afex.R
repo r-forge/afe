@@ -1,10 +1,11 @@
 
-require(car)
+require(coin)
 require(reshape2)
 require(stringr)
 require(lme4)
 require(pbkrtest)
-require(coin)
+require(car)
+
 # require(R2WinBUGS)
 
 options(contrasts=c('contr.sum','contr.poly')) 
