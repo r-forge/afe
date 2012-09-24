@@ -132,6 +132,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 		cat("]\n")
 		names(fits) <- fixed.effects
 	} else if (type == 2 | type == "II") {
+        warning("Type 2 Methods are incorrectly implemented.\nUse car::Anova instead!")
 		cat(str_c("Fitting ", length(fixed.effects) + max.effect.order, " lmer() models:\n["))
 		full.model <- vector("list", max.effect.order)
 		fits <- vector("list", length(fixed.effects))
