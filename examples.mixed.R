@@ -29,7 +29,7 @@ data(lexdec, package = "languageR")
 # using the simplest model
 m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec)
 
-m1 <- mixed(RT ~ Correct + Trial + (1|Subject) + (1|Word), data = lexdec)
+m1 <- mixed(RT ~ Correct + Trial + (1|Subject) + (1|Word), data = lexdec, method = "PB")
 m1 <- mixed(RT ~ Correct + Trial + (1|Subject) + (1|Word), data = lexdec, type = 2)
 
 
@@ -59,3 +59,11 @@ m1.type2 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType * meanW
 m2.type3 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType + Frequency + NativeLanguage  + (1|Subject), weights = weight.orig, type = 3, method = "KR")
 
 m2.type2 <- mixed(data = lex2, formula = RT ~ Correct + Trial + PrevType + Frequency + NativeLanguage + (1|Subject), weights = weight.orig, type = 2)
+
+# GLMM
+
+require("mlmRev")
+
+gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial, data = Contraception, args.test = list(nsim = 10), method = "PB")
+
+gm1 <- mixed(cbind(incidence, size - incidence) ~ period + (1 | herd),  family = binomial, data = cbpp, REML = FALSE, method = "PB", args.test = list(nsim = 20))
