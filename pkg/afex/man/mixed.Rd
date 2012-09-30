@@ -188,7 +188,7 @@ gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district),
   Treating stimuli as a random factor in social psychology:
   A new and comprehensive solution to a pervasive but
   largely ignored problem. \emph{Journal of Personality and
-  Social Psychology}, 103(1), 54–69. doi:10.1037/a0028347
+  Social Psychology}, 103(1), 54-69. doi:10.1037/a0028347
 }
 \seealso{
   \code{\link{ez.glm}} and \code{\link{aov.car}} for
