@@ -7,7 +7,8 @@
 
     Significant User Visible Changes and New Features
     
-    o   
+    o   mixed has method = "PB" for obtaining parametric
+        bootstrapped p-values (e.g., for GLMMs)
     
     Bugfixes
     
@@ -15,6 +16,9 @@
         handing the data.frame over as an argument fixed
         (thanks, again, to Florent Duyme). See
         bugs/eval.scoping.bug.R
+    
+    o   nice.anova did not work with a model with only one within-
+        subjects factor.
     
 
 
@@ -57,3 +61,4 @@
     
     o   removed bug when factor levels of within-subject factors
         were non-legal names (solution uses make.names).
+    

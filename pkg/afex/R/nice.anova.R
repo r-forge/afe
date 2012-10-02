@@ -96,7 +96,7 @@ nice.anova <- function(object, es = NULL, correction = c("GG", "HF", "none"), si
 		} else stop("Non-supported object passed. Object must be of class 'Anova.mlm' or 'anova'.")
 	}
 	#browser()
-	if (row.names(tmp.df)[1] == "(Intercept)")	tmp2 <- as.data.frame(tmp.df[-1,])
+	if (row.names(tmp.df)[1] == "(Intercept)")	tmp2 <- as.data.frame(tmp.df[-1,, drop = FALSE])
 	else tmp2 <- tmp.df
 	tmp2[,"df"] <- paste(ifelse(is.wholenumber(tmp2[,"num Df"]),tmp2[,"num Df"], round(tmp2[,"num Df"], 2)),  ifelse(is.wholenumber(tmp2[,"den Df"]),tmp2[,"den Df"], round(tmp2[,"den Df"], 2)), sep = ", ")
 	tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
