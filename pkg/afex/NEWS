@@ -9,6 +9,8 @@
     
     o   mixed has method = "PB" for obtaining parametric
         bootstrapped p-values (e.g., for GLMMs)
+        
+    o   added alternative argument to compare.2.vectors.
     
     Bugfixes
     
