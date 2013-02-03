@@ -2,9 +2,9 @@
 #'
 #' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s). \code{ez.glm} is called specifying the factors as character vectors.
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, return = "Anova", ...)
+#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ...)
 #'
-#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "Anova", ..., print.formula = FALSE)
+#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE)
 #' 
 #' univ(object)
 #'
@@ -18,18 +18,21 @@
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
 #' @param type The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param return What should be returned? If \code{"Anova"} (the default) will return the object returned by \code{car::Anova}, anything else will return a list (see section Value).
+#' @param return What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate")} (possibly abbreviated).
+#' @param args.return \code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
 #'
-#' @return \code{aov.car} and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}. When argument \code{return} is \code{"Anova"} (the default) they return the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. If \code{return} is something different they return a \code{list} with the following elements:
+#' @return \code{aov.car} and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}). If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
 #'
 #' \describe{
-#'   \item{"Anova"}{the object returned by \code{Anova}}
-#'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}).}
-#'   \item{"data"}{the data used to fit the \code{lm} object.}
+#'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
+#'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
+#'   \item{"data"}{the data used to fit the \code{lm} object. Also returned if \code{return = "data"}.}
 #'   \item{"idata"}{if within-subject factors are present, the \code{idata} argument passed to \code{Anova}.}
 #' }
+#'
+#' If \code{return = "univariate"} the object returned from \code{univ}.
 #' 
 #' \code{univ} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
 #' For objects of class \code{"anova"} (i.e., the object returned by \code{car::Anova} for a purely between-subjects ANOVA) the object is returned unaltered.
@@ -72,8 +75,9 @@
 #' @example examples/examples.aov.car.R
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Anova", ...) {
+aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ...) {
 	#browser()
+    return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate"))
 	# stuff copied from aov:
 	Terms <- terms(formula, "Error", data = data)
     indError <- attr(Terms, "specials")$Error
@@ -120,6 +124,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
 	#browser()
 	data.l <- list(data = tmp.dat)
+    if (return == "data") return(tmp.dat)
 	# branching based on type of ANOVA
 	if (length(within) > 0) {  # if within-subject factors are present:
 		# make idata argument
@@ -133,6 +138,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 		# print(as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)))
 		# browser()
 		tmp.lm <- do.call("lm", list(formula = as.formula(str_c("cbind(",str_c(colnames(tmp.dat[-(seq_along(c(id, between)))]), collapse = ", "), ") ~ ", rh2)), data = tmp.dat))
+        if (return == "lm") return(tmp.lm)
 		Anova.out <- Anova(tmp.lm, idata = idata, idesign = as.formula(str_c("~", rh3)), type = type)
 		data.l <- c(data.l, idata = list(idata))
 	} else { # if NO within-subjetc factors are present (i.e., purley between ANOVA):
@@ -140,13 +146,15 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "Ano
 		tmp.lm <- do.call("lm", list(formula = as.formula(str_c("dv ~ ", rh2)), data = tmp.dat))
 		Anova.out <- Anova(tmp.lm, type = type)
 	}
-	if (return == "Anova") Anova.out
-	else c("Anova" = list(Anova.out), "lm" = list(tmp.lm), data.l)
+	if (return == "Anova") return(Anova.out)
+	else if ((return == "full")  | (return == "all")) return(c("Anova" = list(Anova.out), "lm" = list(tmp.lm), data.l))
+    else if (return == "univariate") return(univ(Anova.out))
+    else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), args.return)))
 }
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "Anova", ..., print.formula = FALSE) {
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE) {
 	if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
 	if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
 	#browser()
@@ -154,7 +162,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 	error <- str_c(" + Error(", id, if (!is.null(within)) "/" else "", str_c(within, collapse = " * "), ")")
 	formula <- str_c(dv, " ~ ", rh, error)
 	if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, ...)
+	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, args.return = args.return, ...)
 }
 
 

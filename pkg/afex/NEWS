@@ -3,9 +3,16 @@
                     ************************
                     
                     Changes in afex Version 0.4-x
-                    Released September/October 2012
+                    Released February 2013
 
     Significant User Visible Changes and New Features
+
+    o   added new return arguments to aov.car and ez.glm
+        (nice, lm, data).
+    
+    o   changed default return value of aov.car and ez.glm
+        to "nice" which now returns a nice ANOVA table
+        (nice.anova)
     
     o   mixed has method = "PB" for obtaining parametric
         bootstrapped p-values (e.g., for GLMMs)
