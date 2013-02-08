@@ -7,6 +7,10 @@
 
     Significant User Visible Changes and New Features
 
+    o   added generalized and partial eta-squared effect
+        sizes to nice.anova (this also included adding
+        observed arguments to aov.car, ez.glm, nice.anova)        
+    
     o   added new return arguments to aov.car and ez.glm
         (nice, lm, data).
     
@@ -26,8 +30,8 @@
         (thanks, again, to Florent Duyme). See
         bugs/eval.scoping.bug.R
     
-    o   nice.anova did not work with a model with only one within-
-        subjects factor.
+    o   nice.anova did not work with a model with only one 
+        within-subjects factor.
     
 
 

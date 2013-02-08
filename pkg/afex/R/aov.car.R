@@ -2,9 +2,9 @@
 #'
 #' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s). \code{ez.glm} is called specifying the factors as character vectors.
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ...)
+#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, return = "nice", observed = NULL, args.return = list(), ...)
 #'
-#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE)
+#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE)
 #' 
 #' univ(object)
 #'
@@ -14,6 +14,7 @@
 #' @param between \code{character} vector indicating the \strong{between}-subject(s) factor(s)/column(s) in \code{data}. Default is \code{NULL} indicating no between-subjects factors.
 #' @param within \code{character} vector indicating the \strong{within}-subject(s) factor(s)/column(s) in \code{data}.  Default is \code{NULL} indicating no within-subjects factors.
 #' @param covariate \code{character} vector indicating the between-subject(s) covariate(s) (i.e., column(s)) in \code{data}. Default is \code{NULL} indicating no covariates.
+#' @param observed \code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).
 #' @param data A \code{data.frame} containing the data. Mandatory.
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
 #' @param type The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
@@ -51,6 +52,8 @@
 #'
 #' \code{ez.glm} will concatante all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
 #'
+#' Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity. 
+#'
 #' @author \code{univ} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
 #'
 #' The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
@@ -61,7 +64,7 @@
 #'
 #' Function \code{univ} was called \code{univariate} in prior versions, but there was a function with similar name in package \pkg{multcomp} leading to bugs and unexpected behavior.
 #'
-#' @seealso \code{\link{nice.anova}} is a function for creating nice ANOVA tables (including sphercitiy corrections) from objects returned by \code{ez.glm} and \code{aov.car}.
+#' @seealso \code{\link{nice.anova}} creats the nice ANOVA tables which are by default returned. See also there for a slightly longer discussion of effect sizes.
 #'
 #' \code{\link{mixed}} provides a (formula) interface for obtaining p-values for mixed-models via \pkg{lme4}.
 #'
@@ -75,7 +78,7 @@
 #' @example examples/examples.aov.car.R
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ...) {
+aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nice", observed = NULL, args.return = list(), ...) {
 	#browser()
     return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate"))
 	# stuff copied from aov:
@@ -149,12 +152,12 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 	if (return == "Anova") return(Anova.out)
 	else if ((return == "full")  | (return == "all")) return(c("Anova" = list(Anova.out), "lm" = list(tmp.lm), data.l))
     else if (return == "univariate") return(univ(Anova.out))
-    else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), args.return)))
+    else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)))
 }
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE) {
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE) {
 	if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
 	if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
 	#browser()
@@ -162,7 +165,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 	error <- str_c(" + Error(", id, if (!is.null(within)) "/" else "", str_c(within, collapse = " * "), ")")
 	formula <- str_c(dv, " ~ ", rh, error)
 	if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, args.return = args.return, ...)
+	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, observed = observed, args.return = args.return, ...)
 }
 
 

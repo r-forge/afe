@@ -14,6 +14,7 @@ roxy.package(
 		Package = "afex",
 		Type = "Package",
 		Title = "Analysis of Factorial Experiments",
+        Maintainer = "Henrik Singmann <henrik.singmann@psychologie.uni-freiburg.de>",
 		Author = "Henrik Singmann <henrik.singmann@psychologie.uni-freiburg.de>",
 		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"henrik.singmann@psychologie.uni-freiburg.de\", role=c(\"aut\", \"cre\")))",
 		Depends = "R (>= 2.14.0), coin, car, lme4, pbkrtest (>= 0.3-2), reshape2, stringr",
