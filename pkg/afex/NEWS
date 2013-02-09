@@ -23,6 +23,11 @@
         
     o   added alternative argument to compare.2.vectors.
     
+    o   aov.car (and ez.glm) now give a warning if 
+        observations are missing on within-subject factors.
+        (As before, cases with missing values are simply
+        excluded from the analysis)
+    
     Bugfixes
     
     o   Bug when running mixed() inside a function and

@@ -122,10 +122,14 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 		}
 	}
 	# Is Type = 3 and contrasts not contr.sum?
-	if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
+	if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  You should use options(contrasts=c('contr.sum','contr.poly')) instead"))
 	# prepare the data:
 	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
 	#browser()
+    if (any(is.na(tmp.dat))) {
+        missing.values <- apply(tmp.dat, 1, function(x) any(is.na(x)))
+        warning(str_c("Missing values for following ID(s):\n", str_c(tmp.dat[missing.values,1], collapse = ", "), "\nRemoving those cases from the analysis."))        
+    }
 	data.l <- list(data = tmp.dat)
     if (return == "data") return(tmp.dat)
 	# branching based on type of ANOVA
