@@ -59,11 +59,12 @@
   model fitted with \code{\link[lme4]{lmer}}. The default
   behavior calculates type 3 like p-values using the
   Kenward-Rogers approximation for degrees-of-freedom
-  implemented in \code{\link[pbkrtest]{KRmodcomp}}, but
-  also allows for parametric bootstrap (\code{method =
-  "PB"}). \code{print}, \code{summary}, and \code{anova}
-  methods for the returned object of class \code{"mixed"}
-  are available (all return the same data.frame).
+  implemented in \code{\link[pbkrtest]{KRmodcomp}} (for
+  LMMs only), but also allows for parametric bootstrap
+  (\code{method = "PB"}) (for LMMs and GLMMs).
+  \code{print}, \code{summary}, and \code{anova} methods
+  for the returned object of class \code{"mixed"} are
+  available (all return the same data.frame).
 }
 \details{
   Type 3 tests are obtained by comparing a model in which
@@ -112,7 +113,9 @@
   \code{PBmodcomp} via \code{args.test}, especially
   \code{nsim} (the number of simulations to form the
   reference distribution. For other arguments see
-  \code{\link[pbkrtest]{PBmodcomp}}.
+  \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML}
+  (argument to \code{lmer}) will be set to \code{FALSE} if
+  method is \code{PB}.
 }
 \note{
   This function is not thoroughly tested so please report

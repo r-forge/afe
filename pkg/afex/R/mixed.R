@@ -1,6 +1,6 @@
 #' Obtain p-values for a mixed-model from lmer().
 #'
-#' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Rogers approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}}, but also allows for parametric bootstrap (\code{method = "PB"}). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (all return the same data.frame).
+#' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Rogers approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}) (for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (all return the same data.frame).
 #'
 #' @usage mixed(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), ...)
 #'
@@ -32,7 +32,7 @@
 #'
 #' p-values are calculated via methods from \pkg{pbkrtest}. When \code{method = "KR"}, the Kenward-Rogers approximation for degrees-of-freedom is calculated using \code{\link[pbkrtest]{KRmodcomp}}, which is only applicable to linear-mixed models. The possible argument to \code{pbkrtest} via \code{args.test} is \code{details}.
 #'
-#' \code{method = "PB"} calculates p-values using parametric bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can be used for linear and also generalized linear mixed models (GLMM) by specifiying a \code{\link[stats]{family}} argument to \code{mixed}. Note that you should specify further arguments to \code{PBmodcomp} via \code{args.test}, especially \code{nsim} (the number of simulations to form the reference distribution. For other arguments see \code{\link[pbkrtest]{PBmodcomp}}.
+#' \code{method = "PB"} calculates p-values using parametric bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can be used for linear and also generalized linear mixed models (GLMM) by specifiying a \code{\link[stats]{family}} argument to \code{mixed}. Note that you should specify further arguments to \code{PBmodcomp} via \code{args.test}, especially \code{nsim} (the number of simulations to form the reference distribution. For other arguments see \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML} (argument to \code{lmer}) will be set to \code{FALSE} if method is \code{PB}.
 #'
 #' @note This function is not thoroughly tested so please report all bugs to henrik.singmann (at) psychologie.uni-freiburg.de \cr
 #' There might be problems with rather big models when constructing the model matrix to fit the \code{lmer} models (potentially problematic with Type 2 tests). If you find any such bug, please send an example including code and data!
@@ -198,14 +198,15 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 
 print.mixed <- function(x, ...) {
     if (x[["method"]] == "KR") {
-        tmp <- x[[1]][,1:5]
-        tmp[,3:5] <- apply(tmp[,3:5], c(1,2), round, digits = 4)
+        tmp <- x[[1]][,1:6]
+        tmp[,2:6] <- apply(tmp[,2:6], c(1,2), round, digits = 4)
         print(tmp)
     } else if (x[["method"]] == "PB") {
         tmp <- x[[1]][,1:3]
         tmp[,2:3] <- apply(tmp[,2:3], c(1,2), round, digits = 4)
         print(tmp)
     }
+    invisible(tmp)
 }
 
 summary.mixed <- function(object, ...) object[[1]]
