@@ -22,7 +22,7 @@ Description: Provides convenience functions for analyzing factorial
     ANOVAs for data in the long format (i.e., one observation per
     row) wrapping car::Anova() (aggregating more then one
     observation per individual and cell of the design), per default
-    returning a print readay ANOVA table. Function mixed() fits a
+    returning a print ready ANOVA table. Function mixed() fits a
     mixed model using lme4::lmer() and computes p-values for all
     effects in the model using either the Kenward-Rogers
     approximation of degrees of freedom (LMM only) or parametric
@@ -30,15 +30,15 @@ Description: Provides convenience functions for analyzing factorial
     default (imitating commercial statistical software) and sets
     the default contrasts to contr.sum. Furthermore,
     compare.2.vectors conveniently compares two vectors using
-    diverse statistics.
+    different statistical tests.
 URL: http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex
 License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.4-55
-Date: 2013-02-10
+Version: 0.4-56
+Date: 2013-02-11
 Collate:
     'afex-package.R'
     'aov.car.R'

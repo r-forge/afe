@@ -28,6 +28,10 @@
         (As before, cases with missing values are simply
         excluded from the analysis)
     
+    o   had to disable saving of the previous contrasts and
+        resetting those after detaching afex due to 
+        CRAN policies (no assignment in global environment).
+    
     Bugfixes
     
     o   Bug when running mixed() inside a function and
