@@ -3,7 +3,7 @@
 #' \tabular{ll}{
 #' Package: \tab afex\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.4-56\cr
+#' Version: \tab 0.4-57\cr
 #' Date: \tab 2013-02-11\cr
 #' Depends: \tab R (>= 2.14.0), coin, car, lme4, pbkrtest (>= 0.3-2), reshape2, stringr\cr
 #' Encoding: \tab UTF-8\cr
@@ -16,7 +16,7 @@
 #' @aliases afex-package afex
 #' @name afex-package
 #' @docType package
-#' @title The afex Package
+#' @title Analysis of Factorial Experiments.
 #' @author Henrik Singmann \email{henrik.singmann@@psychologie.uni-freiburg.de}
 #' @keywords package
 NULL

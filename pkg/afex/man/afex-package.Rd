@@ -2,13 +2,13 @@
 \name{afex-package}
 \alias{afex}
 \alias{afex-package}
-\title{The afex Package}
+\title{Analysis of Factorial Experiments.}
 \description{
   Analysis of Factorial Experiments.
 }
 \details{
   \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-  Version: \tab 0.4-56\cr Date: \tab 2013-02-11\cr Depends:
+  Version: \tab 0.4-57\cr Date: \tab 2013-02-11\cr Depends:
   \tab R (>= 2.14.0), coin, car, lme4, pbkrtest (>= 0.3-2),
   reshape2, stringr\cr Encoding: \tab UTF-8\cr License:
   \tab GPL (>=3)\cr URL: \tab
