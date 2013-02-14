@@ -45,6 +45,10 @@
   characters. The columns that are always present are:
   \code{Effect}, \code{df} (degrees of freedom), \code{F},
   and \code{p}.
+
+  \code{ges} contains the generalized eta-squared effect
+  size measure (Bakeman, 2005), \code{pes} contains partial
+  eta-squared (if requested).
 }
 \description{
   These functions produce a nice ANOVA table best for

@@ -95,8 +95,13 @@
   \code{\link[car]{Anova}}, the return value is dependent
   on the \code{return} argument. When argument
   \code{return} is \code{"nice"} (the default) a nice ANOVA
-  table is returnd (\code{\link{nice.anova}}). If
-  \code{return = "full"} or \code{return = "all"} a list
+  table is returnd (\code{\link{nice.anova}}) with the
+  following columns: \code{Effect}, \code{df}, \code{MSE}
+  (mean-squared errors), \code{F} (potentially with
+  significant symbols), \code{ges} (generalized
+  eta-squared), \code{p}.
+
+  If \code{return = "full"} or \code{return = "all"} a list
   \code{list} with the following elements:
 
   \describe{ \item{"Anova"}{the same as

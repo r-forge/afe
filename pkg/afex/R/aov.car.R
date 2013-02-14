@@ -24,7 +24,9 @@
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
 #'
-#' @return \code{aov.car} and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}). If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
+#' @return \code{aov.car} and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+#'
+#' If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
 #'
 #' \describe{
 #'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
@@ -151,6 +153,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 	} else { # if NO within-subjetc factors are present (i.e., purley between ANOVA):
 		colnames(tmp.dat)[ncol(tmp.dat)] <- "dv"
 		tmp.lm <- do.call("lm", list(formula = as.formula(str_c("dv ~ ", rh2)), data = tmp.dat))
+        if (return == "lm") return(tmp.lm)
 		Anova.out <- Anova(tmp.lm, type = type)
 	}
 	if (return == "Anova") return(Anova.out)
