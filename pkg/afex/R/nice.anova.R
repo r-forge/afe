@@ -104,7 +104,7 @@ nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG",
 	}
 	if (row.names(tmp.df)[1] == "(Intercept)")	tmp2 <- as.data.frame(tmp.df[-1,, drop = FALSE])
 	else tmp2 <- tmp.df
-	tmp2[,"df"] <- paste(ifelse(is.wholenumber(tmp2[,"num Df"]),tmp2[,"num Df"], round(tmp2[,"num Df"], 2)),  ifelse(is.wholenumber(tmp2[,"den Df"]),tmp2[,"den Df"], round(tmp2[,"den Df"], 2)), sep = ", ")
+	tmp2[,"df"] <- paste(ifelse(is.wholenumber(tmp2[,"num Df"]),tmp2[,"num Df"], formatC(tmp2[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(tmp2[,"den Df"]),tmp2[,"den Df"], formatC(tmp2[,"den Df"], digits = 2, format = "f")), sep = ", ")
 	tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
 	symbols.use <-  c(" +", " *", " **", " ***")
 	symbols.use[seq_along(sig.symbols)] <- sig.symbols
