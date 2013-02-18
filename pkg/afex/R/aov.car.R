@@ -2,9 +2,9 @@
 #'
 #' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s). \code{ez.glm} is called specifying the factors as character vectors.
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, return = "nice", observed = NULL, args.return = list(), ...)
+#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, return = "nice", observed = NULL, args.return = list(), ...)
 #'
-#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE)
+#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, factorize = TRUE, return = "nice", args.return = list(), ..., print.formula = FALSE)
 #' 
 #' univ(object)
 #'
@@ -18,6 +18,7 @@
 #' @param data A \code{data.frame} containing the data. Mandatory.
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
 #' @param type The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
+#' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
 #' @param return What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate")} (possibly abbreviated).
 #' @param args.return \code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).
@@ -80,7 +81,7 @@
 #' @example examples/examples.aov.car.R
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nice", observed = NULL, args.return = list(), ...) {
+aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, return = "nice", observed = NULL, args.return = list(), ...) {
 	#browser()
     return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate"))
 	# stuff copied from aov:
@@ -101,6 +102,24 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 	between <- vars[!(vars %in% c(id, within))]
 	effect.parts <- parts[!str_detect(parts, "^Error\\(")]
 	effect.parts.no.within <- effect.parts[!str_detect(effect.parts, str_c("\\<",within,"\\>", collapse = "|"))]
+    # factorize if necessary
+    if (factorize) {
+        if (any(!vapply(data[, between, drop = FALSE], is.factor, TRUE))) {
+            to.factor <- between[!vapply(data[,between, drop = FALSE], is.factor, TRUE)]
+            message(str_c("Converting to factor: ", str_c(to.factor, collapse = ", ")))
+            for (tmp.c in to.factor) {
+                data[,tmp.c] <- factor(data[,tmp.c])
+            }
+        }
+    } else {
+        # check if numeric variables are centered.
+        c.ns <- between[vapply(data[, between, drop = FALSE], is.numeric, TRUE)]
+        if (length(c.ns) > 0) {
+            non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
+            if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results): ", str_c(non.null, collapse = ", ")))
+        }
+    }
+    # make formulas
 	rh2 <- if (length(between) > 0) str_c(effect.parts.no.within, collapse = "+") else "1"
 	lh1 <- str_c(id, if (length(between) > 0) str_c(between, collapse = "+") else NULL, sep = "+")
 	rh1 <- str_c(within, collapse = "+")
@@ -128,6 +147,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 	# prepare the data:
 	tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
 	#browser()
+    # check for missing values:
     if (any(is.na(tmp.dat))) {
         missing.values <- apply(tmp.dat, 1, function(x) any(is.na(x)))
         warning(str_c("Missing values for following ID(s):\n", str_c(tmp.dat[missing.values,1], collapse = ", "), "\nRemoving those cases from the analysis."))        
@@ -164,7 +184,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, return = "nic
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, return = "nice", args.return = list(), ..., print.formula = FALSE) {
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, factorize = TRUE, return = "nice", args.return = list(), ..., print.formula = FALSE) {
 	if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
 	if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
 	#browser()
@@ -172,7 +192,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 	error <- str_c(" + Error(", id, if (!is.null(within)) "/" else "", str_c(within, collapse = " * "), ")")
 	formula <- str_c(dv, " ~ ", rh, error)
 	if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, observed = observed, args.return = args.return, ...)
+	aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, observed = observed, args.return = args.return, ...)
 }
 
 

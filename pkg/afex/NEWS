@@ -1,4 +1,21 @@
                     ************************
+                    ** afex VERSION 0.5-x **
+                    ************************
+                    
+                    Changes in afex Version 0.5-x
+                    Released XXX 2013
+
+    Significant User Visible Changes and New Features
+
+    o   added argument factorize (default: TRUE) to aov.car and ez.glm
+    
+    Bugfixes
+    
+    o   checks if observed variable is in the data and throws
+        an error if not (nice.anova)
+
+
+                    ************************
                     ** afex VERSION 0.4-x **
                     ************************
                     
