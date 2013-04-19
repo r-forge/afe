@@ -9,6 +9,8 @@
 
     o   added argument factorize (default: TRUE) to aov.car and ez.glm
     
+    o   added more informative startup message (thanks to Robert Volcic)
+    
     Bugfixes
     
     o   checks if observed variable is in the data and throws
