@@ -3,7 +3,7 @@
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
   mixed(formula, data, type = 3, method = c("KR", "PB"),
-    args.test = list(), ...)
+    args.test = list(), check.contrasts = TRUE, ...)
 }
 \arguments{
   \item{formula}{a formula describing the full mixed-model
@@ -27,6 +27,10 @@
 
   \item{args.test}{\code{list} of arguments passed to the
   function calculating the p-values. See details.}
+
+  \item{check.contrasts}{\code{logical}. Should contrasts
+  be checked and (if necessary) changed to be
+  \code{"contr.sum"}. See details.}
 
   \item{...}{further arguments (such as \code{weights})
   passed to \code{\link{lmer}}.}
@@ -94,7 +98,9 @@
   (2012). Further introductions to mixed-modeling for
   experimental designs are given by Baayen and colleagues
   (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen &
-  Milin, 2010).
+  Milin, 2010). Recommendations on how to specify the
+  random effects structure for experimental designs can be
+  found in Barr and colleagues (2013).
 
   p-values are calculated via methods from \pkg{pbkrtest}.
   When \code{method = "KR"}, the Kenward-Rogers
@@ -116,10 +122,14 @@
   \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML}
   (argument to \code{lmer}) will be set to \code{FALSE} if
   method is \code{PB}.
+
+  If \code{check.contrasts = TRUE}, contrasts will be set
+  to \code{"contr.sum"} for all factors if default
+  contrasts are not equal to \code{"contr.sum"} or
+  \code{attrib(factor, "contrasts") != "contr.sum"}.
 }
 \note{
-  This function is not thoroughly tested so please report
-  all bugs to henrik.singmann (at)
+  Please report all bugs to henrik.singmann (at)
   psychologie.uni-freiburg.de \cr There might be problems
   with rather big models when constructing the model matrix
   to fit the \code{lmer} models (potentially problematic
@@ -139,6 +149,11 @@
 }
 \examples{
 \dontrun{
+
+# use the obk.long data (mildly reasonable)
+data(obk.long)
+mixed(value ~ treatment * phase + (hour|id), obk.long)
+
 # example data from package languageR:
 # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word.
 data(lexdec, package = "languageR")
@@ -186,6 +201,12 @@ gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district),
   Baayen, R. H., & Milin, P. (2010). Analyzing Reaction
   Times. \emph{International Journal of Psychological
   Research}, 3(2), 12-28.
+
+  Barr, D. J., Levy, R., Scheepers, C., & Tily, H. J.
+  (2013). Random effects structure for confirmatory
+  hypothesis testing: Keep it maximal. \emph{Journal of
+  Memory and Language}, 68(3), 255–278.
+  doi:10.1016/j.jml.2012.11.001
 
   Judd, C. M., Westfall, J., & Kenny, D. A. (2012).
   Treating stimuli as a random factor in social psychology:

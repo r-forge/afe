@@ -7,9 +7,19 @@
 
     Significant User Visible Changes and New Features
 
-    o   added argument factorize (default: TRUE) to aov.car and ez.glm
+    o   added argument factorize (default: TRUE) to aov.car and ez.glm:
+		all variables are now factorized per default.  (now it is 
+		necessary to set factorize=FALSE for ANCOVAs)
     
-    o   added more informative startup message (thanks to Robert Volcic)
+    o   added more informative startup message (thanks to Robert Volcic and 
+		Lars Konieczny)
+		
+	o	mixed, ez.glm and aov.car now check for correct contrasts and set factors
+		to contr.sum if other contrasts are found (can be tunred off via 
+		check.contrasts argument)
+	
+	o	mixed checks numeric variables if they are centered on 0 (and gives 
+		warning if not).
     
     Bugfixes
     

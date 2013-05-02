@@ -5,13 +5,14 @@
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
   aov.car(formula, data, fun.aggregate = NULL, type = 3,
-    factorize = TRUE, return = "nice", observed = NULL,
-    args.return = list(), ...)
+    factorize = TRUE, check.contrasts = TRUE, return =
+    "nice", observed = NULL, args.return = list(), ...)
 
   ez.glm(id, dv, data, between = NULL, within = NULL,
     covariate = NULL, observed = NULL, fun.aggregate =
-    NULL, type = 3, factorize = TRUE, return = "nice",
-    args.return = list(), ..., print.formula = FALSE)
+    NULL, type = 3, factorize = TRUE, check.contrasts =
+    TRUE, return = "nice", args.return = list(), ...,
+    print.formula = FALSE)
 
   univ(object)
 }
@@ -71,6 +72,10 @@
   Default is \code{TRUE}. If one wants to run an ANCOVA,
   needs to be set to \code{FALSE} (in which case centering
   on 0 is checked on numeric variables).}
+
+  \item{check.contrasts}{\code{logical}. Should contrasts
+  for between-subject factors be checked and (if necessary)
+  changed to be \code{"contr.sum"}. See details.}
 
   \item{print.formula}{\code{ez.glm} is a wrapper for
   \code{aov.car}. This boolean argument indicates whether
@@ -215,6 +220,13 @@
   Changing the effect size to \code{"pes"} (partial
   eta-squared) via \code{args.return} or the return value
   via \code{return} removes this necessity.
+
+  If \code{check.contrasts = TRUE}, contrasts will be set
+  to \code{"contr.sum"} for all between-subject factors if
+  default contrasts are not equal to \code{"contr.sum"} or
+  \code{attrib(factor, "contrasts") != "contr.sum"}.
+  (within-subject factors are hard-coded
+  \code{"contr.sum"}.)
 }
 \note{
   Variables entered as within-subjects (i.e., repeated
