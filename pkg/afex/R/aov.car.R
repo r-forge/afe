@@ -56,6 +56,8 @@
 #'
 #' \code{ez.glm} will concatante all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
 #'
+#' To run an ANCOVA you need to set \code{factorize = FALSE} and make sure that all variables have the correct type (i.e., factors are factors and numeric variables are numeric and centered).
+#'
 #' Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity.
 #' 
 #' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
@@ -109,7 +111,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   if (factorize) {
     if (any(!vapply(data[, between, drop = FALSE], is.factor, TRUE))) {
       to.factor <- between[!vapply(data[,between, drop = FALSE], is.factor, TRUE)]
-      message(str_c("Converting to factor: ", str_c(to.factor, collapse = ", ")))
+      warning(str_c("Converting to factor: ", str_c(to.factor, collapse = ", ")))
       for (tmp.c in to.factor) {
         data[,tmp.c] <- factor(data[,tmp.c])
       }

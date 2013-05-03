@@ -212,6 +212,11 @@
   covariates. This is essentially identical to the behavior
   of SPSS's \code{glm} function.
 
+  To run an ANCOVA you need to set \code{factorize = FALSE}
+  and make sure that all variables have the correct type
+  (i.e., factors are factors and numeric variables are
+  numeric and centered).
+
   Note that the default behavior is to return a
   \code{\link{nice.anova}} \code{data.frame}. This includes
   calculation of generalized eta squared for which
