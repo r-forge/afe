@@ -132,8 +132,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 	m.matrix <- model.matrix(rh2, data = data)
 	fixed.effects <- attr(terms(rh2, data = data), "term.labels")
 	mapping <- attr(m.matrix, "assign")
-  # check if numerical variables are centered
-	c.ns <- fixed.effects[vapply(data[, fixed.effects[!str_detect(fixed.effects, ":")], drop = FALSE], is.numeric, TRUE)]
+    # check if numerical variables are centered
+    fixed.vars <- fixed.effects[!str_detect(fixed.effects, ":")]
+	c.ns <- fixed.vars[vapply(data[, fixed.vars, drop = FALSE], is.numeric, TRUE)]
 	if (length(c.ns) > 0) {
 	  non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
 	  if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results): ", str_c(non.null, collapse = ", ")))
