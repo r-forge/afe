@@ -2,7 +2,7 @@
 #'
 #' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Rogers approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}) (for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (all return the same data.frame).
 #'
-#' @usage mixed(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, ...)
+#' @usage mixed(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, progress = TRUE, ...)
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
 #' @param data data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.
@@ -10,6 +10,7 @@
 #' @param method character vector indicating which methods for obtaining p-values should be used. \code{"KR"} (the default) corresponds to the Kenward-Rogers approximation for degrees of freedom (only working with linear mixed models). \code{"PB"} calculates p-values based on parametric bootstrap.
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See details.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
+#' @param progress  if \code{TRUE}, shows progress with a text progress bar
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
 #'
 #' @return An object of class \code{"mixed"} (i.e., a list) with the following elements:
@@ -99,7 +100,7 @@
 #' }
 #' 
 
-mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, ...) {
+mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, progress = TRUE, ...) {
 	if (check.contrasts) {
     resetted <- NULL
     for (i in 1:length(data)) {
@@ -141,7 +142,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 	}
 	# obtain the lmer fits
 	#browser() 
-	mf <- mc[!names(mc) %in% c("type", "method", "args.test")]
+	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts")]
 	mf[[1]] <- as.name("lmer")
     mf[["data"]] <- as.name("data")
     if (method[1] == "PB") if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
@@ -151,54 +152,54 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 	if (type == 3 | type == "III") {
 		if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
 		# prepare lmer call:
-		cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
+		if (progress) cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
         full.model <- eval(mf)
 		#full.model <- eval(mf, data, parent.frame())
-		cat(".")
+		if (progress) cat(".")
 		fits <- vector("list", length(fixed.effects))
 		for (c in seq_along(fixed.effects)) {
 			tmp.columns <- str_c(deparse(-which(mapping == (c-1))), collapse = "")
 			mf[[2]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
 			fits[[c]] <- eval(mf)
-			cat(".")
+			if (progress) cat(".")
 		}
-		cat("]\n")
+		if (progress) cat("]\n")
 		names(fits) <- fixed.effects
 	} else if (type == 2 | type == "II") {
-        warning("Type 2 Methods are incorrectly implemented.\nUse car::Anova instead!")
-		cat(str_c("Fitting ", length(fixed.effects) + max.effect.order, " lmer() models:\n["))
+        warning("Type 2 Methods are incorrectly implemented.\n  Use car::Anova instead!")
+		if (progress) cat(str_c("Fitting ", length(fixed.effects) + max.effect.order, " lmer() models:\n["))
 		full.model <- vector("list", max.effect.order)
 		fits <- vector("list", length(fixed.effects))
 		full.model[[length(full.model)]] <- eval(mf)
-		cat(".")
+		if (progress) cat(".")
 		for (c in seq_len(max.effect.order)) {
 			if (c == max.effect.order) next 
 			tmp.columns <- str_c(deparse(-which(mapping == which(effect.order > c))), collapse = "")
 			mf[[2]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
 			full.model[[c]] <-  eval(mf)
-			cat(".")
+			if (progress) cat(".")
 		}
 		for (c in seq_along(fixed.effects)) {
 			order.c <- effect.order[c]
 			tmp.columns <- str_c(deparse(-which(mapping == (c) | mapping == if (order.c == max.effect.order) -1 else which(effect.order > order.c))), collapse = "")
 			mf[[2]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
 			fits[[c]] <- eval(mf)
-			cat(".")
+			if (progress) cat(".")
 		}
-		cat("]\n")
+		if (progress) cat("]\n")
 		names(fits) <- fixed.effects
 	} else stop('Only type 3 and type 2 tests implemented.')
 	# obtain p-values:
-	cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
+	if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
     #browser()
 	if (method[1] == "KR") {
 		tests <- vector("list", length(fixed.effects))
 		for (c in seq_along(fixed.effects)) {
 			if (type == 3 | type == "III") tests[[c]] <- KRmodcomp(full.model, fits[[c]])
 			else if (type == 2 | type == "II") tests[[c]] <- KRmodcomp(full.model[[order.c]], fits[[c]])
-			cat(".")
+			if (progress) cat(".")
 		}
-		cat("]\n")
+		if (progress) cat("]\n")
 		names(tests) <- fixed.effects
 		df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
 		df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
@@ -212,9 +213,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 		for (c in seq_along(fixed.effects)) {
 			if (type == 3 | type == "III") tests[[c]] <- do.call(PBmodcomp, args = c(largeModel = full.model, smallModel = fits[[c]], args.test))
 			else if (type == 2 | type == "II") tests[[c]] <- do.call(PBmodcomp, args = c(largeModel = full.model[[order.c]], smallModel = fits[[c]], args.test))
-			cat(".")
+			if (progress) cat(".")
         }
-        cat("]\n")
+        if (progress) cat("]\n")
         names(tests) <- fixed.effects
         df.out<- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
         df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,])))[,-2])

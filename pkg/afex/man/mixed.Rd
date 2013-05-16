@@ -3,7 +3,8 @@
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
   mixed(formula, data, type = 3, method = c("KR", "PB"),
-    args.test = list(), check.contrasts = TRUE, ...)
+    args.test = list(), check.contrasts = TRUE, progress =
+    TRUE, ...)
 }
 \arguments{
   \item{formula}{a formula describing the full mixed-model
@@ -31,6 +32,9 @@
   \item{check.contrasts}{\code{logical}. Should contrasts
   be checked and (if necessary) changed to be
   \code{"contr.sum"}. See details.}
+
+  \item{progress}{if \code{TRUE}, shows progress with a
+  text progress bar}
 
   \item{...}{further arguments (such as \code{weights})
   passed to \code{\link{lmer}}.}
