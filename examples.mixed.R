@@ -1,26 +1,17 @@
 
 
-load("pkg/afe/data/affr.rda")
+# Examples for using the per.parammeter argument:
+data(obk.long, package = "afex")
+obk.long$hour <- ordered(obk.long$hour)
 
-## > str(affr)
-## 'data.frame':   960 obs. of  10 variables:
-##  $ id           : Factor w/ 40 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ cond         : Factor w/ 2 levels "logic","pseudo": 2 2 2 2 2 2 2 2 2 2 ...
-##  $ validity     : Factor w/ 2 levels "invalid","valid": 2 2 2 2 2 1 2 1 2 1 ...
-##  $ believability: Factor w/ 3 levels "abstract","believable",..: 3 2 1 1 2 1 3 3 1 3 ...
-##  $ content      : Factor w/ 24 levels "1","2","3","4",..: 11 19 6 21 13 18 14 23 15 2 ...
-##  $ resp         : int  4 5 3 4 4 3 4 2 3 5 ...
-##  $ n.validity   : num  -1 -1 -1 -1 -1 1 -1 1 -1 1 ...
-##  $ n.bel1       : num  0 1 -1 -1 1 -1 0 0 -1 0 ...
-##  $ n.bel2       : num  1 0 -1 -1 0 -1 1 1 -1 1 ...
-##  $ n.cond       : num  1 1 1 1 1 1 1 1 1 1 ...
+# tests only the main effect parameters of hour individually per parameter.
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "^hour$", data = obk.long)
 
-res1 <- mixed("cond * validity * believability", "(1|id) + (1|content)", "resp", affr)
+# tests all parameters including hour individually
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "hour", data = obk.long)
 
-mixed("n.cond * validity * (n.bel1 + n.bel2)", "(1|id) + (1|content)", "resp", affr)
-
-
-# m1 <- lmer(resp ~ validity*believability*cond +(1|id) + (1|content), data = affr)
+# tests all parameters individually
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 
 # example data from package languageR:
 # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word. 

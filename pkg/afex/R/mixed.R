@@ -2,12 +2,13 @@
 #'
 #' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Rogers approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}) (for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (all return the same data.frame).
 #'
-#' @usage mixed(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, progress = TRUE, ...)
+#' @usage mixed(formula, data, type = 3, method = c("KR", "PB"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, ...)
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
 #' @param data data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.
 #' @param type type of test on which effects are based. Only type 3 tests (\code{3} or \code{"III"}) are correctly implemented (see Details).
 #' @param method character vector indicating which methods for obtaining p-values should be used. \code{"KR"} (the default) corresponds to the Kenward-Rogers approximation for degrees of freedom (only working with linear mixed models). \code{"PB"} calculates p-values based on parametric bootstrap.
+#' @param per.parameter \code{character} vector specifying for which variable tests should be run for each parameter (instead for the overall effect). Can be useful e.g., for testing ordered factors. Relatively untested so results should be compared with a second run without setting this argument. Uses \code{\link{grep}} for selecting parameters among the fixed effects so regular expressions (\code{\link{regex}}) are possible. See Examples.
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See details.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
 #' @param progress  if \code{TRUE}, shows progress with a text progress bar
@@ -69,7 +70,20 @@
 #' # use the obk.long data (mildly reasonable)
 #' data(obk.long)
 #' mixed(value ~ treatment * phase + (hour|id), obk.long)
-#'   
+#'
+#' # Examples for using the per.parammeter argument:
+#' data(obk.long, package = "afex")
+#' obk.long$hour <- ordered(obk.long$hour)
+#' 
+#' # tests only the main effect parameters of hour individually per parameter.
+#' mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "^hour$", data = obk.long)
+#' 
+#' # tests all parameters including hour individually
+#' mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "hour", data = obk.long)
+#' 
+#' # tests all parameters individually
+#' mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
+#'
 #' # example data from package languageR:
 #' # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word. 
 #' data(lexdec, package = "languageR")
@@ -100,7 +114,7 @@
 #' }
 #' 
 
-mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = list(), check.contrasts = TRUE, progress = TRUE, ...) {
+mixed <- function(formula, data, type = 3, method = c("KR", "PB"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, ...) {
 	if (check.contrasts) {
     resetted <- NULL
     for (i in 1:length(data)) {
@@ -141,16 +155,37 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 	  if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results): ", str_c(non.null, collapse = ", ")))
 	}
 	# obtain the lmer fits
-	#browser() 
-	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts")]
+	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter")]
 	mf[[1]] <- as.name("lmer")
     mf[["data"]] <- as.name("data")
     if (method[1] == "PB") if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
         message("REML argument to lmer() set to FALSE for method = 'PB'")
         mf[["REML"]] <- FALSE
     }
+	#browser() 
 	if (type == 3 | type == "III") {
 		if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
+		#per.parameter <- c("hour", "treatment")
+		if (!is.null(per.parameter)) {
+			fixed.to.change <- c()
+			for (parameter in per.parameter) {
+				fixed.to.change <- c(fixed.to.change, grep(parameter, fixed.effects))
+			}
+			fixed.to.change <- fixed.effects[sort(unique(fixed.to.change))]
+			if ("(Intercept)" %in% fixed.to.change) fixed.to.change <- fixed.to.change[-1]
+			fixed.all <- dimnames(m.matrix)[[2]]
+			#tf2 <- fixed.to.change[2]
+			for (tf2 in fixed.to.change) {
+				tf <- which(fixed.effects == tf2)
+				fixed.lower <- fixed.effects[seq_len(tf-1)]
+				fixed.upper <- if (tf < length(fixed.effects)) fixed.effects[(tf+1):length(fixed.effects)] else NULL
+				fixed.effects <- c(fixed.lower, fixed.all[which(mapping == (tf-1))], fixed.upper)
+				map.to.replace <- which(mapping == (tf-1))
+				map.lower <- mapping[seq_len(map.to.replace[1]-1)]
+				map.upper <- if (max(map.to.replace) < length(mapping)) mapping[(map.to.replace[length(map.to.replace)]+1):length(mapping)] else NULL
+				mapping <- c(map.lower, seq_along(map.to.replace) + map.lower[length(map.lower)], map.upper + length(map.to.replace)-1)
+			}
+		}
 		# prepare lmer call:
 		if (progress) cat(str_c("Fitting ", length(fixed.effects) + 1, " lmer() models:\n["))
         full.model <- eval(mf)
@@ -167,6 +202,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), args.test = l
 		names(fits) <- fixed.effects
 	} else if (type == 2 | type == "II") {
         warning("Type 2 Methods are incorrectly implemented.\n  Use car::Anova instead!")
+		if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 2 tests.")
 		if (progress) cat(str_c("Fitting ", length(fixed.effects) + max.effect.order, " lmer() models:\n["))
 		full.model <- vector("list", max.effect.order)
 		fits <- vector("list", length(fixed.effects))

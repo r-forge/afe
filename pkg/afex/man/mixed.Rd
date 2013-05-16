@@ -3,8 +3,8 @@
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
   mixed(formula, data, type = 3, method = c("KR", "PB"),
-    args.test = list(), check.contrasts = TRUE, progress =
-    TRUE, ...)
+    per.parameter = NULL, args.test = list(),
+    check.contrasts = TRUE, progress = TRUE, ...)
 }
 \arguments{
   \item{formula}{a formula describing the full mixed-model
@@ -25,6 +25,15 @@
   for degrees of freedom (only working with linear mixed
   models). \code{"PB"} calculates p-values based on
   parametric bootstrap.}
+
+  \item{per.parameter}{\code{character} vector specifying
+  for which variable tests should be run for each parameter
+  (instead for the overall effect). Can be useful e.g., for
+  testing ordered factors. Relatively untested so results
+  should be compared with a second run without setting this
+  argument. Uses \code{\link{grep}} for selecting
+  parameters among the fixed effects so regular expressions
+  (\code{\link{regex}}) are possible. See Examples.}
 
   \item{args.test}{\code{list} of arguments passed to the
   function calculating the p-values. See details.}
@@ -157,6 +166,19 @@
 # use the obk.long data (mildly reasonable)
 data(obk.long)
 mixed(value ~ treatment * phase + (hour|id), obk.long)
+
+# Examples for using the per.parammeter argument:
+data(obk.long, package = "afex")
+obk.long$hour <- ordered(obk.long$hour)
+
+# tests only the main effect parameters of hour individually per parameter.
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "^hour$", data = obk.long)
+
+# tests all parameters including hour individually
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "hour", data = obk.long)
+
+# tests all parameters individually
+mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 
 # example data from package languageR:
 # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word.
