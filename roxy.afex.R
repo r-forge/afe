@@ -23,7 +23,7 @@ roxy.package(
 		License = "GPL (>=3)",
 		Encoding = "UTF-8",
 		stringsAsFactors = FALSE),
-		actions = c("roxy", "package", "html", "doc"),
+		actions = c("roxy", "package"),
 		R.libs = R.libs, 
 		repo.root = "rp.tmp")
 system("rmdir pkg/afex/inst")

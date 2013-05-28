@@ -111,7 +111,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   if (factorize) {
     if (any(!vapply(data[, between, drop = FALSE], is.factor, TRUE))) {
       to.factor <- between[!vapply(data[,between, drop = FALSE], is.factor, TRUE)]
-      warning(str_c("Converting to factor: ", str_c(to.factor, collapse = ", ")))
+      message(str_c("Converting to factor: ", str_c(to.factor, collapse = ", ")))
       for (tmp.c in to.factor) {
         data[,tmp.c] <- factor(data[,tmp.c])
       }
@@ -147,8 +147,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
       fun.aggregate <- mean
     }
   }
-  # Is Type = 3 and contrasts not contr.sum?
-  if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum") warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  You should use options(contrasts=c('contr.sum','contr.poly')) instead"))
+  # Is Type == 3 and contrasts != contr.sum and check.contrasts == FALSE?
+  if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum" & !check.contrasts) warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], "\n  Results likely bogus or not interpretable!\n  You should use check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
   # prepare the data:
   tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   #browser()
@@ -172,7 +172,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
           }
         }
       }
-      if (!is.null(resetted)) warning(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
+    if (!is.null(resetted)) message(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
     }
   }
   data.l <- list(data = tmp.dat)
