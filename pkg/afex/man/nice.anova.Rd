@@ -92,7 +92,8 @@
 
 data(obk.long)
 # create object of class Anova:
-tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, return = "Anova")
+tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour),
+             data = obk.long, return = "Anova")
 
 nice.anova(tmp.aov, observed = "gender")
 

@@ -85,7 +85,8 @@
 #' mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 #'
 #' # example data from package languageR:
-#' # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word. 
+#' # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, 
+#' # with variables linked to subject or word. 
 #' data(lexdec, package = "languageR")
 #' 
 #' # using the simplest model
