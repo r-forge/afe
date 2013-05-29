@@ -117,16 +117,18 @@
 
 mixed <- function(formula, data, type = 3, method = c("KR", "PB"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, ...) {
 	if (check.contrasts) {
+    #browser()
+    vars.to.check <- all.vars(formula)
     resetted <- NULL
-    for (i in 1:length(data)) {
+    for (i in vars.to.check) {
       if (is.factor(data[,i])) {
         if (is.null(attr(data[,i], "contrasts")) & (options("contrasts")[[1]][1] != "contr.sum")) {
           contrasts(data[,i]) <- "contr.sum"
-          resetted  <- c(resetted, colnames(data)[i])
+          resetted  <- c(resetted, i)
         }
         else if (!is.null(attr(data[,i], "contrasts")) && attr(data[,i], "contrasts") != "contr.sum") {
           contrasts(data[,i]) <- "contr.sum"
-          resetted  <- c(resetted, colnames(data)[i])
+          resetted  <- c(resetted, i)
         }
       }
     }
@@ -167,6 +169,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB"), per.parameter
 	if (type == 3 | type == "III") {
 		if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
 		#per.parameter <- c("hour", "treatment")
+        # The next part alters the mapping of parameters to effects/variables if
+        # per.parameter is not NULL (this does the complete magic).
 		if (!is.null(per.parameter)) {
 			fixed.to.change <- c()
 			for (parameter in per.parameter) {
