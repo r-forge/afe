@@ -2,6 +2,39 @@
 
 # Examples for using the per.parammeter argument:
 data(obk.long, package = "afex")
+
+#testing LRTs
+mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT")
+mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", type = 2)
+
+mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, type = 2)
+
+### test type 2 tests:
+
+t2 <- mixed(value ~ treatment*phase +(1|id), data = obk.long, method = "LRT", type = 2)
+
+a2.f <- lmer(value ~ treatment*phase +(1|id), data = obk.long)
+a2.h <- lmer(value ~ treatment+phase +(1|id), data = obk.long)
+a2.t <- lmer(value ~ treatment +(1|id), data = obk.long)
+a2.p <- lmer(value ~ phase +(1|id), data = obk.long)
+
+## LRT
+t2 <- mixed(value ~ treatment*phase +(1|id), data = obk.long, method = "LRT", type = 2)
+
+anova(a2.f, a2.h)
+anova(a2.t, a2.h)
+anova(a2.p, a2.h)
+
+# KR
+t2 <- mixed(value ~ treatment*phase +(1|id), data = obk.long, type = 2)
+
+t2[[1]]
+KRmodcomp(a2.f, a2.h)
+KRmodcomp(a2.t, a2.h)
+KRmodcomp(a2.p, a2.h)
+
+### test "per.parameter" argument
+
 obk.long$hour <- ordered(obk.long$hour)
 
 # tests only the main effect parameters of hour individually per parameter.

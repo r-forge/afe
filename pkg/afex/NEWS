@@ -1,4 +1,23 @@
                     ************************
+                    ** afex VERSION 0.6-x **
+                    ************************
+                    
+                    Changes in afex Version 0.6-x
+                    Released XXX 2013
+
+    Significant User Visible Changes and New Features
+
+    o   added LRT tests to mixed() which should replicate
+        the recommended test by Barr et al. (2013, JML).
+    
+    Bugfixes
+    
+    o   Type 2 tests of mixed() were implemented incorretly (i.e.,
+        they did not what they should have given according
+        to the description given in the help file).
+
+
+                    ************************
                     ** afex VERSION 0.5-x **
                     ************************
                     

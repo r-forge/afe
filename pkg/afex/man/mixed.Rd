@@ -2,8 +2,8 @@
 \alias{mixed}
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
-  mixed(formula, data, type = 3, method = c("KR", "PB"),
-    per.parameter = NULL, args.test = list(),
+  mixed(formula, data, type = 3, method = c("KR", "PB",
+    "LRT"), per.parameter = NULL, args.test = list(),
     check.contrasts = TRUE, progress = TRUE, ...)
 }
 \arguments{
@@ -24,7 +24,10 @@
   default) corresponds to the Kenward-Rogers approximation
   for degrees of freedom (only working with linear mixed
   models). \code{"PB"} calculates p-values based on
-  parametric bootstrap.}
+  parametric bootstrap. \code{"LRT"} calculates p-values
+  via the likelihood ratio tests implemented in the
+  \code{anova} method for \code{mer} objects (and is not
+  recommended).}
 
   \item{per.parameter}{\code{character} vector specifying
   for which variable tests should be run for each parameter
@@ -103,8 +106,8 @@
   didn't find a better way} of implementing the Type 2
   tests). This \strong{does not} correspond to the (type 2)
   Wald Test reported by \code{car::Anova}. If you want type
-  2 tests, use \code{car::Anova} with \code{test = "F"}
-  (from version 2.0-13) instead of this function.
+  2 Wald tests, use \code{car::Anova} with \code{test =
+  "F"} (from version 2.0-13) instead of this function.
 
   For an introduction to mixed-modeling for experimental
   designs using p-values see Judd, Westfall, and Kenny
@@ -115,12 +118,12 @@
   random effects structure for experimental designs can be
   found in Barr and colleagues (2013).
 
-  p-values are calculated via methods from \pkg{pbkrtest}.
-  When \code{method = "KR"}, the Kenward-Rogers
-  approximation for degrees-of-freedom is calculated using
-  \code{\link[pbkrtest]{KRmodcomp}}, which is only
-  applicable to linear-mixed models. The possible argument
-  to \code{pbkrtest} via \code{args.test} is
+  p-values are per default calculated via methods from
+  \pkg{pbkrtest}. When \code{method = "KR"}, the
+  Kenward-Rogers approximation for degrees-of-freedom is
+  calculated using \code{\link[pbkrtest]{KRmodcomp}}, which
+  is only applicable to linear-mixed models. The possible
+  argument to \code{pbkrtest} via \code{args.test} is
   \code{details}.
 
   \code{method = "PB"} calculates p-values using parametric
@@ -136,9 +139,17 @@
   (argument to \code{lmer}) will be set to \code{FALSE} if
   method is \code{PB}.
 
+  \code{method = "LRT"} calculates p-values via likelihood
+  ratio tests implemented in the \code{anova} method for
+  \code{"mer"} objects. This is recommended by Barr et al.
+  (2013) which did not test the other methods implemented
+  here. Furthermore, this is not recommended by the
+  \href{http://glmm.wikidot.com/faq}{lme4 faq} which
+  instead recommends the other methods implemented here.
+
   If \code{check.contrasts = TRUE}, contrasts will be set
-  to \code{"contr.sum"} for all factors if default
-  contrasts are not equal to \code{"contr.sum"} or
+  to \code{"contr.sum"} for all factors in the formula if
+  default contrasts are not equal to \code{"contr.sum"} or
   \code{attrib(factor, "contrasts") != "contr.sum"}.
 }
 \note{
@@ -150,9 +161,10 @@
   an example including code and data!
 
   This functions needs a lot of RAM and rather long time
-  especially with complex random structures. The RAM demand
-  is a problem especially on 32 bit Windows which only
-  supports up to 2 or 3GB RAM (see
+  especially with complex random structures (when
+  \code{method = "KR"}). The RAM demand is a problem
+  especially on 32 bit Windows which only supports up to 2
+  or 3GB RAM (see
   \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R
   Windows FAQ}).
 
