@@ -8,7 +8,7 @@ svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/
 
 roxy.package(
 	pck.source.dir = "pkg/afex",
-	pck.version = str_c("0.5-", svn.number),
+	pck.version = str_c("0.6-", svn.number),
 	pck.description = data.frame(
 		Package = "afex",
 		Type = "Package",
