@@ -153,7 +153,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	fixed.effects <- attr(terms(rh2, data = data), "term.labels")
 	mapping <- attr(m.matrix, "assign")
     # check if numerical variables are centered
-    fixed.vars <- fixed.effects[!str_detect(fixed.effects, ":")]
+    fixed.vars <- all.vars(rh2)
 	c.ns <- fixed.vars[vapply(data[, fixed.vars, drop = FALSE], is.numeric, TRUE)]
 	if (length(c.ns) > 0) {
 	  non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]

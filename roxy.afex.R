@@ -2,7 +2,7 @@
 require(roxyPackage)
 require(stringr)
 
-R.libs <- "C:/R/R-3.0.0/library"
+R.libs <- "C:/R/R-3.0.1/library"
 
 svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" pkg/afex", intern = TRUE)[2], "[[:digit:]]+$")) + 1
 

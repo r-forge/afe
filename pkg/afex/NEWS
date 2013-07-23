@@ -9,12 +9,21 @@
 
     o   added LRT tests to mixed() which should replicate
         the recommended test by Barr et al. (2013, JML).
+        
+    o   added experimental "lme4" return method for 
+        aov.car and ez.glm (which fits the data using lmer).
     
     Bugfixes
     
     o   Type 2 tests of mixed() were implemented incorretly (i.e.,
         they did not what they should have given according
         to the description given in the help file).
+        
+    o   aov.car() and ez.glm() now convert factor levels of within 
+        subjects factors to be of length one so that long levels 
+        do not lead to problems when constructing the call to lm. 
+        Thanks to Isaac Schwabacher for noticing this, see also:
+        https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=15377
 
 
                     ************************
