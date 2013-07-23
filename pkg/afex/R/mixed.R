@@ -138,7 +138,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
   }
   #warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
 	# browser()
-	# prepare fitting
+	# prepare fitting (i.e., obtain model info)
 	mc <- match.call()
 	formula.f <- as.formula(formula)
 	dv <- as.character(formula.f)[[2]]
@@ -152,12 +152,19 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	m.matrix <- model.matrix(rh2, data = data)
 	fixed.effects <- attr(terms(rh2, data = data), "term.labels")
 	mapping <- attr(m.matrix, "assign")
-    # check if numerical variables are centered
-    fixed.vars <- all.vars(rh2)
+	fixed.vars <- all.vars(rh2)
+  # check for missing values in variables used:
+  if (nrow(m.matrix) != nrow(data)) {
+    data <- model.frame(as.formula(str_c(vars.to.check[1], "~", str_c(vars.to.check[-1], collapse = "+"))), data = data)
+    m.matrix <- model.matrix(rh2, data = data)
+    warning(str_c("Due to missing values, reduced number of observations to ", nrow(data)))
+  }
+  
+  # check if numerical variables are centered
 	c.ns <- fixed.vars[vapply(data[, fixed.vars, drop = FALSE], is.numeric, TRUE)]
 	if (length(c.ns) > 0) {
 	  non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
-	  if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results): ", str_c(non.null, collapse = ", ")))
+	  if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results if in interactions): ", str_c(non.null, collapse = ", ")))
 	}
 	# obtain the lmer fits
 	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter")]

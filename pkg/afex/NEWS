@@ -24,6 +24,12 @@
         do not lead to problems when constructing the call to lm. 
         Thanks to Isaac Schwabacher for noticing this, see also:
         https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=15377
+    
+    o   mixed should now work with missing values as it construes
+        a new data object if the model.matrix from which the 
+        different versions are fitted has nrow different to 
+        nrow(data) (with warning). Thanks to Daniel Bunker
+        for reporting this.
 
 
                     ************************
