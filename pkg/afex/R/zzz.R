@@ -1,6 +1,6 @@
 .onAttach <- function(libname, pkgname) {
 	#assign(".oldContrasts", options("contrasts"), envir = .GlobalEnv)
-  packageStartupMessage("************\nWelcome to afex created by Henrik Singmann. Important notes:\n")
+  packageStartupMessage("************\nWelcome to afex. Please report bugs to henrik.singmann@psychologie.uni-freiurg.de. Important notes:\n")
 	if (options("contrasts")[[1]][1] != "contr.sum") {
 		packageStartupMessage("Setting contrasts to effects coding: options(contrasts=c('contr.sum', 'contr.poly'))\nThis affects all functions using contrasts (e.g., lmer, lm, aov, ...).\nTo reset default settings run: options(contrasts=c('contr.treatment', 'contr.poly')) (all afex functions should be unaffected by this)\n")
     # \nPrevious contrasts saved in '.oldContrasts'.

@@ -7,7 +7,7 @@
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
 #' @param data data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.
 #' @param type type of test on which effects are based. Only type 3 tests (\code{3} or \code{"III"}) are correctly implemented (see Details).
-#' @param method character vector indicating which methods for obtaining p-values should be used. \code{"KR"} (the default) corresponds to the Kenward-Rogers approximation for degrees of freedom (only working with linear mixed models). \code{"PB"} calculates p-values based on parametric bootstrap. \code{"LRT"} calculates p-values via the likelihood ratio tests implemented in the \code{anova} method for \code{mer} objects (and is not recommended).
+#' @param method character vector indicating which methods for obtaining p-values should be used. \code{"KR"} (the default) corresponds to the Kenward-Rogers approximation for degrees of freedom (only working with linear mixed models). \code{"PB"} calculates p-values based on parametric bootstrap. \code{"LRT"} calculates p-values via the likelihood ratio tests implemented in the \code{anova} method for \code{lmerMod} objects (and is not recommended).
 #' @param per.parameter \code{character} vector specifying for which variable tests should be run for each parameter (instead for the overall effect). Can be useful e.g., for testing ordered factors. Relatively untested so results should be compared with a second run without setting this argument. Uses \code{\link{grep}} for selecting parameters among the fixed effects so regular expressions (\code{\link{regex}}) are possible. See Examples.
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See details.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
@@ -18,8 +18,8 @@
 #'
 #' \enumerate{
 #' \item \code{anova.table} a data.frame containing the statistics returned from \code{\link[pbkrtest]{KRmodcomp}}.
-#' \item \code{full.model} the \code{"mer"} object returned from fitting the full mixed model.
-#' \item \code{restricted.models} a list of \code{"mer"} objects from fitting the restricted models (i.e., each model lacks the corresponding effect)
+#' \item \code{full.model} the \code{"lmerMod"} object returned from fitting the full mixed model.
+#' \item \code{restricted.models} a list of \code{"lmerMod"} objects from fitting the restricted models (i.e., each model lacks the corresponding effect)
 #' \item \code{tests} a list of objects returned by the function for obtaining the p-values.
 #' \item \code{type} The \code{type} argument used when calling this function.
 #' \item \code{method} The \code{method} argument used when calling this function.
@@ -27,7 +27,7 @@
 #'
 #' The following methods exist for objects of class \code{"mixed"}: \code{print} (which uses rounding and only returns the results with \code{F.scaling = 1}), \code{summary}, and \code{anova} (the latter two return the same data.frame).
 #'
-#' @details Type 3 tests are obtained by comparing a model in which only the corresponding effect is missing with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"mer"} models (from version 2.0-13).
+#' @details Type 3 tests are obtained by comparing a model in which only the corresponding effect is missing with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"lmerMod"} models.
 #'
 #' Type 2 tests are obtained by comparing a model in which the corresponding effect and all higher oder effect (e.g., all three-way interactions for a two-way interaction) are missing with a model in which all effects of the relevant order are present and all higher order effects absent. Consequently, the results for lower order effects are identical of wether or not higher order effects are part of the model or not, which is rather dubious (but \href{https://stat.ethz.ch/pipermail/r-sig-mixed-models/2012q3/018992.html}{I didn't find a better way} of implementing the Type 2 tests). This \strong{does not} correspond to the (type 2) Wald Test reported by \code{car::Anova}. If you want type 2 Wald tests, use \code{car::Anova} with \code{test = "F"} (from version 2.0-13) instead of this function.
 #'
@@ -37,7 +37,7 @@
 #'
 #' \code{method = "PB"} calculates p-values using parametric bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can be used for linear and also generalized linear mixed models (GLMM) by specifiying a \code{\link[stats]{family}} argument to \code{mixed}. Note that you should specify further arguments to \code{PBmodcomp} via \code{args.test}, especially \code{nsim} (the number of simulations to form the reference distribution. For other arguments see \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML} (argument to \code{lmer}) will be set to \code{FALSE} if method is \code{PB}.
 #'
-#' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"mer"} objects. This is recommended by Barr et al. (2013) which did not test the other methods implemented here. Furthermore, this is not recommended by the \href{http://glmm.wikidot.com/faq}{lme4 faq} which instead recommends the other methods implemented here.
+#' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"merMod"} objects. This is recommended by Barr et al. (2013) which did not test the other methods implemented here. Furthermore, this is not recommended by the \href{http://glmm.wikidot.com/faq}{lme4 faq} which instead recommends the other methods implemented here.
 #' 
 #' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all factors in the formula if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}.
 #'
@@ -168,9 +168,10 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	}
 	# obtain the lmer fits
 	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter")]
-	mf[[1]] <- as.name("lmer")
+	if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
+  else mf[[1]] <- as.name("lmer")
     mf[["data"]] <- as.name("data")
-    if (method[1] == "PB") if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
+    if (method[1] == "PB" & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
         message("REML argument to lmer() set to FALSE for method = 'PB'")
         mf[["REML"]] <- FALSE
     }

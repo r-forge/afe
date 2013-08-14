@@ -26,11 +26,13 @@
         https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=15377
     
     o   mixed should now work with missing values as it construes
-        a new data object if the model.matrix from which the 
+        a new data object if the model.matrix from which the
         different versions are fitted has nrow different to 
         nrow(data) (with warning). Thanks to Daniel Bunker
         for reporting this.
-
+        
+    o   mixed should work with the neweset version of lme4 (> 1.0)
+        and the newst version of pbkrtest (>= 0.3-5.1).
 
                     ************************
                     ** afex VERSION 0.5-x **

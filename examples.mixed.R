@@ -1,7 +1,22 @@
 
+require(devtools)
+dev_mode()
 
-# Examples for using the per.parammeter argument:
+install_github("lme4",user="lme4")
+
+install.packages("pbkrtest_0.3-5.1.tar.gz", repos=NULL, type = "source")
+
+# Examples:
 data(obk.long, package = "afex")
+
+#LMMs:
+(x1 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long))
+str(x1, 1)
+
+(x2 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "PB", args.test = list(nsim = 10)))
+str(x2, 1)
+
+(x3 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT"))
 
 #testing LRTs
 mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT")
@@ -90,4 +105,4 @@ require("mlmRev")
 
 gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial, data = Contraception, args.test = list(nsim = 10), method = "PB")
 
-gm1 <- mixed(cbind(incidence, size - incidence) ~ period + (1 | herd),  family = binomial, data = cbpp, REML = FALSE, method = "PB", args.test = list(nsim = 20))
+gm1 <- mixed(cbind(incidence, size - incidence) ~ period + (1 | herd),  family = binomial, data = cbpp, method = "PB", args.test = list(nsim = 10))

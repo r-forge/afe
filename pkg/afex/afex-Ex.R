@@ -24,11 +24,9 @@ flush(stderr()); flush(stdout())
 data(obk.long, package = "afex")
 
 # run univariate mixed ANOVA for the full design:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-        data = obk.long, observed = "gender")
+aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, observed = "gender")
 
-ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
-        within = c("phase", "hour"), observed = "gender")
+ez.glm("id", "value", obk.long, between = c("treatment", "gender"), within = c("phase", "hour"), observed = "gender")
 
 # both calls return the same:
 ##                         Effect          df   MSE         F  ges     p
@@ -50,13 +48,11 @@ ez.glm("id", "value", obk.long, between = c("treatment", "gender"),
 
 
 # replicating ?Anova using aov.car:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-        data = obk.long, type = 2, return = "Anova")
+aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, type = 2, return = "Anova")
 # in contrast to aov you do not need the within-subject factors outside Error()
 
 # replicating ?Anova using ez.glm:
-ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        c("phase", "hour"), type = 2, return = "Anova")
+ez.glm("id", "value", obk.long, c("treatment", "gender"), c("phase", "hour"), type = 2, return = "Anova")
 
 #both return:
 ## Type II Repeated Measures MANOVA Tests: Pillai test statistic
@@ -81,12 +77,9 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
 # ANCOVA: adding a covariate (necessary to set factorize = FALSE)
-aov.car(value ~ treatment * gender + age + Error(id/phase*hour), 
-        data = obk.long, observed = c("gender", "age"), factorize = FALSE)
+aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
-ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
-        within = c("phase", "hour"), covariate = "age", 
-        observed = c("gender", "age"), factorize = FALSE)
+ez.glm("id", "value", obk.long, between = c("treatment", "gender"), within = c("phase", "hour"), covariate = "age", observed = c("gender", "age"), factorize = FALSE)
 
 # aggregating over one within-subjects factor (phase) with warning:
 aov.car(value ~ treatment * gender + Error(id/hour), data = obk.long, observed = "gender")
@@ -96,24 +89,19 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"), "hour", observed = "ge
 # runs with "numeric" factors
 obk.long$hour2 <- as.numeric(as.character(obk.long$hour))
 
-aov.car(value ~ treatment * gender + Error(id/hour2), 
-        data = obk.long, type = 2,observed = c("gender"))
+aov.car(value ~ treatment * gender + Error(id/hour2), data = obk.long, type = 2,observed = c("gender"))
 
 # only between
-aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2,observed = c("gender"))
-aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2, observed = c("gender"))
+aov.car(value ~ treatment * gender + Error(id), data = obk.long, type = 2,observed = c("gender"))
+aov.car(value ~ treatment * gender + Error(id), data = obk.long, type = 2, observed = c("gender"))
 
-ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        within = NULL, type = 2, print.formula = TRUE, observed = "gender")
+ez.glm("id", "value", obk.long, c("treatment", "gender"), within = NULL, type = 2, print.formula = TRUE, observed = "gender")
 
 # only within
 
 aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
 
-ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
-        type = 2, print.formula = TRUE)
+ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), type = 2, print.formula = TRUE)
 
 # using return = "full":
 
@@ -128,12 +116,9 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "full"), 1)
 ##  $ idata:'data.frame':  15 obs. of  2 variables:
 
 # use args.return arguments:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-        data = obk.long, args.return = list(correction = "none", es = "pes"))
+aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, args.return = list(correction = "none", es = "pes"))
 
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-        data = obk.long,observed = "gender", 
-        args.return = list(correction = "none", MSE = FALSE))
+aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long,observed = "gender", args.return = list(correction = "none", MSE = FALSE))
 
 
 
@@ -212,8 +197,7 @@ flush(stderr()); flush(stdout())
 ##D mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 ##D 
 ##D # example data from package languageR:
-##D # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns,
-##D # with variables linked to subject or word.
+##D # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word.
 ##D data(lexdec, package = "languageR")
 ##D 
 ##D # using the simplest model
@@ -259,8 +243,7 @@ flush(stderr()); flush(stdout())
 
 data(obk.long)
 # create object of class Anova:
-tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour),
-             data = obk.long, return = "Anova")
+tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long, return = "Anova")
 
 nice.anova(tmp.aov, observed = "gender")
 
@@ -301,8 +284,7 @@ OBrienKaiser2 <- within(OBrienKaiser, {
 attributes(OBrienKaiser2$age) <- NULL # needed or resahpe2::melt throws an error.
 OBrienKaiser2$age <- as.numeric(OBrienKaiser2$age)
 obk.long <- melt(OBrienKaiser2, id.vars = c("id", "treatment", "gender", "age"))
-obk.long[,c("phase", "hour")] <- lapply(as.data.frame(do.call(rbind,
-        strsplit(as.character(obk.long$variable), "\\."),)), factor)
+obk.long[,c("phase", "hour")] <- lapply(as.data.frame(do.call(rbind,strsplit(as.character(obk.long$variable), "\\."),)), factor)
 obk.long <- obk.long[,c("id", "treatment", "gender", "age", "phase", "hour", "value")]
 obk.long <- obk.long[order(obk.long$id),]
 rownames(obk.long) <- NULL
@@ -328,7 +310,6 @@ head(obk.long)
 
 ### * <FOOTER>
 ###
-options(digits = 7L)
 base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
 grDevices::dev.off()
 ###

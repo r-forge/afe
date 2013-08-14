@@ -26,8 +26,8 @@
   models). \code{"PB"} calculates p-values based on
   parametric bootstrap. \code{"LRT"} calculates p-values
   via the likelihood ratio tests implemented in the
-  \code{anova} method for \code{mer} objects (and is not
-  recommended).}
+  \code{anova} method for \code{lmerMod} objects (and is
+  not recommended).}
 
   \item{per.parameter}{\code{character} vector specifying
   for which variable tests should be run for each parameter
@@ -58,14 +58,14 @@
   \enumerate{ \item \code{anova.table} a data.frame
   containing the statistics returned from
   \code{\link[pbkrtest]{KRmodcomp}}. \item
-  \code{full.model} the \code{"mer"} object returned from
-  fitting the full mixed model. \item
-  \code{restricted.models} a list of \code{"mer"} objects
-  from fitting the restricted models (i.e., each model
-  lacks the corresponding effect) \item \code{tests} a list
-  of objects returned by the function for obtaining the
-  p-values. \item \code{type} The \code{type} argument used
-  when calling this function. \item \code{method} The
+  \code{full.model} the \code{"lmerMod"} object returned
+  from fitting the full mixed model. \item
+  \code{restricted.models} a list of \code{"lmerMod"}
+  objects from fitting the restricted models (i.e., each
+  model lacks the corresponding effect) \item \code{tests}
+  a list of objects returned by the function for obtaining
+  the p-values. \item \code{type} The \code{type} argument
+  used when calling this function. \item \code{method} The
   \code{method} argument used when calling this function. }
 
   The following methods exist for objects of class
@@ -91,7 +91,7 @@
   only the corresponding effect is missing with the full
   model (containing all effects). This corresponds to the
   (type 3) Wald tests given by \code{car::Anova} for
-  \code{"mer"} models (from version 2.0-13).
+  \code{"lmerMod"} models.
 
   Type 2 tests are obtained by comparing a model in which
   the corresponding effect and all higher oder effect
@@ -141,10 +141,10 @@
 
   \code{method = "LRT"} calculates p-values via likelihood
   ratio tests implemented in the \code{anova} method for
-  \code{"mer"} objects. This is recommended by Barr et al.
-  (2013) which did not test the other methods implemented
-  here. Furthermore, this is not recommended by the
-  \href{http://glmm.wikidot.com/faq}{lme4 faq} which
+  \code{"merMod"} objects. This is recommended by Barr et
+  al. (2013) which did not test the other methods
+  implemented here. Furthermore, this is not recommended by
+  the \href{http://glmm.wikidot.com/faq}{lme4 faq} which
   instead recommends the other methods implemented here.
 
   If \code{check.contrasts = TRUE}, contrasts will be set
