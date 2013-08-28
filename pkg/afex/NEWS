@@ -10,6 +10,9 @@
     o   added LRT tests to mixed() which should replicate
         the recommended test by Barr et al. (2013, JML).
         
+    o   multicore estimation of (g)lmer models now available
+        through package parallel (argument cl) for mixed().
+        
     o   added experimental "lme4" return method for 
         aov.car and ez.glm (which fits the data using lmer).
     
@@ -32,7 +35,8 @@
         for reporting this.
         
     o   mixed should work with the neweset version of lme4 (> 1.0)
-        and the newst version of pbkrtest (>= 0.3-5.1).
+        and the newst version of pbkrtest (>= 0.3-5.1), but also 
+        with older versions.
 
                     ************************
                     ** afex VERSION 0.5-x **

@@ -4,7 +4,8 @@
 \usage{
   mixed(formula, data, type = 3, method = c("KR", "PB",
     "LRT"), per.parameter = NULL, args.test = list(),
-    check.contrasts = TRUE, progress = TRUE, ...)
+    check.contrasts = TRUE, progress = TRUE, cl = NULL,
+    ...)
 }
 \arguments{
   \item{formula}{a formula describing the full mixed-model
@@ -47,6 +48,10 @@
 
   \item{progress}{if \code{TRUE}, shows progress with a
   text progress bar}
+
+  \item{cl}{A vector identifying a cluster; used for
+  distributing the estimation of the different models using
+  several cores. See examples.}
 
   \item{...}{further arguments (such as \code{weights})
   passed to \code{\link{lmer}}.}
@@ -220,6 +225,17 @@ require("mlmRev") # for the data, see ?Contraception
 
 gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district),
  family = binomial, data = Contraception, args.test = list(nsim = 10), method = "PB")
+
+## using multicore
+require(parallel)
+(nc <- detectCores()) # number of cores
+cl <- makeCluster(rep("localhost", nc)) # make cluster
+# to keep track of what the function is doind, redirect output to outfile:
+# cl <- makeCluster(rep("localhost", nc), outfile = "cl.log.txt")
+
+# obtain fits with multicore:
+mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
+
 }
 }
 \author{

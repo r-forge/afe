@@ -61,6 +61,14 @@ mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "hour", data = obk.l
 # tests all parameters individually
 mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 
+### test "cl" (cluster)
+
+require(parallel)
+cl <- makeCluster(rep("localhost", 2), outfile = "cl.log.txt")
+
+mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
+
+
 # example data from package languageR:
 # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word. 
 data(lexdec, package = "languageR")
