@@ -172,10 +172,6 @@
   or 3GB RAM (see
   \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R
   Windows FAQ}).
-
-  This function calls \code{lme4:::nobars} for dealing with
-  the formula. So any significant changes to \pkg{lme4} or
-  \code{lme4:::nobars} may disrupt its functionality.
 }
 \examples{
 \dontrun{

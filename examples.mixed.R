@@ -4,7 +4,9 @@ dev_mode()
 
 install_github("lme4",user="lme4")
 
-install.packages("pbkrtest_0.3-5.1.tar.gz", repos=NULL, type = "source")
+install_github("lme4",user="lme4", ref = "release") 
+
+install.packages("pbkrtest")
 
 # Examples:
 data(obk.long, package = "afex")

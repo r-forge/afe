@@ -85,6 +85,9 @@
 #' @name aov.car
 #' @aliases aov.car ez.glm univ
 #' @export aov.car ez.glm univ
+#' @import car
+#' @importFrom stringr str_c str_detect str_replace_all
+#' @importFrom reshape2 dcast
 #' @example examples/examples.aov.car.R
 #'
 

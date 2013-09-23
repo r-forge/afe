@@ -8,14 +8,14 @@
 }
 \details{
   \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-  Version: \tab 0.6-78\cr Date: \tab 2013-08-28\cr Depends:
-  \tab R (>= 2.14.0), coin, car, lme4, pbkrtest (>= 0.3-2),
-  reshape2, stringr\cr Encoding: \tab UTF-8\cr License:
-  \tab GPL (>=3)\cr URL: \tab
+  Version: \tab 0.6-80\cr Date: \tab 2013-09-24\cr Depends:
+  \tab R (>= 2.14.0), coin, car, lme4, pbkrtest (>=
+  0.3-2)\cr Encoding: \tab UTF-8\cr License: \tab GPL
+  (>=3)\cr URL: \tab
   http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr
   }
 
-  Provides convenience functions for analysing factorial
+  Provides convenience functions for analyzing factorial
   experiments using ANOVA or mixed-models. ez.glm() and
   aov.car() allow convenient calculation of between, within
   (i.e., repeated-measures), or mixed between-within (i.e.,

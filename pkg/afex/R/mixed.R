@@ -47,8 +47,6 @@
 #'
 #' This functions needs a lot of RAM and rather long time especially with complex random structures (when \code{method = "KR"}). The RAM demand is a problem especially on 32 bit Windows which only supports up to 2 or 3GB RAM (see \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R Windows FAQ}).
 #'
-#' This function calls \code{lme4:::nobars} for dealing with the formula. So any significant changes to \pkg{lme4} or \code{lme4:::nobars} may disrupt its functionality.
-#'
 #' @author Henrik Singmann with contributions from \href{http://stackoverflow.com/q/11335923/289572}{Ben Bolker and Joshua Wiley}.
 #'
 #' @seealso \code{\link{ez.glm}} and \code{\link{aov.car}} for convenience functions to analyze experimental deisgns with classical ANOVA or ANCOVA wrapping \code{\link[car]{Anova}}. 
@@ -67,6 +65,8 @@
 #' @S3method print mixed
 #' @S3method summary mixed
 #' @S3method anova mixed
+#' @import pbkrtest
+#' @importFrom lme4 lmer glmer nobars
 #' @examples
 #' \dontrun{
 #' 
@@ -159,7 +159,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	effect.order <- effect.order[!grepl("\\|", all.terms)]
 	max.effect.order <- max(effect.order)
 	random <- str_c(str_c("(", all.terms[grepl("\\|", all.terms)], ")"), collapse = " + ")
-	rh2 <- lme4:::nobars(formula.f)
+	rh2 <- nobars(formula.f)
 	rh2[[2]] <- NULL
 	m.matrix <- model.matrix(rh2, data = data)
 	fixed.effects <- attr(terms(rh2, data = data), "term.labels")

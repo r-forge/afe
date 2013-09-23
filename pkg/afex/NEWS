@@ -15,6 +15,9 @@
         
     o   added experimental "lme4" return method for 
         aov.car and ez.glm (which fits the data using lmer).
+        
+    o   reshape2 and stringr are not any more loaded when
+        loading afex (are now only imported via Imports)
     
     Bugfixes
     
