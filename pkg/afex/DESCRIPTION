@@ -5,7 +5,7 @@ Depends:
     R (>= 2.14.0),
     coin,
     car,
-    lme4,
+    lme4 (>= 1.0.4),
     pbkrtest (>= 0.3-2)
 Suggests:
     ascii,
@@ -36,7 +36,7 @@ Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.6-80
+Version: 0.6-81
 Date: 2013-09-24
 Collate:
     'afex-package.R'

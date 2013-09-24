@@ -22,8 +22,8 @@
     Bugfixes
     
     o   Type 2 tests of mixed() were implemented incorretly (i.e.,
-        they did not what they should have given according
-        to the description given in the help file).
+        they did not give what they should have given according
+        to the description in the help file).
         
     o   aov.car() and ez.glm() now convert factor levels of within 
         subjects factors to be of length one so that long levels 
@@ -37,9 +37,9 @@
         nrow(data) (with warning). Thanks to Daniel Bunker
         for reporting this.
         
-    o   mixed should work with the neweset version of lme4 (> 1.0)
-        and the newst version of pbkrtest (>= 0.3-5.1), but also 
-        with older versions.
+    o   mixed should work with the neweset version of lme4 (>= 1.0.4)
+        and the newst version of pbkrtest (>= 0.3-5.1), but not 
+        with older versions (due to CRAN policy to disallow :::).
 
                     ************************
                     ** afex VERSION 0.5-x **
