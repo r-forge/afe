@@ -6,7 +6,7 @@ Depends:
     coin,
     car,
     lme4 (>= 1.0.4),
-    pbkrtest (>= 0.3-2)
+    pbkrtest (>= 0.3-6)
 Suggests:
     ascii,
     xtable,
@@ -36,8 +36,8 @@ Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.6-82
-Date: 2013-09-24
+Version: 0.7-83
+Date: 2013-10-01
 Collate:
     'afex-package.R'
     'aov.car.R'

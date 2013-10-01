@@ -13,7 +13,6 @@ data(obk.long, package = "afex")
 
 #LMMs:
 (x1 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long))
-str(x1, 1)
 
 (x2 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "PB", args.test = list(nsim = 10)))
 str(x2, 1)
@@ -70,6 +69,9 @@ cl <- makeCluster(rep("localhost", 2), outfile = "cl.log.txt")
 
 mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
 
+m1 <- lmer(value ~ treatment*phase*hour +(1|id), data = obk.long)
+
+mixed(m1, data = obk.long, method = "LRT", cl = cl)
 
 # example data from package languageR:
 # Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, with variables linked to subject or word. 

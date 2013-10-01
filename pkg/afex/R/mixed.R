@@ -130,7 +130,7 @@
 #' 
 
 mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, cl = NULL, ...) {
-	if (check.contrasts) {
+  if (check.contrasts) {
     #browser()
     vars.to.check <- all.vars(formula)
     resetted <- NULL
@@ -152,7 +152,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	# browser()
 	# prepare fitting (i.e., obtain model info)
 	mc <- match.call()
+  #browser()
 	formula.f <- as.formula(formula)
+  if (class(formula) != "formula") message("Formula (the first argument) converted to formula.")
 	dv <- as.character(formula.f)[[2]]
 	all.terms <- attr(terms(formula.f), "term.labels")
 	effect.order <- attr(terms(formula.f), "order")
@@ -180,13 +182,14 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	}
 	# obtain the lmer fits
 	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter", "cl")]
+  mf[["formula"]] <- formula.f
 	if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
-  else mf[[1]] <- as.name("lmer")
-    mf[["data"]] <- as.name("data")
-    if (method[1] == "PB" & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
-        message("REML argument to lmer() set to FALSE for method = 'PB'")
-        mf[["REML"]] <- FALSE
-    }
+	else mf[[1]] <- as.name("lmer")
+	mf[["data"]] <- as.name("data")
+	if (method[1] == "PB" & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
+	  message("REML argument to lmer() set to FALSE for method = 'PB'")
+	  mf[["REML"]] <- FALSE
+	}
 	#browser()
 	## prepare (g)lmer formulas:
 	if (type == 3 | type == "III") {
@@ -216,7 +219,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	  }
     # make formulas
 	  formulas <- vector("list", length(fixed.effects) + 1)
-    formulas[[1]] <- mf[[2]]
+    formulas[[1]] <- mf[["formula"]]
 	  for (i in seq_along(fixed.effects)) {
 	    tmp.columns <- str_c(deparse(-which(mapping == (i-1))), collapse = "")
 	    formulas[[i+1]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
@@ -227,7 +230,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	  if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 3 tests.")
 	  full.model.formulas <- vector("list", max.effect.order)
 	  submodel.formulas <- vector("list", length(fixed.effects))
-	  full.model.formulas[[length(full.model.formulas)]] <- mf[[2]]
+	  full.model.formulas[[length(full.model.formulas)]] <- mf[["formula"]]
 	  for (c in seq_len(max.effect.order)) {
 	    if (c == max.effect.order) next 
 	    tmp.columns <- str_c(deparse(-which(mapping %in% which(effect.order > c))), collapse = "")
@@ -246,7 +249,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     if (progress) cat(str_c("Fitting ", length(formulas), " (g)lmer() models:\n["))
     fits <- vector("list", length(formulas))
     for (i in seq_along(formulas)) {
-      mf[[2]] <- formulas[[i]]
+      mf[["formula"]] <- formulas[[i]]
       fits[[i]] <- eval(mf)
       if (progress) cat(".")
     }
