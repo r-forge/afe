@@ -15,6 +15,10 @@
         formula correctly to a formula (gave error if formula
         was a different object and not-available on cluster nodes).
         Prints message if formula is converted to a formula.
+        
+    o   mixed() sets REML = FALSE if method = "LRT" and no 
+        family argument is present (i.e., for LMMs) as LRTs
+        for models fitted with REML are not recommended.
 
 
                     ************************

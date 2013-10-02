@@ -186,8 +186,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 	if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
 	else mf[[1]] <- as.name("lmer")
 	mf[["data"]] <- as.name("data")
-	if (method[1] == "PB" & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
-	  message("REML argument to lmer() set to FALSE for method = 'PB'")
+	if ((method[1] %in% c("PB", "LRT")) & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
+	  message("REML argument to lmer() set to FALSE for method = 'PB' or 'LRT'")
 	  mf[["REML"]] <- FALSE
 	}
 	#browser()
