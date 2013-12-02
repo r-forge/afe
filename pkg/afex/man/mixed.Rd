@@ -256,7 +256,7 @@ mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl 
   Barr, D. J., Levy, R., Scheepers, C., & Tily, H. J.
   (2013). Random effects structure for confirmatory
   hypothesis testing: Keep it maximal. \emph{Journal of
-  Memory and Language}, 68(3), 255–278.
+  Memory and Language}, 68(3), 255-278.
   doi:10.1016/j.jml.2012.11.001
 
   Judd, C. M., Westfall, J., & Kenny, D. A. (2012).

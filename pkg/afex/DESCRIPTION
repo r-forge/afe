@@ -36,8 +36,8 @@ Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.7-85
-Date: 2013-12-02
+Version: 0.7-86
+Date: 2013-12-03
 Collate:
     'afex-package.R'
     'aov.car.R'
