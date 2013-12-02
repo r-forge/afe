@@ -16,6 +16,10 @@
         was a different object and not-available on cluster nodes).
         Prints message if formula is converted to a formula.
         
+    o   Using multicore for fitting the models prodcued erroneous 
+        results (did not use correct contrasta as nodes). This is
+        corrected now.
+        
     o   mixed() sets REML = FALSE if method = "LRT" and no 
         family argument is present (i.e., for LMMs) as LRTs
         for models fitted with REML are not recommended.

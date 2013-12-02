@@ -263,6 +263,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     }
     if (progress) cat(paste0("Fitting ", length(formulas), " (g)lmer() models.\n"))
     junk <- clusterEvalQ(cl = cl, library("lme4", character.only = TRUE))
+    if (options("contrasts")[[1]][1] == "contr.sum") junk <- clusterEvalQ(cl = cl, options(contrasts=c('contr.sum', 'contr.poly')))
     if (progress) junk <- clusterEvalQ(cl = cl, cat("["))
     fits <- clusterApplyLB(cl = cl, x = formulas, eval.cl, m.call = mf, progress = progress)
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))
