@@ -26,7 +26,7 @@
 #' \item \code{method} The \code{method} argument used when calling this function.
 #' }
 #'
-#' The following methods exist for objects of class \code{"mixed"}: \code{print} (which uses rounding and only returns the results with \code{F.scaling = 1}), \code{summary}, and \code{anova} (the latter two return the same data.frame).
+#' The following methods exist for objects of class \code{"mixed"}: \code{print} (which uses rounding and invisibly returns the output), \code{summary}, and \code{anova} (the latter two return the same data.frame).
 #'
 #' @details Type 3 tests are obtained by comparing a model in which only the corresponding effect is missing with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"lmerMod"} models.
 #'
@@ -40,7 +40,7 @@
 #'
 #' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"merMod"} objects. This is recommended by Barr et al. (2013) which did not test the other methods implemented here. Furthermore, this is not recommended by the \href{http://glmm.wikidot.com/faq}{lme4 faq} which instead recommends the other methods implemented here.
 #' 
-#' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all factors in the formula if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}.
+#' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all factors in the formula if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. Furthermore, the current contrasts (obtained via \code{getOption("contrasts")}) will be set at the cluster nodes if \code{cl} is not \code{NULL}.
 #'
 #' @note Please report all bugs to henrik.singmann (at) psychologie.uni-freiburg.de \cr
 #' There might be problems with rather big models when constructing the model matrix to fit the \code{lmer} models (potentially problematic with Type 2 tests). If you find any such bug, please send an example including code and data!
@@ -70,9 +70,9 @@
 #' @examples
 #' \dontrun{
 #' 
-#' # use the obk.long data (mildly reasonable)
+#' # use the obk.long data (not reasonable, no random slopes)
 #' data(obk.long)
-#' mixed(value ~ treatment * phase + (hour|id), obk.long)
+#' mixed(value ~ treatment * phase + (1|id), obk.long)
 #'
 #' # Examples for using the per.parammeter argument:
 #' data(obk.long, package = "afex")
@@ -338,8 +338,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     df.small  <- vapply(tests, function(x) x[["Df"]][1], 0)
     chisq  <- vapply(tests, function(x) x[["Chisq"]][2], 0)
     df  <- vapply(tests, function(x) x[["Chi Df"]][2], 0)
-    p  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
-    df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p, stringsAsFactors = FALSE)
+    p.value  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
+    df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p.value, stringsAsFactors = FALSE)
     rownames(df.out) <- NULL
   } else stop('Only methods "KR", "PB" or "LRT" currently implemented.')
   #prepare output object
@@ -348,23 +348,33 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
   list.out
 }
 
+round.ps <- function(x) {
+  substr(as.character(ifelse(x < 0.0001, " <.0001", ifelse(x < 0.001, formatC(x, digits = 4, format = "f"), ifelse(x < 0.01, formatC(x, digits = 3, format = "f"), ifelse(round(x, 2) == 1, " >.99", formatC(x, digits = 2, format = "f")))))), 2, 7)
+}
+
+
 print.mixed <- function(x, ...) {
   if (x[["method"]] == "KR") {
     tmp <- x[[1]][,1:6]
-    tmp[,2:6] <- apply(tmp[,2:6], c(1,2), round, digits = 4)
-    print(tmp)
+    tmp[,"stat"] <- formatC(tmp[,"stat"], format = "f", digits = 2)
+    tmp[,"ddf"] <- prettyNum(tmp[,"ddf"], digits = 2)
+    tmp[,"F.scaling"] <- prettyNum(tmp[,"F.scaling"], digits = 2)
+    
   } else if (x[["method"]] == "PB") {
     tmp <- x[[1]][,1:3]
-    tmp[,2:3] <- apply(tmp[,2:3], c(1,2), round, digits = 4)
-    print(tmp)
+    tmp[,2] <- formatC(tmp[,2], format = "f", digits = 2)
   } else if (x[["method"]] == "LRT") {
     tmp <- x[[1]]
-    tmp[,"chisq"] <- round(tmp[,"chisq"], 2)
-    tmp[,"p"] <- round(tmp[,"p"], 4)
-    print(tmp)
+    tmp[,"chisq"] <- formatC(tmp[,"chisq"], format = "f", digits = 2)
   }
+  tmp[,"p.value"] <- round.ps(tmp[,"p.value"])
+  warnings <- lapply(x[[3]], function(y) y@optinfo$warnings)
+  warn <- vapply(warnings, function(y)  !length(y)==0, NA)
+  if (any(warn)) warning("At least the following warnings were obtained when fitting via lme4:\n", paste(paste(names(which(warn)), vapply(warnings[warn], function(x) x[[1]][1], ""), sep = ": "), collapse = "\n"))
+  print(tmp)
   invisible(tmp)
 }
+
 
 summary.mixed <- function(object, ...) object[[1]]
 

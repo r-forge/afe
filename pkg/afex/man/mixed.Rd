@@ -77,9 +77,8 @@
 
   The following methods exist for objects of class
   \code{"mixed"}: \code{print} (which uses rounding and
-  only returns the results with \code{F.scaling = 1}),
-  \code{summary}, and \code{anova} (the latter two return
-  the same data.frame).
+  invisibly returns the output), \code{summary}, and
+  \code{anova} (the latter two return the same data.frame).
 }
 \description{
   Fits and calculates p-values for all effects in a mixed
@@ -158,6 +157,9 @@
   to \code{"contr.sum"} for all factors in the formula if
   default contrasts are not equal to \code{"contr.sum"} or
   \code{attrib(factor, "contrasts") != "contr.sum"}.
+  Furthermore, the current contrasts (obtained via
+  \code{getOption("contrasts")}) will be set at the cluster
+  nodes if \code{cl} is not \code{NULL}.
 }
 \note{
   Please report all bugs to henrik.singmann (at)
@@ -178,9 +180,9 @@
 \examples{
 \dontrun{
 
-# use the obk.long data (mildly reasonable)
+# use the obk.long data (not reasonable, no random slopes)
 data(obk.long)
-mixed(value ~ treatment * phase + (hour|id), obk.long)
+mixed(value ~ treatment * phase + (1|id), obk.long)
 
 # Examples for using the per.parammeter argument:
 data(obk.long, package = "afex")

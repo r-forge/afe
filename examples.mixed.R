@@ -7,12 +7,13 @@ install_github("lme4",user="lme4")
 install_github("lme4",user="lme4", ref = "release") 
 
 install.packages("pbkrtest")
+require(afex)
 
 # Examples:
 data(obk.long, package = "afex")
 
 #LMMs:
-(x1 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long))
+(x1 <- mixed(value ~ treatment*phase*hour +(hour|id), data = obk.long))
 
 (x2 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "PB", args.test = list(nsim = 10)))
 str(x2, 1)
@@ -69,7 +70,7 @@ cl <- makeCluster(rep("localhost", 2), outfile = "cl.log.txt")
 
 m0 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
 m0[[2]]
-
+m0
 m1 <- lmer(value ~ treatment*phase*hour +(1|id), data = obk.long)
 
 mixed(m1, data = obk.long, method = "LRT", cl = cl)
