@@ -12,7 +12,7 @@
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See details.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
 #' @param progress  if \code{TRUE}, shows progress with a text progress bar
-#' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. Note that afex sets the current contrasts (\code{getOption("contrasts")}) at the nodes.
+#' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. If \code{ckeck.contrasts}, mixed sets the current contrasts (\code{getOption("contrasts")}) at the nodes.
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
 #'
 #' @return An object of class \code{"mixed"} (i.e., a list) with the following elements:
@@ -149,24 +149,24 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     if (!is.null(resetted)) message(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
   }
   #warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
-	# browser()
-	# prepare fitting (i.e., obtain model info)
-	mc <- match.call()
+  # browser()
+  # prepare fitting (i.e., obtain model info)
+  mc <- match.call()
   #browser()
-	formula.f <- as.formula(formula)
+  formula.f <- as.formula(formula)
   if (class(formula) != "formula") message("Formula (the first argument) converted to formula.")
-	dv <- as.character(formula.f)[[2]]
-	all.terms <- attr(terms(formula.f), "term.labels")
-	effect.order <- attr(terms(formula.f), "order")
-	effect.order <- effect.order[!grepl("\\|", all.terms)]
-	max.effect.order <- max(effect.order)
-	random <- str_c(str_c("(", all.terms[grepl("\\|", all.terms)], ")"), collapse = " + ")
-	rh2 <- nobars(formula.f)
-	rh2[[2]] <- NULL
-	m.matrix <- model.matrix(rh2, data = data)
-	fixed.effects <- attr(terms(rh2, data = data), "term.labels")
-	mapping <- attr(m.matrix, "assign")
-	fixed.vars <- all.vars(rh2)
+  dv <- as.character(formula.f)[[2]]
+  all.terms <- attr(terms(formula.f), "term.labels")
+  effect.order <- attr(terms(formula.f), "order")
+  effect.order <- effect.order[!grepl("\\|", all.terms)]
+  max.effect.order <- max(effect.order)
+  random <- str_c(str_c("(", all.terms[grepl("\\|", all.terms)], ")"), collapse = " + ")
+  rh2 <- nobars(formula.f)
+  rh2[[2]] <- NULL
+  m.matrix <- model.matrix(rh2, data = data)
+  fixed.effects <- attr(terms(rh2, data = data), "term.labels")
+  mapping <- attr(m.matrix, "assign")
+  fixed.vars <- all.vars(rh2)
   # check for missing values in variables used:
   if (nrow(m.matrix) != nrow(data)) {
     data <- model.frame(as.formula(str_c(vars.to.check[1], "~", str_c(vars.to.check[-1], collapse = "+"))), data = data)
@@ -175,74 +175,74 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
   }
   
   # check if numerical variables are centered
-	c.ns <- fixed.vars[vapply(data[, fixed.vars, drop = FALSE], is.numeric, TRUE)]
-	if (length(c.ns) > 0) {
-	  non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
-	  if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results if in interactions): ", str_c(non.null, collapse = ", ")))
-	}
-	# obtain the lmer fits
-	mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter", "cl")]
+  c.ns <- fixed.vars[vapply(data[, fixed.vars, drop = FALSE], is.numeric, TRUE)]
+  if (length(c.ns) > 0) {
+    non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
+    if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results if in interactions): ", str_c(non.null, collapse = ", ")))
+  }
+  # obtain the lmer fits
+  mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter", "cl")]
   mf[["formula"]] <- formula.f
-	if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
-	else mf[[1]] <- as.name("lmer")
-	mf[["data"]] <- as.name("data")
-	if ((method[1] %in% c("PB", "LRT")) & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
-	  message("REML argument to lmer() set to FALSE for method = 'PB' or 'LRT'")
-	  mf[["REML"]] <- FALSE
-	}
-	#browser()
-	## prepare (g)lmer formulas:
-	if (type == 3 | type == "III") {
-	  if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
-	  #per.parameter <- c("hour", "treatment")
-	  # The next part alters the mapping of parameters to effects/variables if
-	  # per.parameter is not NULL (this does the complete magic).
-	  if (!is.null(per.parameter)) {
-	    fixed.to.change <- c()
-	    for (parameter in per.parameter) {
-	      fixed.to.change <- c(fixed.to.change, grep(parameter, fixed.effects))
-	    }
-	    fixed.to.change <- fixed.effects[sort(unique(fixed.to.change))]
-	    if ("(Intercept)" %in% fixed.to.change) fixed.to.change <- fixed.to.change[-1]
-	    fixed.all <- dimnames(m.matrix)[[2]]
-	    #tf2 <- fixed.to.change[2]
-	    for (tf2 in fixed.to.change) {
-	      tf <- which(fixed.effects == tf2)
-	      fixed.lower <- fixed.effects[seq_len(tf-1)]
-	      fixed.upper <- if (tf < length(fixed.effects)) fixed.effects[(tf+1):length(fixed.effects)] else NULL
-	      fixed.effects <- c(fixed.lower, fixed.all[which(mapping == (tf-1))], fixed.upper)
-	      map.to.replace <- which(mapping == (tf-1))
-	      map.lower <- mapping[seq_len(map.to.replace[1]-1)]
-	      map.upper <- if (max(map.to.replace) < length(mapping)) mapping[(map.to.replace[length(map.to.replace)]+1):length(mapping)] else NULL
-	      mapping <- c(map.lower, seq_along(map.to.replace) + map.lower[length(map.lower)], map.upper + length(map.to.replace)-1)
-	    }
-	  }
+  if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
+  else mf[[1]] <- as.name("lmer")
+  mf[["data"]] <- as.name("data")
+  if ((method[1] %in% c("PB", "LRT")) & !("family" %in% names(mf))) if ((!"REML" %in% names(mf)) || mf[["REML"]]) {
+    message("REML argument to lmer() set to FALSE for method = 'PB' or 'LRT'")
+    mf[["REML"]] <- FALSE
+  }
+  #browser()
+  ## prepare (g)lmer formulas:
+  if (type == 3 | type == "III") {
+    if (attr(terms(rh2, data = data), "intercept") == 1) fixed.effects <- c("(Intercept)", fixed.effects)
+    #per.parameter <- c("hour", "treatment")
+    # The next part alters the mapping of parameters to effects/variables if
+    # per.parameter is not NULL (this does the complete magic).
+    if (!is.null(per.parameter)) {
+      fixed.to.change <- c()
+      for (parameter in per.parameter) {
+        fixed.to.change <- c(fixed.to.change, grep(parameter, fixed.effects))
+      }
+      fixed.to.change <- fixed.effects[sort(unique(fixed.to.change))]
+      if ("(Intercept)" %in% fixed.to.change) fixed.to.change <- fixed.to.change[-1]
+      fixed.all <- dimnames(m.matrix)[[2]]
+      #tf2 <- fixed.to.change[2]
+      for (tf2 in fixed.to.change) {
+        tf <- which(fixed.effects == tf2)
+        fixed.lower <- fixed.effects[seq_len(tf-1)]
+        fixed.upper <- if (tf < length(fixed.effects)) fixed.effects[(tf+1):length(fixed.effects)] else NULL
+        fixed.effects <- c(fixed.lower, fixed.all[which(mapping == (tf-1))], fixed.upper)
+        map.to.replace <- which(mapping == (tf-1))
+        map.lower <- mapping[seq_len(map.to.replace[1]-1)]
+        map.upper <- if (max(map.to.replace) < length(mapping)) mapping[(map.to.replace[length(map.to.replace)]+1):length(mapping)] else NULL
+        mapping <- c(map.lower, seq_along(map.to.replace) + map.lower[length(map.lower)], map.upper + length(map.to.replace)-1)
+      }
+    }
     # make formulas
-	  formulas <- vector("list", length(fixed.effects) + 1)
+    formulas <- vector("list", length(fixed.effects) + 1)
     formulas[[1]] <- mf[["formula"]]
-	  for (i in seq_along(fixed.effects)) {
-	    tmp.columns <- str_c(deparse(-which(mapping == (i-1))), collapse = "")
-	    formulas[[i+1]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
-	  }
-	  names(formulas) <- fixed.effects
-	} else if (type == 2 | type == "II") {
-	  warning("Implementation of Type 2 method not unproblematic.\n  Check documentation or use car::Anova (Wald tests).")
-	  if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 3 tests.")
-	  full.model.formulas <- vector("list", max.effect.order)
-	  submodel.formulas <- vector("list", length(fixed.effects))
-	  full.model.formulas[[length(full.model.formulas)]] <- mf[["formula"]]
-	  for (c in seq_len(max.effect.order)) {
-	    if (c == max.effect.order) next 
-	    tmp.columns <- str_c(deparse(-which(mapping %in% which(effect.order > c))), collapse = "")
-	    full.model.formulas[[c]] <-  as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
-	  }
-	  for (c in seq_along(fixed.effects)) {
-	    order.c <- effect.order[c]
-	    tmp.columns <- str_c(deparse(-which(mapping == (c) | mapping %in% if (order.c == max.effect.order) -1 else which(effect.order > order.c))), collapse = "")
-	    submodel.formulas[[c]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
-	  }
-	  formulas <- c(full.model.formulas, submodel.formulas)
-	} else stop('Only type 3 and type 2 tests implemented.')
+    for (i in seq_along(fixed.effects)) {
+      tmp.columns <- str_c(deparse(-which(mapping == (i-1))), collapse = "")
+      formulas[[i+1]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
+    }
+    names(formulas) <- fixed.effects
+  } else if (type == 2 | type == "II") {
+    warning("Implementation of Type 2 method not unproblematic.\n  Check documentation or use car::Anova (Wald tests).")
+    if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 3 tests.")
+    full.model.formulas <- vector("list", max.effect.order)
+    submodel.formulas <- vector("list", length(fixed.effects))
+    full.model.formulas[[length(full.model.formulas)]] <- mf[["formula"]]
+    for (c in seq_len(max.effect.order)) {
+      if (c == max.effect.order) next 
+      tmp.columns <- str_c(deparse(-which(mapping %in% which(effect.order > c))), collapse = "")
+      full.model.formulas[[c]] <-  as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
+    }
+    for (c in seq_along(fixed.effects)) {
+      order.c <- effect.order[c]
+      tmp.columns <- str_c(deparse(-which(mapping == (c) | mapping %in% if (order.c == max.effect.order) -1 else which(effect.order > order.c))), collapse = "")
+      submodel.formulas[[c]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
+    }
+    formulas <- c(full.model.formulas, submodel.formulas)
+  } else stop('Only type 3 and type 2 tests implemented.')
   ## fit models
   # single core
   if (is.null(cl)) {
@@ -264,104 +264,106 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     if (progress) cat(paste0("Fitting ", length(formulas), " (g)lmer() models.\n"))
     #junk <- clusterEvalQ(cl = cl, library("lme4", character.only = TRUE))
     junk <- clusterEvalQ(cl = cl, loadNamespace("lme4"))
-    curr.contrasts <- getOption("contrasts")
-    clusterExport(cl = cl, "curr.contrasts", envir = sys.nframe())
-    junk <- clusterEvalQ(cl = cl, options(contrasts=curr.contrasts))
+    if (check.contrasts)  {
+      curr.contrasts <- getOption("contrasts")
+      clusterExport(cl = cl, "curr.contrasts", envir = sys.nframe())
+      junk <- clusterEvalQ(cl = cl, options(contrasts=curr.contrasts))
+    }
     if (progress) junk <- clusterEvalQ(cl = cl, cat("["))
     fits <- clusterApplyLB(cl = cl, x = formulas, eval.cl, m.call = mf, progress = progress)
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))
   }
   ## prepare for p-values:
-	if (type == 3 | type == "III") {
+  if (type == 3 | type == "III") {
     full.model <- fits[[1]]
     fits <- fits[-1]
-	} else if (type == 2 | type == "II") {
+  } else if (type == 2 | type == "II") {
     full.model <- fits[1:max.effect.order]
     fits <- fits[(max.effect.order+1):length(fits)]
-	}
-	names(fits) <- fixed.effects
-	# obtain p-values:
+  }
+  names(fits) <- fixed.effects
+  # obtain p-values:
   #browser()
-	if (method[1] == "KR") {
-	  if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
-		tests <- vector("list", length(fixed.effects))
-		for (c in seq_along(fixed.effects)) {
-			if (type == 3 | type == "III") tests[[c]] <- KRmodcomp(full.model, fits[[c]])
-			else if (type == 2 | type == "II") {
-			  order.c <- effect.order[c]
-        tests[[c]] <- KRmodcomp(full.model[[order.c]], fits[[c]])
-			}
-			if (progress) cat(".")
-		}
-		if (progress) cat("]\n")
-		names(tests) <- fixed.effects
-		df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-		df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
-		FtestU <- vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))
-		row.names(FtestU) <- str_c(row.names(FtestU), ".U")
-		df.out <- cbind(df.out, t(FtestU))
-		rownames(df.out) <- NULL
-		#browser()
-	} else if (method[1] == "PB") {
-	  if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
+  if (method[1] == "KR") {
+    if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
     tests <- vector("list", length(fixed.effects))
-		for (c in seq_along(fixed.effects)) {
-			if (type == 3 | type == "III") tests[[c]] <- do.call(PBmodcomp, args = c(largeModel = full.model, smallModel = fits[[c]], args.test))
-			else if (type == 2 | type == "II") {
-			  order.c <- effect.order[c]
+    for (c in seq_along(fixed.effects)) {
+      if (type == 3 | type == "III") tests[[c]] <- KRmodcomp(full.model, fits[[c]])
+      else if (type == 2 | type == "II") {
+        order.c <- effect.order[c]
+        tests[[c]] <- KRmodcomp(full.model[[order.c]], fits[[c]])
+      }
+      if (progress) cat(".")
+    }
+    if (progress) cat("]\n")
+    names(tests) <- fixed.effects
+    df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
+    df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
+    FtestU <- vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))
+    row.names(FtestU) <- str_c(row.names(FtestU), ".U")
+    df.out <- cbind(df.out, t(FtestU))
+    rownames(df.out) <- NULL
+    #browser()
+  } else if (method[1] == "PB") {
+    if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
+    tests <- vector("list", length(fixed.effects))
+    for (c in seq_along(fixed.effects)) {
+      if (type == 3 | type == "III") tests[[c]] <- do.call(PBmodcomp, args = c(largeModel = full.model, smallModel = fits[[c]], args.test))
+      else if (type == 2 | type == "II") {
+        order.c <- effect.order[c]
         tests[[c]] <- do.call(PBmodcomp, args = c(largeModel = full.model[[order.c]], smallModel = fits[[c]], args.test))
-			}
-			if (progress) cat(".")
-        }
-        if (progress) cat("]\n")
-        names(tests) <- fixed.effects
-        df.out<- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-        df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,])))[,-2])
-        LRT <- vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))
-        row.names(LRT) <- str_c(row.names(LRT), ".LRT")
-        df.out <- cbind(df.out, t(LRT))
-        rownames(df.out) <- NULL
-	} else if (method[1] == "LRT") {
-	  tests <- vector("list", length(fixed.effects))
-	  for (c in seq_along(fixed.effects)) {
-	    if (type == 3 | type == "III") tests[[c]] <- anova(full.model, fits[[c]])
-	    else if (type == 2 | type == "II") {
-	      order.c <- effect.order[c]
+      }
+      if (progress) cat(".")
+    }
+    if (progress) cat("]\n")
+    names(tests) <- fixed.effects
+    df.out<- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
+    df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,])))[,-2])
+    LRT <- vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))
+    row.names(LRT) <- str_c(row.names(LRT), ".LRT")
+    df.out <- cbind(df.out, t(LRT))
+    rownames(df.out) <- NULL
+  } else if (method[1] == "LRT") {
+    tests <- vector("list", length(fixed.effects))
+    for (c in seq_along(fixed.effects)) {
+      if (type == 3 | type == "III") tests[[c]] <- anova(full.model, fits[[c]])
+      else if (type == 2 | type == "II") {
+        order.c <- effect.order[c]
         tmpModel  <- full.model[[order.c]] 
         tests[[c]] <- anova(tmpModel, fits[[c]])
-	    }
-	  }
-	  names(tests) <- fixed.effects
+      }
+    }
+    names(tests) <- fixed.effects
     df.large  <- vapply(tests, function(x) x[["Df"]][2], 0)
-	  df.small  <- vapply(tests, function(x) x[["Df"]][1], 0)
-	  chisq  <- vapply(tests, function(x) x[["Chisq"]][2], 0)
-	  df  <- vapply(tests, function(x) x[["Chi Df"]][2], 0)
-	  p  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
-	  df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p, stringsAsFactors = FALSE)
-	  rownames(df.out) <- NULL
-	} else stop('Only methods "KR", "PB" or "LRT" currently implemented.')
-	#prepare output object
-	list.out <- list(anova.table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
-	class(list.out) <- "mixed"
-	list.out
+    df.small  <- vapply(tests, function(x) x[["Df"]][1], 0)
+    chisq  <- vapply(tests, function(x) x[["Chisq"]][2], 0)
+    df  <- vapply(tests, function(x) x[["Chi Df"]][2], 0)
+    p  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
+    df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p, stringsAsFactors = FALSE)
+    rownames(df.out) <- NULL
+  } else stop('Only methods "KR", "PB" or "LRT" currently implemented.')
+  #prepare output object
+  list.out <- list(anova.table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
+  class(list.out) <- "mixed"
+  list.out
 }
 
 print.mixed <- function(x, ...) {
-    if (x[["method"]] == "KR") {
-        tmp <- x[[1]][,1:6]
-        tmp[,2:6] <- apply(tmp[,2:6], c(1,2), round, digits = 4)
-        print(tmp)
-    } else if (x[["method"]] == "PB") {
-        tmp <- x[[1]][,1:3]
-        tmp[,2:3] <- apply(tmp[,2:3], c(1,2), round, digits = 4)
-        print(tmp)
-    } else if (x[["method"]] == "LRT") {
-      tmp <- x[[1]]
-      tmp[,"chisq"] <- round(tmp[,"chisq"], 2)
-      tmp[,"p"] <- round(tmp[,"p"], 4)
-      print(tmp)
-    }
-    invisible(tmp)
+  if (x[["method"]] == "KR") {
+    tmp <- x[[1]][,1:6]
+    tmp[,2:6] <- apply(tmp[,2:6], c(1,2), round, digits = 4)
+    print(tmp)
+  } else if (x[["method"]] == "PB") {
+    tmp <- x[[1]][,1:3]
+    tmp[,2:3] <- apply(tmp[,2:3], c(1,2), round, digits = 4)
+    print(tmp)
+  } else if (x[["method"]] == "LRT") {
+    tmp <- x[[1]]
+    tmp[,"chisq"] <- round(tmp[,"chisq"], 2)
+    tmp[,"p"] <- round(tmp[,"p"], 4)
+    print(tmp)
+  }
+  invisible(tmp)
 }
 
 summary.mixed <- function(object, ...) object[[1]]
