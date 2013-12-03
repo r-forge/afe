@@ -67,7 +67,8 @@ mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long
 require(parallel)
 cl <- makeCluster(rep("localhost", 2), outfile = "cl.log.txt")
 
-mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
+m0 <- mixed(value ~ treatment*phase*hour +(1|id), data = obk.long, method = "LRT", cl = cl)
+m0[[2]]
 
 m1 <- lmer(value ~ treatment*phase*hour +(1|id), data = obk.long)
 

@@ -3,7 +3,7 @@
                     ************************
                     
                     Changes in afex Version 0.7-x
-                    Released XXX 2013
+                    Released December 2013
 
     Significant User Visible Changes and New Features
 
@@ -17,12 +17,15 @@
         Prints message if formula is converted to a formula.
         
     o   Using multicore for fitting the models prodcued erroneous 
-        results (did not use correct contrasta as nodes). This is
-        corrected now.
+        results (did not use correct contrasts at nodes). Now the
+        current contrasts are also set at the nodes.
         
     o   mixed() sets REML = FALSE if method = "LRT" and no 
         family argument is present (i.e., for LMMs) as LRTs
         for models fitted with REML are not recommended.
+        
+    o   on the cluster nodes now only the lme4 namespace is 
+        loaded (instead of using library) to avoid a CRAN note.
 
 
                     ************************

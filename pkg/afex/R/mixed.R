@@ -12,7 +12,7 @@
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See details.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
 #' @param progress  if \code{TRUE}, shows progress with a text progress bar
-#' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples.
+#' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. Note that afex sets the current contrasts (\code{getOption("contrasts")}) at the nodes.
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
 #'
 #' @return An object of class \code{"mixed"} (i.e., a list) with the following elements:
@@ -262,8 +262,11 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
       return(res)
     }
     if (progress) cat(paste0("Fitting ", length(formulas), " (g)lmer() models.\n"))
-    junk <- clusterEvalQ(cl = cl, library("lme4", character.only = TRUE))
-    if (options("contrasts")[[1]][1] == "contr.sum") junk <- clusterEvalQ(cl = cl, options(contrasts=c('contr.sum', 'contr.poly')))
+    #junk <- clusterEvalQ(cl = cl, library("lme4", character.only = TRUE))
+    junk <- clusterEvalQ(cl = cl, loadNamespace("lme4"))
+    curr.contrasts <- getOption("contrasts")
+    clusterExport(cl = cl, "curr.contrasts", envir = sys.nframe())
+    junk <- clusterEvalQ(cl = cl, options(contrasts=curr.contrasts))
     if (progress) junk <- clusterEvalQ(cl = cl, cat("["))
     fits <- clusterApplyLB(cl = cl, x = formulas, eval.cl, m.call = mf, progress = progress)
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))

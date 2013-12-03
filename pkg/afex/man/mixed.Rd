@@ -51,7 +51,9 @@
 
   \item{cl}{A vector identifying a cluster; used for
   distributing the estimation of the different models using
-  several cores. See examples.}
+  several cores. See examples. Note that afex sets the
+  current contrasts (\code{getOption("contrasts")}) at the
+  nodes.}
 
   \item{...}{further arguments (such as \code{weights})
   passed to \code{\link{lmer}}.}
