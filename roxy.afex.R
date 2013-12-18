@@ -8,7 +8,7 @@ svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/
 
 roxy.package(
 	pck.source.dir = "pkg/afex",
-	pck.version = str_c("0.7-", svn.number),
+	pck.version = str_c("0.8-", svn.number),
 	pck.description = data.frame(
 		Package = "afex",
 		Type = "Package",
@@ -25,9 +25,9 @@ roxy.package(
 		actions = c("roxy"),
 		R.libs = R.libs, 
 		repo.root = "rp.tmp")
-system("rmdir pkg/afex/inst")
+#system("rmdir pkg/afex/inst")
 
-checkNEWS("pkg/afex/NEWS")
+#checkNEWS("pkg/afex/NEWS")
 
 help(package = "afex")
 		

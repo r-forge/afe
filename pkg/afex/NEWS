@@ -1,4 +1,23 @@
                     ************************
+                    ** afex VERSION 0.8-x **
+                    ************************
+                    
+                    Changes in afex Version 0.8-x
+                    Released XXX 2014
+
+    Significant User Visible Changes and New Features
+
+    o   removed renaming of within subject factor levels to names
+        with length 1 (which was introduced in 0.6).
+    
+    Bugfixes
+    
+    o   removed bug that aov.car didn't work when running some ANCOVAs
+        (thanks to Gang Chen for reporting this).
+
+        
+
+                    ************************
                     ** afex VERSION 0.7-x **
                     ************************
                     

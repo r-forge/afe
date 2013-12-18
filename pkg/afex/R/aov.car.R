@@ -138,11 +138,12 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   new.factor.levels <- c(letters, LETTERS)
   for (within.factor in within) {
     data[,within.factor] <- factor(make.names(as.character(data[,within.factor])))
-    if (length(levels(data[,within.factor])) <= length(new.factor.levels)) levels(data[,within.factor]) <- new.factor.levels[seq_along(levels(data[,within.factor]))]
+    #if (length(levels(data[,within.factor])) <= length(new.factor.levels)) levels(data[,within.factor]) <- new.factor.levels[seq_along(levels(data[,within.factor]))]
   }
   # Check if each id is in only one between subjects cell.
-  if (length(between) > 0) {
-    split.data <- split(data, lapply(between, function(x) data[,x]))
+  between.factors <- between[vapply(data[, between, drop = FALSE], is.factor, TRUE)]
+  if (length(between.factors) > 0) {
+    split.data <- split(data, lapply(between.factors, function(x) data[,x]))
     ids.per.condition <- lapply(split.data, function(x) unique(as.character(x[,id])))
     ids.in.more.condition <- unique(unlist(lapply(seq_along(ids.per.condition), function(x) unique(unlist(lapply(ids.per.condition[-x], function(y, z = ids.per.condition[[x]]) intersect(z, y)))))))
     if (length(ids.in.more.condition) > 0) stop(str_c("Following ids are in more than one between subjects condition:\n", str_c(ids.in.more.condition, collapse = ", ")))
