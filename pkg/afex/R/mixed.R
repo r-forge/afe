@@ -357,8 +357,8 @@ print.mixed <- function(x, ...) {
   if (x[["method"]] == "KR") {
     tmp <- x[[1]][,1:6]
     tmp[,"stat"] <- formatC(tmp[,"stat"], format = "f", digits = 2)
-    tmp[,"ddf"] <- prettyNum(tmp[,"ddf"], digits = 2)
-    tmp[,"F.scaling"] <- prettyNum(tmp[,"F.scaling"], digits = 2)
+    tmp[,"ddf"] <- prettyNum(tmp[,"ddf"], digits = 2, nsmall = 2)
+    tmp[,"F.scaling"] <- prettyNum(tmp[,"F.scaling"], digits = 2, nsmall = 2)
     
   } else if (x[["method"]] == "PB") {
     tmp <- x[[1]][,1:3]
