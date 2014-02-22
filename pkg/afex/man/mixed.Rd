@@ -2,7 +2,9 @@
 \alias{mixed}
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
-mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
+mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"),
+     per.parameter = NULL, args.test = list(),
+     check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
 }
 \arguments{
   \item{formula}{a formula describing the full mixed-model
@@ -230,6 +232,8 @@ md_16.4b$cog <- scale(md_16.4b$cog, scale=FALSE)
 
 # parameters are again almost perfectly recovered:
 summary(mixed4_orig$full.model)
+
+
 
 \dontrun{
 

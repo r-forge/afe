@@ -1,6 +1,9 @@
 #' Data 16.4 from Maxwell & Delaney
 #'
-#' Data from a hypothetical inductive reasoning study. Description from pp. 841:
+#' Data from a hypothetical inductive reasoning study. 
+#' 
+#' 
+#' Description from pp. 841:
 #' 
 #' Suppose an educational psychologist has developed an intervention to teach inductive reasoning skills to school children. She decides to test the efficacy of her intervention by conducting a randomized design. Three classrooms of students are randomly assigned to the treatment condition, and 3 other classrooms are assigned to the control.
 #' 

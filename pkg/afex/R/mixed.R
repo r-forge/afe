@@ -2,7 +2,9 @@
 #'
 #' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Rogers approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}) (for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (all return the same data.frame).
 #'
-#' @usage mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
+#' @usage mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"), 
+#'      per.parameter = NULL, args.test = list(), 
+#'      check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
 #' @param data data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.
@@ -130,6 +132,8 @@
 #' 
 #' # parameters are again almost perfectly recovered:
 #' summary(mixed4_orig$full.model)
+#' 
+#' 
 #' 
 #' \dontrun{
 #' 

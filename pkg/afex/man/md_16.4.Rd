@@ -14,9 +14,10 @@ md_16.4
 }
 \description{
 Data from a hypothetical inductive reasoning study.
-Description from pp. 841:
 }
 \details{
+Description from pp. 841:
+
 Suppose an educational psychologist has developed an
 intervention to teach inductive reasoning skills to school
 children. She decides to test the efficacy of her

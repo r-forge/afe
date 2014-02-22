@@ -2,9 +2,14 @@
 #'
 #' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s). \code{ez.glm} is called specifying the factors as character vectors.
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", observed = NULL, args.return = list(), ...)
+#' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, 
+#'      factorize = TRUE, check.contrasts = TRUE, 
+#'      return = "nice", observed = NULL, args.return = list(), ...)
 #'
-#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", args.return = list(), ..., print.formula = FALSE)
+#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
+#'      observed = NULL, fun.aggregate = NULL, type = 3, 
+#'      factorize = TRUE, check.contrasts = TRUE, 
+#'      return = "nice", args.return = list(), ..., print.formula = FALSE)
 #' 
 #' univ(object)
 #'

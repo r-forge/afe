@@ -4,9 +4,14 @@
 \alias{univ}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
-aov.car(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", observed = NULL, args.return = list(), ...)
+aov.car(formula, data, fun.aggregate = NULL, type = 3,
+     factorize = TRUE, check.contrasts = TRUE,
+     return = "nice", observed = NULL, args.return = list(), ...)
 
-ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", args.return = list(), ..., print.formula = FALSE)
+ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
+     observed = NULL, fun.aggregate = NULL, type = 3,
+     factorize = TRUE, check.contrasts = TRUE,
+     return = "nice", args.return = list(), ..., print.formula = FALSE)
 
 univ(object)
 }
@@ -244,7 +249,18 @@ behavior.
 }
 \examples{
 
-# exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
+# Examples from a pureyl within-design from
+# Maxwell & Delaney (2004, Chapter 11),
+# Table 12.5 (p. 578):
+data(md_12.1)
+ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), 
+       args.return=list(correction = "none", es = "none"))
+
+# Default output
+ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))       
+
+
+# examples using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 
 data(obk.long, package = "afex")
 
@@ -334,13 +350,6 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
         within = NULL, type = 2, print.formula = TRUE, observed = "gender")
 
 # only within
-
-# Maxwell & Delaney (2004, Chapter 11),
-# Table 12.5 (p. 578):
-data(md_12.1)
-ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), 
-      args.return=list(correction = "none", es = "none"))
-
 aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
 
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
