@@ -3,17 +3,17 @@ Type: Package
 Title: Analysis of Factorial Experiments
 Depends:
     R (>= 2.14.0),
-    coin,
     car,
     lme4 (>= 1.0.4),
-    pbkrtest (>= 0.3-6)
+    pbkrtest (>= 0.3-6),
+    reshape2
 Suggests:
     ascii,
     xtable,
     parallel
 Imports:
-    reshape2,
-    stringr
+    stringr,
+    coin
 Description: Provides convenience functions for analyzing factorial
     experiments using ANOVA or mixed-models. ez.glm() and aov.car()
     allow convenient calculation of between, within (i.e.,

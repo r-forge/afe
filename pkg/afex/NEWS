@@ -18,6 +18,8 @@
         
     o   added examples data sets from Maxwell & Delaney (2004) for 
         within-subjects ANOVA and mixed models.
+        
+    o   reshape2 is now again in depends but coin only imported.
     
     Bugfixes
         
