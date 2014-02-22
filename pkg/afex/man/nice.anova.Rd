@@ -2,7 +2,8 @@
 \alias{nice.anova}
 \title{Make nice ANOVA table for printing.}
 \usage{
-nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), MSE = TRUE, sig.symbols = c(" +", " *", " **", " ***"))
+nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"),
+     MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
 }
 \arguments{
   \item{object}{An object of class \code{"Anova.mlm"} or
@@ -37,6 +38,10 @@ nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none
   \item{MSE}{logical. Should the column containing the Mean
   Sqaured Error (MSE) be displayed? Default is
   \code{TRUE}.}
+
+  \item{intercept}{logical. Should intercept (if present)
+  be printed (default is \code{FALSE} which suppresses
+  printing of the intercept)}
 }
 \value{
 A \code{data.frame} with the ANOVA table consisting of
@@ -85,8 +90,17 @@ to obtain the correct effect size estimate. Partial eta
 squared (\code{"pes"}) does not require this.
 }
 \examples{
-# exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
+## example from Olejnik & Algina (2003)
+# "Repeated Measures Design" (pp. 439):
+data(md_12.1)
+# create object of class Anova:
+rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"),
+              return = "Anova")
+# use different es:
+nice.anova(rmd, es = "pes") # noise: .82
+nice.anova(rmd, es = "ges") # noise: .39
 
+# exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 data(obk.long)
 # create object of class Anova:
 tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour),

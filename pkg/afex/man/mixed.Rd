@@ -173,6 +173,64 @@ especially on 32 bit Windows which only supports up to 2 or
 Windows FAQ}).
 }
 \examples{
+### replicate results from Table 16.3 (Maxwell & Delaney, 2004, p. 837)
+data(md_16.1)
+
+# original results need treatment contrasts:
+(mixed1_orig <- mixed(severity ~ sex + (1|id), md_16.1, check.contrasts=FALSE))
+summary(mixed1_orig$full.model)
+
+# p-values stay the same with afex default contrasts (contr.sum),
+# but estimates and t-values for the fixed effects parameters change.
+(mixed1 <- mixed(severity ~ sex + (1|id), md_16.1))
+summary(mixed1$full.model)
+
+
+# data for next examples (Maxwell & Delaney, Table 16.4)
+data(md_16.4)
+str(md_16.4)
+
+### replicate results from Table 16.6 (Maxwell & Delaney, 2004, p. 845)
+# Note that (1|room:cond) is needed because room is nested within cond.
+# p-values (almost) hold.
+(mixed2 <- mixed(induct ~ cond + (1|room:cond), md_16.4))
+# (differences are dut to the use of Kenward-Rogers approximation here,
+# whereas M&W's p-values are based on uncorrected df.)
+
+# again, to obtain identical parameter and t-values, use treatment contrasts:
+summary(mixed2$full.model) # not identical
+
+# prepare new data.frame with contrasts:
+md_16.4b <- within(md_16.4, cond <- C(cond, contr.treatment, base = 2))
+str(md_16.4b)
+
+# p-values stays identical:
+(mixed2_orig <- mixed(induct ~ cond + (1|room:cond), md_16.4b, check.contrasts=FALSE))
+summary(mixed2_orig$full.model) # replicates parameters
+
+
+### replicate results from Table 16.7 (Maxwell & Delaney, 2004, p. 851)
+# F-values (almost) hold, p-values (especially for skill) are off
+(mixed3 <- mixed(induct ~ cond + skill + (1|room:cond), md_16.4))
+
+# however, parameters are perfectly recovered when using the original contrasts:
+mixed3_orig <- mixed(induct ~ cond + skill + (1|room:cond), md_16.4b, check.contrasts=FALSE)
+summary(mixed3_orig$full.model)
+
+
+
+### replicate results from Table 16.10 (Maxwell & Delaney, 2004, p. 862)
+# for this we need to center cog:
+md_16.4b$cog <- scale(md_16.4b$cog, scale=FALSE)
+
+# F-values and p-values are relatively off:
+(mixed4 <- mixed(induct ~ cond*cog + (cog|room:cond), md_16.4b))
+# contrast has a relatively important influence on cog
+(mixed4_orig <- mixed(induct ~ cond*cog + (cog|room:cond), md_16.4b, check.contrasts=FALSE))
+
+# parameters are again almost perfectly recovered:
+summary(mixed4_orig$full.model)
+
 \dontrun{
 
 # use the obk.long data (not reasonable, no random slopes)
@@ -262,11 +320,19 @@ stimuli as a random factor in social psychology: A new and
 comprehensive solution to a pervasive but largely ignored
 problem. \emph{Journal of Personality and Social
 Psychology}, 103(1), 54-69. doi:10.1037/a0028347
+
+Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing
+experiments and analyzing data: a model-comparisons
+perspective.} Mahwah, N.J.: Lawrence Erlbaum Associates.
 }
 \seealso{
 \code{\link{ez.glm}} and \code{\link{aov.car}} for
 convenience functions to analyze experimental deisgns with
 classical ANOVA or ANCOVA wrapping
 \code{\link[car]{Anova}}.
+
+see the following foir the data sets from Maxwell and
+Delaney (2004) used: \code{\link{md_16.1}} and
+\code{\link{md_16.4}}.
 }
 

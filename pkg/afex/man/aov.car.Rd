@@ -256,22 +256,22 @@ ez.glm("id", "value", obk.long, between = c("treatment", "gender"),
         within = c("phase", "hour"), observed = "gender")
 
 # both calls return the same:
-##                         Effect          df   MSE         F  ges     p
-## 1                    treatment       2, 10 22.81    3.94 +  .20   .05
-## 2                       gender       1, 10 22.81    3.66 +  .11   .08
-## 3             treatment:gender       2, 10 22.81      2.86  .18   .10
-## 4                        phase 1.60, 15.99  5.02 16.13 ***  .15 <.001
-## 5              treatment:phase 3.20, 15.99  5.02    4.85 *  .10   .01
-## 6                 gender:phase 1.60, 15.99  5.02      0.28 .003   .71
-## 7       treatment:gender:phase 3.20, 15.99  5.02      0.64  .01   .61
-## 8                         hour 1.84, 18.41  3.39 16.69 ***  .13 <.001
-## 9               treatment:hour 3.68, 18.41  3.39      0.09 .002   .98
-## 10                 gender:hour 1.84, 18.41  3.39      0.45 .004   .63
-## 11       treatment:gender:hour 3.68, 18.41  3.39      0.62  .01   .64
-## 12                  phase:hour 3.60, 35.96  2.67      1.18  .02   .33
-## 13        treatment:phase:hour 7.19, 35.96  2.67      0.35 .009   .93
-## 14           gender:phase:hour 3.60, 35.96  2.67      0.93  .01   .45
-## 15 treatment:gender:phase:hour 7.19, 35.96  2.67      0.74  .02   .65
+##                         Effect          df   MSE         F  ges      p
+## 1                    treatment       2, 10 22.81    3.94 +  .20    .05
+## 2                       gender       1, 10 22.81    3.66 +  .11    .08
+## 3             treatment:gender       2, 10 22.81      2.86  .18    .10
+## 4                        phase 1.60, 15.99  5.02 16.13 ***  .15  .0003
+## 5              treatment:phase 3.20, 15.99  5.02    4.85 *  .10    .01
+## 6                 gender:phase 1.60, 15.99  5.02      0.28 .003    .71
+## 7       treatment:gender:phase 3.20, 15.99  5.02      0.64  .01    .61
+## 8                         hour 1.84, 18.41  3.39 16.69 ***  .13 <.0001
+## 9               treatment:hour 3.68, 18.41  3.39      0.09 .002    .98
+## 10                 gender:hour 1.84, 18.41  3.39      0.45 .004    .63
+## 11       treatment:gender:hour 3.68, 18.41  3.39      0.62  .01    .64
+## 12                  phase:hour 3.60, 35.96  2.67      1.18  .02    .33
+## 13        treatment:phase:hour 7.19, 35.96  2.67      0.35 .009    .93
+## 14           gender:phase:hour 3.60, 35.96  2.67      0.93  .01    .45
+## 15 treatment:gender:phase:hour 7.19, 35.96  2.67      0.74  .02    .65
 
 
 # replicating ?Anova using aov.car:
@@ -334,6 +334,12 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
         within = NULL, type = 2, print.formula = TRUE, observed = "gender")
 
 # only within
+
+# Maxwell & Delaney (2004, Chapter 11),
+# Table 12.5 (p. 578):
+data(md_12.1)
+ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), 
+      args.return=list(correction = "none", es = "none"))
 
 aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
 
