@@ -3,9 +3,9 @@
 #' \tabular{ll}{
 #' Package: \tab afex\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.8-94\cr
-#' Date: \tab 2014-02-22\cr
-#' Depends: \tab R (>= 2.14.0), car, lme4 (>= 1.0.4), pbkrtest (>= 0.3-6), reshape2\cr
+#' Version: \tab 0.9-96\cr
+#' Date: \tab 2014-03-08\cr
+#' Depends: \tab R (>= 2.15.0), car, lme4 (>= 1.0.6), pbkrtest (>= 0.3-6), reshape2\cr
 #' Encoding: \tab UTF-8\cr
 #' License: \tab GPL (>=3)\cr
 #' URL: \tab http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr

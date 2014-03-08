@@ -1,4 +1,21 @@
                     ************************
+                    ** afex VERSION 0.9-x **
+                    ************************
+                    
+                    Changes in afex Version 0.9-x
+                    Released XXXX 2014
+
+    Significant User Visible Changes and New Features
+
+    o   added argument intercept to nice.anova (default FALSE) which
+        allows to selective display the intercept in an ANOVA table.
+
+    Bugfixes
+    
+    o   increased requirement of R version and lme4 version.    
+
+
+                    ************************
                     ** afex VERSION 0.8-x **
                     ************************
                     

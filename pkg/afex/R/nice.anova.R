@@ -129,6 +129,7 @@ nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG",
     df.out <- cbind(df.out, pes = round_ps(tmp2$SS/(tmp2$SS + tmp2[,"Error SS"])), stringsAsFactors = FALSE)
   }
   if ("ges" %in% es) {
+    #browser()
     # This code is basically a copy from ezANOVA by Mike Lawrence!
     if(!is.null(observed)){
       obs <- rep(FALSE,nrow(tmp2))
