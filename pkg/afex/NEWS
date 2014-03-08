@@ -13,6 +13,9 @@
     Bugfixes
     
     o   increased requirement of R version and lme4 version.    
+    
+    o   print.mixed should now propagate all warnings from lme4 (i.e., 
+        also the new convergence warnings).
 
 
                     ************************

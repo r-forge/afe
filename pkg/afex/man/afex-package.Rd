@@ -8,8 +8,8 @@ Analysis of Factorial Experiments.
 }
 \details{
 \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-Version: \tab 0.9-96\cr Date: \tab 2014-03-08\cr Depends:
-\tab R (>= 2.15.0), car, lme4 (>= 1.0.6), pbkrtest (>=
+Version: \tab 0.9-97\cr Date: \tab 2014-03-08\cr Depends:
+\tab R (>= 2.15.0), car, lme4 (>= 1.0.5), pbkrtest (>=
 0.3-6), reshape2\cr Encoding: \tab UTF-8\cr License: \tab
 GPL (>=3)\cr URL: \tab
 http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr
@@ -25,7 +25,7 @@ more then one observation per individual and cell of the
 design), per default returning a print ready ANOVA table.
 Function mixed() fits a mixed model using lme4::lmer() and
 computes p-values for all effects in the model using either
-the Kenward-Rogers approximation of degrees of freedom (LMM
+the Kenward-Roger approximation of degrees of freedom (LMM
 only), parametric bootstrap (LMMs and GLMMs) or likelihood
 ratio tests (LMMs and GLMMs). afex uses type 3 sums of
 squares as default (imitating commercial statistical
