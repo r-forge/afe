@@ -2,9 +2,13 @@
 require(roxyPackage)
 require(stringr)
 
+## Windows
 R.libs <- "C:/R/R-devel/library"
-
 svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" pkg/afex", intern = TRUE)[2], "[[:digit:]]+$")) + 1
+
+# Linux:
+R.libs <- "./packages/library"
+svn.number <- as.numeric(substr(system("svn info", intern=TRUE)[6], 10, 15)) +1
 
 roxy.package(
 	pck.source.dir = "pkg/afex",

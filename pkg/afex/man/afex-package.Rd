@@ -1,6 +1,5 @@
 \docType{package}
 \name{afex-package}
-\alias{afex}
 \alias{afex-package}
 \title{The afex Package}
 \description{
@@ -8,7 +7,7 @@ Analysis of Factorial Experiments.
 }
 \details{
 \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-Version: \tab 0.9-97\cr Date: \tab 2014-03-08\cr Depends:
+Version: \tab 0.9-98\cr Date: \tab 2014-03-09\cr Depends:
 \tab R (>= 2.15.0), car, lme4 (>= 1.0.5), pbkrtest (>=
 0.3-6), reshape2\cr Encoding: \tab UTF-8\cr License: \tab
 GPL (>=3)\cr URL: \tab
@@ -35,7 +34,6 @@ vectors using a variety of tests.
 }
 \author{
 Henrik Singmann
-\email{henrik.singmann@psychologie.uni-freiburg.de}
 }
 \keyword{package}
 

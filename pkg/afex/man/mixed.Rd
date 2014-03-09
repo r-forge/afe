@@ -337,7 +337,7 @@ Language}, 68(3), 255-278. doi:10.1016/j.jml.2012.11.001
 Dalal, D. K., & Zickar, M. J. (2012). Some Common Myths
 About Centering Predictor Variables in Moderated Multiple
 Regression and Polynomial Regression. \emph{Organizational
-Research Methods}, 15(3), 339?362.
+Research Methods}, 15(3), 339-362.
 doi:10.1177/1094428111430540
 
 Judd, C. M., Westfall, J., & Kenny, D. A. (2012). Treating

@@ -65,7 +65,7 @@
 #' 
 #' Barr, D. J., Levy, R., Scheepers, C., & Tily, H. J. (2013). Random effects structure for confirmatory hypothesis testing: Keep it maximal. \emph{Journal of Memory and Language}, 68(3), 255-278. doi:10.1016/j.jml.2012.11.001
 #'
-#' Dalal, D. K., & Zickar, M. J. (2012). Some Common Myths About Centering Predictor Variables in Moderated Multiple Regression and Polynomial Regression. \emph{Organizational Research Methods}, 15(3), 339?362. doi:10.1177/1094428111430540
+#' Dalal, D. K., & Zickar, M. J. (2012). Some Common Myths About Centering Predictor Variables in Moderated Multiple Regression and Polynomial Regression. \emph{Organizational Research Methods}, 15(3), 339-362. doi:10.1177/1094428111430540
 #'
 #' Judd, C. M., Westfall, J., & Kenny, D. A. (2012). Treating stimuli as a random factor in social psychology: A new and comprehensive solution to a pervasive but largely ignored problem. \emph{Journal of Personality and Social Psychology}, 103(1), 54-69. doi:10.1037/a0028347
 #' 
@@ -420,6 +420,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
 
 
 print.mixed <- function(x, ...) {
+  ntry <- function(x) tryCatch(x, error = function(e) NULL)
+  
   if (x[["method"]] == "KR") {
     tmp <- x[[1]][,1:6]
     tmp[,"stat"] <- formatC(tmp[,"stat"], format = "f", digits = 2)
@@ -434,8 +436,8 @@ print.mixed <- function(x, ...) {
     tmp[,"chisq"] <- formatC(tmp[,"chisq"], format = "f", digits = 2)
   }
   tmp[,"p.value"] <- round_ps(tmp[,"p.value"])
-  warnings1 <- c(full = list(x$full.model@optinfo$warnings), lapply(x[[3]], function(y) y@optinfo$warnings))
-  warnings2 <- c(full = list(x$full.model@optinfo$conv$lme4$messages), lapply(x[[3]], function(y) y@optinfo$conv$lme4$messages))  
+  warnings1 <- c(full = list(x$full.model@optinfo$warnings), lapply(x[[3]], function(y) y@optinfo$warnings))  
+  warnings2 <- c(full = list(ntry(x$full.model@optinfo$conv$lme4$messages)), lapply(x[[3]], function(y) ntry(y@optinfo$conv$lme4$messages)))  
   warnings <- mapply(function(x, y) c(unlist(x), y), warnings1, warnings2, SIMPLIFY=FALSE)  
   warn <- vapply(warnings, function(y) !length(y)==0, NA)
   for (i in names(warn)[warn]) warning("lme4 reported (at least) the following warnings for '", i, "':\n  * ", paste(warnings[[i]], collapse = "\n  * "))

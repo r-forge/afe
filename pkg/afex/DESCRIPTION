@@ -33,5 +33,5 @@ License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")))
-Version: 0.9-97
-Date: 2014-03-08
+Version: 0.9-98
+Date: 2014-03-09
