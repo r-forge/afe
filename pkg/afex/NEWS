@@ -9,6 +9,12 @@
 
     o   added argument intercept to nice.anova (default FALSE) which
         allows to selective display the intercept in an ANOVA table.
+        
+    o   added return="marginal" to aov.car which returns the marginal 
+        means of all effects (i.e., of main effects and interactions). 
+        Is also returned if return="full".
+    
+    o   removed return="lme4" from aov.car.
 
     Bugfixes
     

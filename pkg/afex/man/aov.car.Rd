@@ -85,7 +85,7 @@ univ(object)
   (the default) will return a nice ANOVA table (produced by
   \code{\link{nice.anova}}. Possible values are
   \code{c("Anova", "lm", "data", "nice", "full", "all",
-  "univariate", "lme4")} (possibly abbreviated).}
+  "univariate", "marginal")} (possibly abbreviated).}
 
   \item{args.return}{\code{list} of further arguments
   passed to the function which produces the return value.
@@ -124,7 +124,8 @@ of class \code{"lm"} or \code{"mlm"}). Also returned if
 the \code{lm} object. Also returned if \code{return =
 "data"}.} \item{"idata"}{if within-subject factors are
 present, the \code{idata} argument passed to \code{Anova}.}
-}
+\item{"marginal"}{a list containing the marginal means (the
+same as when \code{return = "marginal"}).} }
 
 If \code{return = "univariate"} the object returned from
 \code{univ}.
@@ -145,12 +146,9 @@ The elements of the list returned by \code{univ} are:
 \code{spehricity.correction} (containing both,
 Greenhouse-Geisser and Hyundt-Feldt correction).
 
-If \code{return = "lme4"} The data (possibly aggregated to
-have one observation per cell) is fitted with
-\code{lme4::lmer} using all within-subjects factors as
-fully crossed random slopes and the obtained \code{mer}
-object returned for further analysis. (This behavhior is
-rather experimental!)
+If \code{return = "marginal"} A list with data.frames
+containing the marginal means for all effects. Numerical
+variables are ignored.
 }
 \description{
 These functions allow convenient access to
@@ -241,11 +239,6 @@ unused levels dropped.
 
 Contrasts attached to a factor as an attribute are probably
 not preserved and not supported.
-
-Function \code{univ} was called \code{univariate} in prior
-versions, but there was a function with similar name in
-package \pkg{multcomp} leading to bugs and unexpected
-behavior.
 }
 \examples{
 
