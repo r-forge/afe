@@ -271,12 +271,12 @@ mixed(value ~ treatment*phase*hour +(1|id), per.parameter = "hour", data = obk.l
 mixed(value ~ treatment*phase*hour +(1|id), per.parameter = ".", data = obk.long)
 
 # example data from package languageR:
-# Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns,
-# with variables linked to subject or word.
+# Lexical decision latencies elicited from 21 subjects for 79 English concrete nouns, 
+# with variables linked to subject or word. 
 data(lexdec, package = "languageR")
 
 # using the simplest model
-m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight +
+m1 <- mixed(RT ~ Correct + Trial + PrevType * meanWeight + 
     Frequency + NativeLanguage * Length + (1|Subject) + (1|Word), data = lexdec)
 
 m1
@@ -295,9 +295,9 @@ m1
 # Fitting a GLMM using parametric bootstrap:
 require("mlmRev") # for the data, see ?Contraception
 
-gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district),
+gm1 <- mixed(use ~ age + I(age^2) + urban + livch + (1 | district), 
  family = binomial, data = Contraception, args.test = list(nsim = 10), method = "PB")
-
+ 
 ## using multicore
 require(parallel)
 (nc <- detectCores()) # number of cores

@@ -18,6 +18,9 @@ data(obk.long, package = "afex")
 aov.car(value ~ treatment * gender + Error(id/phase*hour), 
         data = obk.long, observed = "gender")
 
+aov4(value ~ treatment * gender + (phase*hour|id), 
+        data = obk.long, observed = "gender")
+
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
@@ -75,6 +78,10 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
 aov.car(value ~ treatment * gender + age + Error(id/phase*hour), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
+aov4(value ~ treatment * gender + age + (phase*hour|id), 
+        data = obk.long, observed = c("gender", "age"), factorize = FALSE)
+
+
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), covariate = "age", 
         observed = c("gender", "age"), factorize = FALSE)
@@ -92,15 +99,17 @@ aov.car(value ~ treatment * gender + Error(id/hour2),
 
 # only between
 aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2,observed = c("gender"))
-aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2, observed = c("gender"))
-
+        data = obk.long, observed = c("gender"))
+aov4(value ~ treatment * gender + (1|id), 
+        data = obk.long, observed = c("gender"))
 ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        within = NULL, type = 2, print.formula = TRUE, observed = "gender")
+        within = NULL, print.formula = TRUE, observed = "gender")
 
 # only within
 aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
+
+aov4(value ~ (phase*hour|id), data = obk.long, type = 2, 
+     print.formula = TRUE)
 
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
         type = 2, print.formula = TRUE)
@@ -116,6 +125,7 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "full"), 1)
 ##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
 ##  $ data :'data.frame':  16 obs. of  16 variables:
 ##  $ idata:'data.frame':  15 obs. of  2 variables:
+##  $ marginal:List of 3
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), 

@@ -1,10 +1,15 @@
 #' Convenience wrappers for car::Anova using either a formula or factor based interface.
 #'
-#' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s). \code{ez.glm} is called specifying the factors as character vectors.
+#' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s), \code{aov4} can be called with a \pkg{lme4}-like formula, and \code{ez.glm} is called specifying the factors as character vectors.
 #'
 #' @usage aov.car(formula, data, fun.aggregate = NULL, type = 3, 
 #'      factorize = TRUE, check.contrasts = TRUE, 
 #'      return = "nice", observed = NULL, args.return = list(), ...)
+#'      
+#' aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = 3,
+#'      factorize = TRUE, check.contrasts = TRUE,
+#'      return = "nice", args.return = list(), ..., 
+#'      print.formula = FALSE)
 #'
 #' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
 #'      observed = NULL, fun.aggregate = NULL, type = 3, 
@@ -13,7 +18,7 @@
 #' 
 #' univ(object)
 #'
-#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}}. Should include an error term (i.e., \code{Error( / )}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
+#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/ )} or \code{(...|id)}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
 #' @param dv \code{character} vector (of length 1) indicating the column containing the \strong{dependent variable} in \code{data}.
 #' @param between \code{character} vector indicating the \strong{between}-subject(s) factor(s)/column(s) in \code{data}. Default is \code{NULL} indicating no between-subjects factors.
@@ -31,7 +36,7 @@
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
 #'
-#' @return \code{aov.car} and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
 #'
 #' If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
 #'
@@ -56,7 +61,7 @@
 #'
 #' However, note that lower order effects (e.g., main effects) in type 3 ANOVAs are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} via \code{options(contrasts=c('contr.sum','contr.poly'))}. This should be done automatically when loading \pkg{afex} and \pkg{afex} will issue a warning when running type 3 SS and \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{other coding schemes}. You can check the coding with \code{options("contrasts")}. 
 #' 
-#' The \code{formula} for \code{aov.car} must contain a single \code{Error} term specyfying the \code{ID} column and potential within-subject factors (you may use \code{\link{mixed}} with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term, i.e., it is not necessary to specify them outside the \code{Error} term, see Examples).
+#' The \code{formula}s for \code{aov.car} or \code{aov4} must contain a single \code{Error} term specyfying the \code{ID} column and potential within-subject factors (you can use \code{\link{mixed}} with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term, i.e., it is not necessary to specify them outside the \code{Error} term, see Examples).
 #'
 #' Suppressing the intercept (i.e, via \code{0 +} or \code{- 1}) is ignored. Specific specifications of effects (e.g., excluding terms with \code{-} or using \code{^}) could be okay but is not tested. Using the \code{\link{I}} or \code{\link{poly}} function within the formula is not tested and not supported!
 #'
@@ -77,6 +82,8 @@
 #' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors and unused levels dropped.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
+#' 
+#' The workhorse is \code{aov.car}. \code{aov4} and \code{ez.glm} only construe and pass an appropriate formula to \code{aov.car}. Use \code{print.formula = TRUE} to view this formula.
 #'
 #' @seealso \code{\link{nice.anova}} creats the nice ANOVA tables which are by default returned. See also there for a slightly longer discussion of effect sizes.
 #'
@@ -87,11 +94,12 @@
 #' @references Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
 #' @name aov.car
-#' @aliases aov.car ez.glm univ
-#' @export aov.car ez.glm univ
+#' @aliases aov.car ez.glm univ aov4
+#' @export aov.car ez.glm univ aov4
 #' @import car
 #' @importFrom stringr str_c str_detect str_replace_all
 #' @importFrom reshape2 dcast
+#' @importFrom lme4 findbars nobars 
 #' @example examples/examples.aov.car.R
 #'
 
@@ -233,6 +241,26 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   else if ((return == "full")  | (return == "all")) return(c("Anova" = list(Anova.out), "lm" = list(tmp.lm), data.l, marginal = list(marginals.out)))
   else if (return == "univariate") return(univ(Anova.out))
   else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)))
+}
+
+aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", args.return = list(), ..., print.formula = FALSE) {
+  #browser()
+  barterms <- findbars(formula)
+  if (length(barterms) > 1) stop("aov4 only allows one random effect term")
+  within <- all.vars(barterms[[1]][[2]])
+  id <- all.vars(barterms[[1]][[3]])
+  error <- str_c(" + Error(", id, if (length(within) > 0) "/" else "", str_c(within, collapse = " * "), ")")
+  lh <- as.character(nobars(formula))
+  if (length(lh) == 1) {
+   dv <- lh
+   rh <- "1"
+  } else {
+    dv <- lh[2]
+    rh <- lh[3]
+  }
+  formula <- str_c(dv, " ~ ", rh, error)
+  if (print.formula) message(str_c("Formula send to aov.car: ", formula))
+  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, args.return = args.return, ...)
 }
 
 

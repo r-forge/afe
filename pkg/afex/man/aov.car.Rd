@@ -1,5 +1,6 @@
 \name{aov.car}
 \alias{aov.car}
+\alias{aov4}
 \alias{ez.glm}
 \alias{univ}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
@@ -7,6 +8,11 @@
 aov.car(formula, data, fun.aggregate = NULL, type = 3,
      factorize = TRUE, check.contrasts = TRUE,
      return = "nice", observed = NULL, args.return = list(), ...)
+
+aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = 3,
+     factorize = TRUE, check.contrasts = TRUE,
+     return = "nice", args.return = list(), ...,
+     print.formula = FALSE)
 
 ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
      observed = NULL, fun.aggregate = NULL, type = 3,
@@ -17,11 +23,12 @@ univ(object)
 }
 \arguments{
   \item{formula}{A formula specifying the ANOVA model
-  similar to \code{\link{aov}}. Should include an error
-  term (i.e., \code{Error( / )}). Note that the
-  within-subject factors do not need to be outside the
-  Error term (this contrasts with \code{aov}). See
-  Details.}
+  similar to \code{\link{aov}} (for \code{aov.car} or
+  similar to \code{lme4:lmer} for \code{aov4}). Should
+  include an error term (i.e., \code{Error(id/ )} or
+  \code{(...|id)}). Note that the within-subject factors do
+  not need to be outside the Error term (this contrasts
+  with \code{aov}). See Details.}
 
   \item{id}{\code{character} vector (of length 1)
   indicating the subject identifier column in \code{data}.}
@@ -101,14 +108,14 @@ univ(object)
   \code{\link[car]{Anova}}.}
 }
 \value{
-\code{aov.car} and \code{ez.glm} are wrappers to
-\code{\link[car]{Anova}}, the return value is dependent on
-the \code{return} argument. When argument \code{return} is
-\code{"nice"} (the default) a nice ANOVA table is returnd
-(\code{\link{nice.anova}}) with the following columns:
-\code{Effect}, \code{df}, \code{MSE} (mean-squared errors),
-\code{F} (potentially with significant symbols), \code{ges}
-(generalized eta-squared), \code{p}.
+\code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers
+to \code{\link[car]{Anova}}, the return value is dependent
+on the \code{return} argument. When argument \code{return}
+is \code{"nice"} (the default) a nice ANOVA table is
+returnd (\code{\link{nice.anova}}) with the following
+columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared
+errors), \code{F} (potentially with significant symbols),
+\code{ges} (generalized eta-squared), \code{p}.
 
 If \code{return = "full"} or \code{return = "all"} a list
 \code{list} with the following elements:
@@ -160,7 +167,8 @@ between-within ANOVAs can be calculated conveniently
 without using the rather unhandy format of
 \code{car::Anova}. \code{aov.car} can be called using a
 formula similar to \code{\link{aov}} specifying an error
-strata for the within-subject factor(s). \code{ez.glm} is
+strata for the within-subject factor(s), \code{aov4} can be
+called with a \pkg{lme4}-like formula, and \code{ez.glm} is
 called specifying the factors as character vectors.
 }
 \details{
@@ -183,9 +191,9 @@ should be done automatically when loading \pkg{afex} and
 coding schemes}. You can check the coding with
 \code{options("contrasts")}.
 
-The \code{formula} for \code{aov.car} must contain a single
-\code{Error} term specyfying the \code{ID} column and
-potential within-subject factors (you may use
+The \code{formula}s for \code{aov.car} or \code{aov4} must
+contain a single \code{Error} term specyfying the \code{ID}
+column and potential within-subject factors (you can use
 \code{\link{mixed}} with multiple error terms). Factors
 outside the \code{Error} term are treated as
 between-subject factors (the within-subject factors
@@ -239,6 +247,11 @@ unused levels dropped.
 
 Contrasts attached to a factor as an attribute are probably
 not preserved and not supported.
+
+The workhorse is \code{aov.car}. \code{aov4} and
+\code{ez.glm} only construe and pass an appropriate formula
+to \code{aov.car}. Use \code{print.formula = TRUE} to view
+this formula.
 }
 \examples{
 
@@ -259,6 +272,9 @@ data(obk.long, package = "afex")
 
 # run univariate mixed ANOVA for the full design:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), 
+        data = obk.long, observed = "gender")
+
+aov4(value ~ treatment * gender + (phase*hour|id), 
         data = obk.long, observed = "gender")
 
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
@@ -318,6 +334,10 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
 aov.car(value ~ treatment * gender + age + Error(id/phase*hour), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
+aov4(value ~ treatment * gender + age + (phase*hour|id), 
+        data = obk.long, observed = c("gender", "age"), factorize = FALSE)
+
+
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), covariate = "age", 
         observed = c("gender", "age"), factorize = FALSE)
@@ -335,15 +355,17 @@ aov.car(value ~ treatment * gender + Error(id/hour2),
 
 # only between
 aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2,observed = c("gender"))
-aov.car(value ~ treatment * gender + Error(id), 
-        data = obk.long, type = 2, observed = c("gender"))
-
+        data = obk.long, observed = c("gender"))
+aov4(value ~ treatment * gender + (1|id), 
+        data = obk.long, observed = c("gender"))
 ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        within = NULL, type = 2, print.formula = TRUE, observed = "gender")
+        within = NULL, print.formula = TRUE, observed = "gender")
 
 # only within
 aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
+
+aov4(value ~ (phase*hour|id), data = obk.long, type = 2, 
+     print.formula = TRUE)
 
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
         type = 2, print.formula = TRUE)
@@ -359,6 +381,7 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "full"), 1)
 ##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
 ##  $ data :'data.frame':  16 obs. of  16 variables:
 ##  $ idata:'data.frame':  15 obs. of  2 variables:
+##  $ marginal:List of 3
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/phase*hour), 
