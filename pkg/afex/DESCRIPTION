@@ -37,5 +37,5 @@ Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.9-103
+Version: 0.9-105
 Date: 2014-04-08

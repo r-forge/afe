@@ -26,6 +26,9 @@
         but no ddf (and hence no p-value). Experimental.
      
     o   renamed colname stat to F when method = "KR" (mixed).
+    
+    o   added tests (currently only for mixed()) via pkg testthat, 
+        see tests/testthat.
         
     Bugfixes
     
