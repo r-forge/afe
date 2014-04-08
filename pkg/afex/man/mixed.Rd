@@ -122,7 +122,7 @@ p-values are per default calculated via methods from
 the Kenward-Roger approximation for degrees-of-freedom is
 calculated using \code{\link[pbkrtest]{KRmodcomp}}, which
 is only applicable to linear-mixed models. The test
-statistic in the output (\code{stat}) is a F-value.
+statistic in the output is a F-value (\code{F}).
 
 \code{method = "PB"} calculates p-values using parametric
 bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can

@@ -24,6 +24,8 @@
         
     o   added method = "F" to mixed() which only returns the F-value 
         but no ddf (and hence no p-value). Experimental.
+     
+    o   renamed colname stat to F when method = "KR" (mixed).
         
     Bugfixes
     

@@ -33,7 +33,7 @@
 #'
 #' @details For an introduction to mixed-modeling for experimental designs see Barr, Levy, Scheepers, & Tily (2013; I highly recommend reading this paper if you use this function), arguments for using the Kenward-Roger approximation for obtaining p-values are given by Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). Specific recommendations on which random effects structure to specify for confirmatory tests can be found in Barr and colleagues (2013).
 #'
-#' p-values are per default calculated via methods from \pkg{pbkrtest}. When \code{method = "KR"} (the default), the Kenward-Roger approximation for degrees-of-freedom is calculated using \code{\link[pbkrtest]{KRmodcomp}}, which is only applicable to linear-mixed models. The test statistic in the output (\code{stat}) is a F-value.
+#' p-values are per default calculated via methods from \pkg{pbkrtest}. When \code{method = "KR"} (the default), the Kenward-Roger approximation for degrees-of-freedom is calculated using \code{\link[pbkrtest]{KRmodcomp}}, which is only applicable to linear-mixed models. The test statistic in the output is a F-value (\code{F}).
 #'
 #' \code{method = "PB"} calculates p-values using parametric bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can be used for linear and also generalized linear mixed models (GLMM) by specifying a \code{\link[stats]{family}} argument to \code{mixed}. Note that you should specify further arguments to \code{PBmodcomp} via \code{args.test}, especially \code{nsim} (the number of simulations to form the reference distribution) or \code{cl} (for using multiple cores). For other arguments see \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML} (argument to \code{[g]lmer}) will be set to \code{FALSE} if method is \code{PB}.
 #'
@@ -271,7 +271,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     row.names(FtestU) <- str_c(row.names(FtestU), ".U")
     df.out <- cbind(df.out, t(FtestU))
     rownames(df.out) <- NULL
-    #browser()
+    colnames(df.out)[2] <- "F"
   } else if (method[1] == "PB") {
     if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
     tests <- vector("list", length(fixed.effects))
@@ -314,7 +314,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     tests <- vector("list", length(fixed.effects))
     getFvalue <- function(largeModel, smallModel) {
       #browser()
-      L     <- pbkrtest:::.model2restrictionMatrix(largeModel, smallModel)
+      L  <- pbkrtest:::.model2restrictionMatrix(largeModel, smallModel)
       #PhiA  <- vcovAdj(largeModel, details = 0)
       PhiA  <- vcov(largeModel)
       beta <- fixef(largeModel)
@@ -351,7 +351,7 @@ print.mixed <- function(x, ...) {
   
   if (x[["method"]] == "KR") {
     tmp <- x[[1]][,1:6]
-    tmp[,"stat"] <- formatC(tmp[,"stat"], format = "f", digits = 2)
+    tmp[,"F"] <- formatC(tmp[,"F"], format = "f", digits = 2)
     tmp[,"ddf"] <- prettyNum(tmp[,"ddf"], digits = 2, nsmall = 2)
     tmp[,"F.scaling"] <- prettyNum(tmp[,"F.scaling"], digits = 2, nsmall = 2)
     
