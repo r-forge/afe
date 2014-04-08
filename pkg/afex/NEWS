@@ -13,13 +13,15 @@
     o   added return="marginal" to aov.car which returns the marginal 
         means of all effects (i.e., of main effects and interactions). 
         Is also returned if return="full".
+        
+    o   testing the intercept in mixed models in now only optional.
+        Per default the new argument test.intercept = FALSE.
     
     o   removed return="lme4" from aov.car.
     
     o   added argument intercept to nice.anova (default FALSE) which
         allows to selective display the intercept in an ANOVA table.
         
-
     Bugfixes
     
     o   increased requirement of R version and lme4 version.    
@@ -27,6 +29,7 @@
     o   print.mixed should now propagate all warnings from lme4 (i.e., 
         also the new convergence warnings).
 
+        
 
                     ************************
                     ** afex VERSION 0.8-x **

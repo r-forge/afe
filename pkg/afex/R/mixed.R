@@ -3,7 +3,7 @@
 #' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Roger approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}), or likelihood ratio tests (the latter two for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (the last two return the same data.frame).
 #'
 #' @usage mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"), 
-#'      per.parameter = NULL, args.test = list(), 
+#'      per.parameter = NULL, args.test = list(), test.intercept = FALSE,
 #'      check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
@@ -12,6 +12,7 @@
 #' @param method character vector indicating which methods for obtaining p-values should be used. \code{"KR"} (the default) corresponds to the Kenward-Roger approximation for degrees of freedom (only working with linear mixed models). \code{"PB"} calculates p-values based on parametric bootstrap. \code{"LRT"} calculates p-values via the likelihood ratio tests implemented in the \code{anova} method for \code{merMod} objects (only recommended for models with many [i.e., > 50] levels for the random factors).
 #' @param per.parameter \code{character} vector specifying for which variable tests should be run for each parameter (instead for the overall effect). Can be useful e.g., for testing ordered factors. Relatively untested so results should be compared with a second run without setting this argument. Uses \code{\link{grep}} for selecting parameters among the fixed effects so regular expressions (\code{\link{regex}}) are possible. See Examples.
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See Details.
+#' @param test.intercept logical. Whether or not the intercept should also be fitted and tested for significance. Default is \code{FALSE}. Only relevant if \code{type = 3}.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details.
 #' @param progress  if \code{TRUE}, shows progress with a text progress bar.
 #' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. If \code{ckeck.contrasts}, mixed sets the current contrasts (\code{getOption("contrasts")}) at the nodes. Note this does \emph{not} distribute calculation of p-values (e.g., when using \code{method = "PB"}) across the cluster. Use \code{args.test} for this.
@@ -81,7 +82,7 @@
 #' @example examples/examples.mixed.R
 #' 
 
-mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), check.contrasts = TRUE, progress = TRUE, cl = NULL, ...) {
+mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), test.intercept = FALSE, check.contrasts = TRUE, progress = TRUE, cl = NULL, ...) {
   if (check.contrasts) {
     #browser()
     vars.to.check <- all.vars(formula)
@@ -102,7 +103,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
   }
   #warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
   # browser()
-  # prepare fitting (i.e., obtain model info)
+  ####################
+  ### Part I: prepare fitting (i.e., obtain model info, check model, ...)
+  ####################
   mc <- match.call()
   #browser()
   formula.f <- as.formula(formula)
@@ -132,8 +135,11 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
     if (length(non.null) > 0) message(str_c("Numerical variables NOT centered on 0 (i.e., interpretation of all main effects might be difficult if in interactions): ", str_c(non.null, collapse = ", ")))
   }
-  # obtain the lmer fits
-  mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter", "cl")]
+  ####################
+  ### Part II: obtain the lmer fits
+  ####################
+  ## Part IIa: prepare formulas
+  mf <- mc[!names(mc) %in% c("type", "method", "args.test", "progress", "check.contrasts", "per.parameter", "cl", "test.intercept")]
   mf[["formula"]] <- formula.f
   if ("family" %in% names(mf)) mf[[1]] <- as.name("glmer")
   else mf[[1]] <- as.name("lmer")
@@ -176,7 +182,11 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
       tmp.columns <- str_c(deparse(-which(mapping == (i-1))), collapse = "")
       formulas[[i+1]] <- as.formula(str_c(dv, "~ 0 + m.matrix[,", tmp.columns, "] +", random))
     }
-    names(formulas) <- fixed.effects
+    names(formulas) <- c("full.model", fixed.effects)
+    if (!test.intercept && fixed.effects[1] == "(Intercept)") {
+      fixed.effects <- fixed.effects[-1]
+      formulas[["(Intercept)"]] <- NULL
+    }
   } else if (type == 2 | type == "II") {
     warning("Implementation of Type 2 method not unproblematic.\n  Check documentation or use car::Anova (Wald tests).")
     if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 3 tests.")
@@ -195,7 +205,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     }
     formulas <- c(full.model.formulas, submodel.formulas)
   } else stop('Only type 3 and type 2 tests implemented.')
-  ## fit models
+  ## Part IIb: fit models
   # single core
   if (is.null(cl)) {
     if (progress) cat(str_c("Fitting ", length(formulas), " (g)lmer() models:\n["))
@@ -225,6 +235,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     fits <- clusterApplyLB(cl = cl, x = formulas, eval.cl, m.call = mf, progress = progress)
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))
   }
+  ####################
+  ### Part III: obtain p-values
+  ####################
   ## prepare for p-values:
   if (type == 3 | type == "III") {
     full.model <- fits[[1]]
@@ -294,7 +307,9 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p.value, stringsAsFactors = FALSE)
     rownames(df.out) <- NULL
   } else stop('Only methods "KR", "PB" or "LRT" currently implemented.')
-  #prepare output object
+  ####################
+  ### Part IV: prepare output
+  ####################
   list.out <- list(anova.table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
   class(list.out) <- "mixed"
   list.out
