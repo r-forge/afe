@@ -13,7 +13,8 @@ Suggests:
     parallel
 Imports:
     stringr,
-    coin
+    coin,
+    Matrix
 Description: Provides convenience functions for analyzing factorial
     experiments using ANOVA or mixed-models. ez.glm() and aov.car()
     allow convenient calculation of between, within (i.e.,
@@ -36,5 +37,5 @@ Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
     role=c("aut", "cre")))
-Version: 0.9-101
+Version: 0.9-102
 Date: 2014-04-08

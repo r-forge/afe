@@ -78,6 +78,9 @@
 #' @S3method anova mixed
 #' @import pbkrtest
 #' @importFrom lme4 lmer glmer nobars
+#' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag
+#' @importClassesFrom Matrix Matrix
+#' @importFrom Matrix Matrix sparseMatrix
 #' 
 #' @example examples/examples.mixed.R
 #' 
@@ -306,7 +309,34 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     p.value  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
     df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p.value, stringsAsFactors = FALSE)
     rownames(df.out) <- NULL
-  } else stop('Only methods "KR", "PB" or "LRT" currently implemented.')
+  } else if (method[1] == "F") {
+    #browser()
+    tests <- vector("list", length(fixed.effects))
+    getFvalue <- function(largeModel, smallModel) {
+      #browser()
+      L     <- pbkrtest:::.model2restrictionMatrix(largeModel, smallModel)
+      #PhiA  <- vcovAdj(largeModel, details = 0)
+      PhiA  <- vcov(largeModel)
+      beta <- fixef(largeModel)
+      betaH <- 0
+      betaDiff <- cbind( beta - betaH )
+      Wald  <- as.numeric(t(betaDiff) %*% t(L) %*% solve(L%*%PhiA%*%t(L), L%*%betaDiff))
+      q <- rankMatrix(L)
+      FstatU <- Wald/q      
+      list(df1 = q, F = FstatU)
+    }
+    for (c in seq_along(fixed.effects)) {
+      if (type == 3 | type == "III") tests[[c]] <- getFvalue(full.model, fits[[c]])
+      else if (type == 2 | type == "II") {
+        order.c <- effect.order[c]
+        tmpModel  <- full.model[[order.c]] 
+        tests[[c]] <- getFvalue(tmpModel, fits[[c]])
+      }
+    }
+    names(tests) <- fixed.effects
+    df.out <- data.frame(Effect = fixed.effects, F = vapply(tests, "[[", i = "F", 0), ndf = vapply(tests, "[[", i = "df1", 0), p.value = NA, stringsAsFactors = FALSE)
+    rownames(df.out) <- NULL
+  } else stop('Only methods "KR", "PB", "LRT" or "F" currently implemented.')
   ####################
   ### Part IV: prepare output
   ####################
@@ -331,6 +361,8 @@ print.mixed <- function(x, ...) {
   } else if (x[["method"]] == "LRT") {
     tmp <- x[[1]]
     tmp[,"chisq"] <- formatC(tmp[,"chisq"], format = "f", digits = 2)
+  } else {
+    tmp <- x[[1]]
   }
   tmp[,"p.value"] <- round_ps(tmp[,"p.value"])
   warnings1 <- c(full = list(x$full.model@optinfo$warnings), lapply(x[[3]], function(y) y@optinfo$warnings))  

@@ -22,6 +22,9 @@
     o   added argument intercept to nice.anova (default FALSE) which
         allows to selective display the intercept in an ANOVA table.
         
+    o   added method = "F" to mixed() which only returns the F-value 
+        but no ddf (and hence no p-value). Experimental.
+        
     Bugfixes
     
     o   increased requirement of R version and lme4 version.    
