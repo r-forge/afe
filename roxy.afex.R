@@ -1,4 +1,4 @@
-
+﻿
 require(roxyPackage)
 require(stringr)
 
@@ -17,8 +17,12 @@ roxy.package(
 		Package = "afex",
 		Type = "Package",
 		Title = "Analysis of Factorial Experiments",
-		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"henrik.singmann@psychologie.uni-freiburg.de\", role=c(\"aut\", \"cre\")))",
-		Depends = "R (>= 2.15.0), car, lme4 (>= 1.0.5), pbkrtest (>= 0.3-6), reshape2",
+		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"henrik.singmann@psychologie.uni-freiburg.de\", role=c(\"aut\", \"cre\")),
+        person(given=\"Ben\", family=\"Bolker\", role=c(\"ctb\")),
+        person(given=\"Søren\", family=\"Højsgaard\", role=c(\"ctb\")),
+        person(given=\"John\", family=\"Fox\", role=c(\"ctb\")),
+        person(given=\"Michael A.\", family=\"Lawrence\", role=c(\"ctb\")))",
+		Depends = "R (>= 3.0.0), car, lme4 (>= 1.0.5), pbkrtest (>= 0.3-6), reshape2",
 		Suggests = "ascii, xtable, parallel",
         Imports = "stringr, coin, Matrix",
 		Description = "Provides convenience functions for analyzing factorial experiments using ANOVA or mixed-models. ez.glm() and aov.car() allow convenient calculation of between, within (i.e., repeated-measures), or mixed between-within (i.e., split-plot) ANOVAs for data in the long format (i.e., one observation per row) wrapping car::Anova() (aggregating more then one observation per individual and cell of the design), per default returning a print ready ANOVA table. Function mixed() fits a mixed model using lme4::lmer() and computes p-values for all effects in the model using either the Kenward-Roger approximation of degrees of freedom (LMM only), parametric bootstrap (LMMs and GLMMs) or likelihood ratio tests (LMMs and GLMMs). afex uses type 3 sums of squares as default (imitating commercial statistical software) and sets the default contrasts to contr.sum. Furthermore, compare.2.vectors() conveniently compares two vectors using a variety of tests.",

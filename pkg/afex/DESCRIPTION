@@ -36,6 +36,10 @@ License: GPL (>=3)
 Encoding: UTF-8
 Authors@R: c(person(given="Henrik", family="Singmann",
     email="henrik.singmann@psychologie.uni-freiburg.de",
-    role=c("aut", "cre")))
-Version: 0.9-106
+    role=c("aut", "cre")), person(given="Ben", family="Bolker",
+    role=c("ctb")), person(given="Søren", family="Højsgaard",
+    role=c("ctb")), person(given="John", family="Fox",
+    role=c("ctb")), person(given="Michael A.", family="Lawrence",
+    role=c("ctb")))
+Version: 0.9-107
 Date: 2014-04-23

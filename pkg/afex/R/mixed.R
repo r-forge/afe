@@ -314,7 +314,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     tests <- vector("list", length(fixed.effects))
     getFvalue <- function(largeModel, smallModel) {
       #browser()
-      L  <- pbkrtest:::.model2restrictionMatrix(largeModel, smallModel)
+      L  <- .model2restrictionMatrix(largeModel, smallModel)
       #PhiA  <- vcovAdj(largeModel, details = 0)
       PhiA  <- vcov(largeModel)
       beta <- fixef(largeModel)
@@ -385,3 +385,44 @@ summary.mixed <- function(object, ...) object[[1]]
 anova.mixed <- function(object, ...) object[[1]]
 
 # is.mixed <- function(x) inherits(x, "mixed")
+
+## some code copied from pbkrtest.
+
+.restrictionMatrixBA<-function(B,A) {
+  ## <A> in <B>
+  ## determine L such that  <A>={Bb| b in Lb=0}
+  d <- rankMatrix(cbind(A,B)) - rankMatrix(B)
+  if (d > 0) {
+    stop('Error:  <A> not subspace of <B> \n')
+  }
+  Q  <- qr.Q(qr(cbind(A,B)))
+  Q2 <- Q[,(rankMatrix(A)+1):rankMatrix(B)] 
+  L  <- t(Q2)  %*% B
+  ##make rows of L2 orthogonal
+  L <-t(qr.Q(qr(t(L))))
+  L
+}
+
+.model2restrictionMatrix <- function (largeModel, smallModel) {
+  L <- if(is.matrix(smallModel)) {
+    ## ensures  that L is of full row rank:
+    LL <- smallModel
+    q  <- rankMatrix(LL)
+    if (q < nrow(LL) ){
+      t(qr.Q(qr(t(LL)))[,1:qr(LL)$rank])
+    } else {
+      smallModel
+    }
+  } else  { #smallModel is mer model
+    .restrictionMatrixBA(getME(largeModel,'X'),getME(smallModel,'X'))
+  }
+  L<-.makeSparse(L)
+  L
+}
+
+.makeSparse<-function(X) {
+  X<-as.matrix(X)
+  w<-cbind(c(row(X)),c(col(X)),c(X))
+  w<-w[abs(w[,3])>1e-16,,drop=FALSE]
+  Y<-sparseMatrix(w[,1],w[,2],x=w[,3],dims=dim(X))
+}
