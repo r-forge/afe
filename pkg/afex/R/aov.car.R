@@ -196,6 +196,9 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   all.terms <- attr(terms(full.formula), "term.labels")
   marginals.out <- lapply(all.terms, function(x) aggregate(as.formula(str_c(dv, " ~ ", x)), dat.ret, mean))
   names(marginals.out) <- all.terms
+  grand.mean <- data.frame(mean(dat.ret[,dv]))
+  colnames(grand.mean) <- dv
+  marginals.out <- c(grand_mean = list(grand.mean), marginals.out)
   if (return == "marginal") {
     return(marginals.out)
   }

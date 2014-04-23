@@ -127,4 +127,6 @@ mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial,
 mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial, 
  method = "PB", data = Contraception, args.test = list(nsim = 10, cl = cl), cl = cl)
 
+stopCluster(cl)
+
 }

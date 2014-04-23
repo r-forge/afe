@@ -52,3 +52,14 @@ test_that("mixed, mlmRev: type 3 and 2 LRTs; print.mixed and propagate warnings"
 test_that("mixed, obk.long: LMM with method = PB", {
   expect_that(mixed(value ~ treatment+phase*hour +(1|id), data = obk.long, method = "PB", args.test = list(nsim = 10), progress=FALSE), is_a("mixed"))
 })
+
+test_that("mixed, obk.long: multicore loads lme4", {
+  data(obk.long, package = "afex")
+  require(parallel)
+  cl <- makeCluster(rep("localhost", 2)) # make cluster
+  # 1. Obtain fits with multicore:
+  m_mc1 <- mixed(value ~ treatment +(1|id), data = obk.long, method = "LRT", cl = cl, control = lmerControl(optCtrl=list(maxfun = 100000)), progress=FALSE)
+  cl_search <- clusterEvalQ(cl, search())
+  stopCluster(cl)  
+  expect_that(all(vapply(cl_search, function(x) any(grepl("^package:base$", x)), NA)), is_true())
+})

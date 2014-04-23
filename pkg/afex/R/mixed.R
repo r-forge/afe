@@ -14,7 +14,7 @@
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See Details.
 #' @param test.intercept logical. Whether or not the intercept should also be fitted and tested for significance. Default is \code{FALSE}. Only relevant if \code{type = 3}.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details.
-#' @param progress  if \code{TRUE}, shows progress with a text progress bar.
+#' @param progress  if \code{TRUE}, shows progress with a text progress bar and other status messages during fitting.
 #' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. If \code{ckeck.contrasts}, mixed sets the current contrasts (\code{getOption("contrasts")}) at the nodes. Note this does \emph{not} distribute calculation of p-values (e.g., when using \code{method = "PB"}) across the cluster. Use \code{args.test} for this.
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
 #'
@@ -39,14 +39,14 @@
 #'
 #' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"merMod"} objects. This is recommended by Barr et al. (2013; which did not test the other methods implemented here). Using likelihood ratio tests is only recommended for models with many levels for the random effects (> 50), but can be pretty helpful in case the othwer methods fail (due to memory and/or time limitations). The \href{http://glmm.wikidot.com/faq}{lme4 faq} also recommends the other methods over likelihood ratio tests.
 #' 
-#' Type 3 tests are obtained by comparing a model in which only the corresponding effect is missing with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"lmerMod"} models.
+#' Type 3 tests are obtained by comparing a model in which only the tested effect is excluded with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"lmerMod"} models. The submodels in which the tested effect is excluded are obtained by manually creating a model matrix which si then fitted in \code{"lme4"}. This is done to avoid R's "feature" to not allow this behavior.
 #'
-#' Type 2 tests are obtained by comparing a model in which the corresponding effect and all higher oder effect (e.g., all three-way interactions for a two-way interaction) are missing with a model in which all effects of the relevant order are present and all higher order effects absent. Consequently, the results for lower order effects are identical of wether or not higher order effects are part of the model or not, which is rather dubious (but \href{https://stat.ethz.ch/pipermail/r-sig-mixed-models/2012q3/018992.html}{I didn't find a better way} of implementing the Type 2 tests). This \strong{does not} correspond to the (type 2) Wald test reported by \code{car::Anova}. If you want type 2 Wald tests, use \code{car::Anova} with \code{test = "F"} (from version 2.0-13) instead of this function.
+#' Type 2 tests are truly sequential. They are obtained by comparing a model in which the tested effect and all higher oder effect (e.g., all three-way interactions for testing a two-way interaction) are excluded with a model in which only effects up to the order of the tested effect are present and all higher order effects absent. In other words, there are multiple full models, one for each order of effects. Consequently, the results for lower order effects are identical of whether or not higher order effects are part of the model or not. This latter feature is not consistent with classical ANOVA type 2 tests but a consequence of the sequential tests (and \href{https://stat.ethz.ch/pipermail/r-sig-mixed-models/2012q3/018992.html}{I didn't find a better way} of implementing the Type 2 tests). This \strong{does not} correspond to the (type 2) Wald test reported by \code{car::Anova}. If you want type 2 Wald tests instead of truly sequential typde 2 tests, use \code{car::Anova} with \code{test = "F"}. Note that the order in which the effects are entered into the formula does not matter (in contrast to type 1 tests).
 #'
 #' 
 #' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all factors in the formula if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. Furthermore, the current contrasts (obtained via \code{getOption("contrasts")}) will be set at the cluster nodes if \code{cl} is not \code{NULL}.
 #'
-#' @note When \code{method = "KR"}, obtaining p-values is known to crash due too insufficient memory or other computational limitations (especially with complex random effects structures). In these cases, the other methods should be used. The RAM demand is a problem especially on 32 bit Windows which only supports up to 2 or 3GB RAM (see \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R Windows FAQ}).
+#' @note When \code{method = "KR"}, obtaining p-values is known to crash due too insufficient memory or other computational limitations (especially with complex random effects structures). In these cases, the other methods should be used. The RAM demand is a problem especially on 32 bit Windows which only supports up to 2 or 3GB RAM (see \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R Windows FAQ}). Then it is probably a good idea to use methods "LRT" or "PB".
 #'
 #' \code{"mixed"} will throw a message if numerical variables are not centered on 0, as main effects (of other variables then the numeric one) can be hard to interpret if numerical variables appear in interactions. See
 #'
@@ -107,6 +107,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
   }
   #warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], ".\n  Use options(contrasts=c('contr.sum','contr.poly')) instead"))
   # browser()
+  method <- match.arg(method, c("KR", "PB", "LRT", "F"), several.ok=TRUE)
   ####################
   ### Part I: prepare fitting (i.e., obtain model info, check model, ...)
   ####################
@@ -192,7 +193,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
       formulas[["(Intercept)"]] <- NULL
     }
   } else if (type == 2 | type == "II") {
-    warning("Implementation of Type 2 method not unproblematic.\n  Check documentation or use car::Anova (Wald tests).")
+    #warning("Implementation of Type 2 method not unproblematic.\n  Check documentation or use car::Anova (Wald tests).")
     if (!is.null(per.parameter)) stop("per.parameter argument only implemented for Type 3 tests.")
     full.model.formulas <- vector("list", max.effect.order)
     submodel.formulas <- vector("list", length(fixed.effects))
@@ -229,7 +230,8 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     }
     if (progress) cat(paste0("Fitting ", length(formulas), " (g)lmer() models.\n"))
     #junk <- clusterEvalQ(cl = cl, library("lme4", character.only = TRUE))
-    junk <- clusterEvalQ(cl = cl, loadNamespace("lme4"))
+    junk <- clusterCall(cl = cl, "require", package = "lme4", character.only = TRUE)
+    #junk <- clusterEvalQ(cl = cl, loadNamespace("lme4"))
     if (check.contrasts)  {
       curr.contrasts <- getOption("contrasts")
       clusterExport(cl = cl, "curr.contrasts", envir = sys.nframe())

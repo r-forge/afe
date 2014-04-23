@@ -53,7 +53,8 @@ mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"),
   \code{"contr.sum"}? See Details.}
 
   \item{progress}{if \code{TRUE}, shows progress with a
-  text progress bar.}
+  text progress bar and other status messages during
+  fitting.}
 
   \item{cl}{A vector identifying a cluster; used for
   distributing the estimation of the different models using
@@ -150,25 +151,34 @@ to memory and/or time limitations). The
 recommends the other methods over likelihood ratio tests.
 
 Type 3 tests are obtained by comparing a model in which
-only the corresponding effect is missing with the full
-model (containing all effects). This corresponds to the
-(type 3) Wald tests given by \code{car::Anova} for
-\code{"lmerMod"} models.
+only the tested effect is excluded with the full model
+(containing all effects). This corresponds to the (type 3)
+Wald tests given by \code{car::Anova} for \code{"lmerMod"}
+models. The submodels in which the tested effect is
+excluded are obtained by manually creating a model matrix
+which si then fitted in \code{"lme4"}. This is done to
+avoid R's "feature" to not allow this behavior.
 
-Type 2 tests are obtained by comparing a model in which the
-corresponding effect and all higher oder effect (e.g., all
-three-way interactions for a two-way interaction) are
-missing with a model in which all effects of the relevant
-order are present and all higher order effects absent.
-Consequently, the results for lower order effects are
-identical of wether or not higher order effects are part of
-the model or not, which is rather dubious (but
+Type 2 tests are truly sequential. They are obtained by
+comparing a model in which the tested effect and all higher
+oder effect (e.g., all three-way interactions for testing a
+two-way interaction) are excluded with a model in which
+only effects up to the order of the tested effect are
+present and all higher order effects absent. In other
+words, there are multiple full models, one for each order
+of effects. Consequently, the results for lower order
+effects are identical of whether or not higher order
+effects are part of the model or not. This latter feature
+is not consistent with classical ANOVA type 2 tests but a
+consequence of the sequential tests (and
 \href{https://stat.ethz.ch/pipermail/r-sig-mixed-models/2012q3/018992.html}{I
 didn't find a better way} of implementing the Type 2
 tests). This \strong{does not} correspond to the (type 2)
 Wald test reported by \code{car::Anova}. If you want type 2
-Wald tests, use \code{car::Anova} with \code{test = "F"}
-(from version 2.0-13) instead of this function.
+Wald tests instead of truly sequential typde 2 tests, use
+\code{car::Anova} with \code{test = "F"}. Note that the
+order in which the effects are entered into the formula
+does not matter (in contrast to type 1 tests).
 
 If \code{check.contrasts = TRUE}, contrasts will be set to
 \code{"contr.sum"} for all factors in the formula if
@@ -186,7 +196,8 @@ structures). In these cases, the other methods should be
 used. The RAM demand is a problem especially on 32 bit
 Windows which only supports up to 2 or 3GB RAM (see
 \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R
-Windows FAQ}).
+Windows FAQ}). Then it is probably a good idea to use
+methods "LRT" or "PB".
 
 \code{"mixed"} will throw a message if numerical variables
 are not centered on 0, as main effects (of other variables
@@ -325,6 +336,8 @@ mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial,
 ## Both ways can be combined:
 mixed(use ~ age + I(age^2) + urban + livch + (1 | district), family = binomial, 
  method = "PB", data = Contraception, args.test = list(nsim = 10, cl = cl), cl = cl)
+
+stopCluster(cl)
 
 }
 }
