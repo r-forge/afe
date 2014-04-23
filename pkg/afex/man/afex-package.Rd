@@ -7,8 +7,8 @@ Analysis of Factorial Experiments.
 }
 \details{
 \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-Version: \tab 0.9-105\cr Date: \tab 2014-04-08\cr Depends:
-\tab R (>= 2.15.0), car, lme4 (>= 1.0.5), pbkrtest (>=
+Version: \tab 0.9-106\cr Date: \tab 2014-04-23\cr Depends:
+\tab R (>= 3.0.0), car, lme4 (>= 1.0.5), pbkrtest (>=
 0.3-6), reshape2\cr Encoding: \tab UTF-8\cr License: \tab
 GPL (>=3)\cr URL: \tab
 http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr
