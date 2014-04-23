@@ -3,10 +3,10 @@
 #' \tabular{ll}{
 #' Package: \tab afex\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.9-107\cr
+#' Version: \tab 0.9-108\cr
 #' Date: \tab 2014-04-23\cr
 #' Depends: \tab R (>= 3.0.0), car, lme4 (>= 1.0.5), pbkrtest (>= 0.3-6), reshape2\cr
-#' Encoding: \tab UTF-8\cr
+#' Encoding: \tab latin1\cr
 #' License: \tab GPL (>=3)\cr
 #' URL: \tab http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr
 #' }
@@ -17,6 +17,6 @@
 #' @name afex-package
 #' @docType package
 #' @title The afex Package
-#' @author Henrik Singmann, with contributions from Ben Bolker, Søren Højsgaard, John Fox, Michael A. Lawrence
+#' @author Henrik Singmann, with contributions from Ben Bolker, Søren Højsgaard, Ulrich Halekoh, John Fox, Michael A. Lawrence
 #' @keywords package
 NULL

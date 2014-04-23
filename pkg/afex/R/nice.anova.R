@@ -35,6 +35,8 @@
 #' 
 #' @name nice.anova
 #' @export nice.anova
+#' 
+#' @encoding UTF-8
 #'
 #' @examples
 #'

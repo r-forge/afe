@@ -81,6 +81,7 @@
 #' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag
 #' @importClassesFrom Matrix Matrix
 #' @importFrom Matrix Matrix sparseMatrix
+#' @encoding UTF-8
 #' 
 #' @example examples/examples.mixed.R
 #' 

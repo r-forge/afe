@@ -1,3 +1,4 @@
+\encoding{UTF-8}
 \name{mixed}
 \alias{mixed}
 \title{Obtain p-values for a mixed-model from lmer().}

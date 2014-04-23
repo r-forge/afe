@@ -1,3 +1,4 @@
+\encoding{UTF-8}
 \name{aov.car}
 \alias{aov.car}
 \alias{aov4}

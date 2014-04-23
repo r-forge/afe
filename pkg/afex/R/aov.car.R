@@ -101,6 +101,8 @@
 #' @importFrom reshape2 dcast
 #' @importFrom lme4 findbars nobars 
 #' @example examples/examples.aov.car.R
+#' 
+#' @encoding UTF-8
 #'
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", observed = NULL, args.return = list(), ...) {
@@ -116,6 +118,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   # from here, code by Henrik Singmann:
   vars <- all.vars(formula)
   dv <- vars[1]
+  #chec if dv is numeric:
+  if (!is.numeric(data[,dv])) stop("dv needs to be numeric.")
   vars <- vars[-1]
   parts <- attr(terms(formula, "Error", data = data), "term.labels")
   error.term <- parts[str_detect(parts, "^Error\\(")]
