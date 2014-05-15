@@ -366,6 +366,7 @@ print.mixed <- function(x, ...) {
     tmp[,"chisq"] <- formatC(tmp[,"chisq"], format = "f", digits = 2)
   } else {
     tmp <- x[[1]]
+    tmp[,2] <- formatC(tmp[,2], format = "f", digits = 2)
   }
   tmp[,"p.value"] <- round_ps(tmp[,"p.value"])
   if (is.list(x$full)) {

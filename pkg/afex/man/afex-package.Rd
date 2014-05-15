@@ -7,7 +7,7 @@ Analysis of Factorial Experiments.
 }
 \details{
 \tabular{ll}{ Package: \tab afex\cr Type: \tab Package\cr
-Version: \tab 0.9-109\cr Date: \tab 2014-04-24\cr Depends:
+Version: \tab 0.10-110\cr Date: \tab 2014-05-15\cr Depends:
 \tab R (>= 3.0.0), car, lme4 (>= 1.0.5), pbkrtest (>=
 0.3-6), reshape2\cr Encoding: \tab latin1\cr License: \tab
 GPL (>=3)\cr URL: \tab
@@ -28,13 +28,12 @@ the Kenward-Roger approximation of degrees of freedom (LMM
 only), parametric bootstrap (LMMs and GLMMs) or likelihood
 ratio tests (LMMs and GLMMs). afex uses type 3 sums of
 squares as default (imitating commercial statistical
-software) and sets the default contrasts to contr.sum.
-Furthermore, compare.2.vectors() conveniently compares two
-vectors using a variety of tests.
+software). Furthermore, compare.2.vectors() conveniently
+compares two vectors using a variety of tests.
 }
 \author{
 Henrik Singmann, with contributions from Ben Bolker, Søren
-Højsgaard, Ulrich Halekoh, John Fox, Michael A. Lawrence
+Højsgaard, John Fox, Michael A. Lawrence
 }
 \keyword{package}
 
