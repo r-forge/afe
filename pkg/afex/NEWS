@@ -3,7 +3,7 @@
                     ************************
                     
                     Changes in afex Version 0.10-x
-                    Released April 2014
+                    Released xxx 2014
 
     Significant User Visible Changes and New Features
 
@@ -15,7 +15,9 @@
         
     Bugfixes
     
-    o   
+    o   removed bug when factor levels of within-subject factors
+        contained "+" or "-" and were not converted correctly. Added 
+        tests for known bugs in aov.car.
         
 
                     ************************

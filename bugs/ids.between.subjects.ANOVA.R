@@ -6,6 +6,7 @@ data1<-data.frame(species, habitat, mvt.rate, ind)
 
 str(data1)
 
-xtabs(~ habitat + ind)
+xtabs(~ species + habitat + ind)
 
+# should give an error
 ez.glm("ind", "mvt.rate", data1, within = "habitat", between = "species")

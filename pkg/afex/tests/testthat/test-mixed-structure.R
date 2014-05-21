@@ -43,12 +43,12 @@ test_that("mixed, obk.long: type 2 and LRTs", {
     ))
 })
 
-test_that("mixed, mlmRev: type 3 and 2 LRTs; print.mixed and propagate warnings", {
+test_that("mixed, mlmRev: type 3 and 2 LRTs for GLMMs", {
   require("mlmRev")
   suppressWarnings(gm1 <- mixed(use ~ age*urban + (1 | district), family = binomial, data = Contraception, method = "LRT", progress=FALSE))
   suppressWarnings(gm2 <- mixed(use ~ age*urban + (1 | district), family = binomial, data = Contraception, method = "LRT", type = 2, progress=FALSE))
-  expect_that(print(gm1), gives_warning("."))
-  expect_that(print(gm2), gives_warning("."))  
+  expect_that(gm1, is_a("mixed"))
+  expect_that(gm1, is_a("mixed"))
 })
 
 test_that("mixed, obk.long: LMM with method = PB", {
