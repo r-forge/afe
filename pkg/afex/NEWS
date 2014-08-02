@@ -3,7 +3,7 @@
                     ************************
                     
                     Changes in afex Version 0.10-x
-                    Released xxx 2014
+                    Released August 2014
 
     Significant User Visible Changes and New Features
 
@@ -12,6 +12,10 @@
     
     o   new functions to globally set contrasts: set_sum_contrasts & 
         set_treatment_contrasts (and some more wrappers).
+        
+    o   Added more mixed model examples from Maxwell & Delaney, Chapter 
+        15 ("Multilevel Models for within subjects designs"), see ?mixed 
+        and ?md_15.1. Thanks to Ulf Mertens. 
         
     Bugfixes
     

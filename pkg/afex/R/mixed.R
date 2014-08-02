@@ -56,7 +56,7 @@
 #'
 #' @seealso \code{\link{ez.glm}} and \code{\link{aov.car}} for convenience functions to analyze experimental deisgns with classical ANOVA or ANCOVA wrapping \code{\link[car]{Anova}}. 
 #' 
-#' see the following for the data sets from Maxwell and Delaney (2004) used: \code{\link{md_16.1}} and \code{\link{md_16.4}}.
+#' see the following for the data sets from Maxwell and Delaney (2004) used and more examples: \code{\link{md_15.1}}, \code{\link{md_16.1}}, and \code{\link{md_16.4}}.
 #'
 #' @references Baayen, R. H. (2008). \emph{Analyzing linguistic data: a practical introduction to statistics using R}. Cambridge, UK; New York: Cambridge University Press.
 #'

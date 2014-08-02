@@ -1,3 +1,16 @@
+### replicate results from Table 15.4 (Maxwell & Delaney, 2004, p. 789)
+data(md_15.1)
+# random intercept plus slope
+(t15.4a <- mixed(iq ~ timecat + (1+time|id),data=md_15.1))
+
+# to also replicate exact parameters use treatment.contrasts and the last level as base level:
+contrasts(md_15.1$timecat) <- contr.treatment(4, base = 4)
+(t15.4b <- mixed(iq ~ timecat + (1+time|id),data=md_15.1, check.contrasts=FALSE))
+summary(t15.4a$full.model)  # gives "wrong" parameters extimates
+summary(t15.4b$full.model)  # identical parameters estimates
+
+# for more examples from chapter 15 see ?md_15.1
+
 ### replicate results from Table 16.3 (Maxwell & Delaney, 2004, p. 837)
 data(md_16.1)
 
