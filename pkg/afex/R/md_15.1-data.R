@@ -1,6 +1,6 @@
 #' Data 15.1 / 11.5 from Maxwell & Delaney
 #'
-#' Hypothetical IQ Data from 12 children at 4 time points: Example data for chapter 11/15 of Maaxwell and Delaney (2004, Table 15.1, p. 766) in long format. Has two one within-subjects factor: time.
+#' Hypothetical IQ Data from 12 children at 4 time points: Example data for chapter 11/15 of Maxwell and Delaney (2004, Table 15.1, p. 766) in long format. Has two one within-subjects factor: time.
 #' 
 #' Description from pp. 534:
 #' 
@@ -8,7 +8,7 @@
 #' 
 #' To replicate the results in chapter 15 several different contrasts need to be applied, see Examples.
 #'
-#' \code{time} is time in moths (centered at 0) and \code{timecat} is the same as a categorical variable.
+#' \code{time} is time in months (centered at 0) and \code{timecat} is the same as a categorical variable.
 #'
 #' @docType data
 #' @keywords dataset
@@ -16,7 +16,7 @@
 #' @usage md_15.1
 #' @format A data.frame with 48 rows and 4 variables.
 #' @source Maxwell, S. E., & Delaney, H. D. (2004). Designing experiments and analyzing data: a model-comparisons perspective. Mahwah, N.J.: Lawrence Erlbaum Associates. p. 766
-#' @author R code for examples written by by Ulf Mertens and Henrik Singmann
+#' @author R code for examples written by Ulf Mertens and Henrik Singmann
 #'
 #' @examples
 #' ### replicate results from Table 15.2 to 15.6 (Maxwell & Delaney, 2004, pp. 774)
@@ -48,7 +48,7 @@
 #' # fit all parameters separately
 #' (t15.5 <- mixed(iq ~ timecat + (1+time|id), data=md_15.1, check.contrasts=FALSE,
 #'                   per.parameter="timecat"))
-#' # quadratic trend is considerbaly off, conclusions stay the same.
+#' # quadratic trend is considerably off, conclusions stay the same.
 #' 
 #' 
 #' ### Table 15.6, page 797
