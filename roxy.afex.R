@@ -12,7 +12,7 @@ svn.number <- as.numeric(substr(system("svn info", intern=TRUE)[6], 10, 15)) +1
 
 roxy.package(
 	pck.source.dir = "pkg/afex",
-	pck.version = str_c("0.10-", svn.number),
+	pck.version = str_c("0.11-", svn.number),
 	pck.description = data.frame(
 		Package = "afex",
 		Type = "Package",
@@ -34,7 +34,7 @@ roxy.package(
 		stringsAsFactors = FALSE),
 		actions = c("roxy"),
 		R.libs = R.libs, 
-		repo.root = "rp.tmp")
+		repo.root = tempdir())
 #system("rmdir pkg/afex/inst")
 
 #checkNEWS("pkg/afex/NEWS")

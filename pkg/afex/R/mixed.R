@@ -18,6 +18,7 @@
 #' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. If \code{ckeck.contrasts}, mixed sets the current contrasts (\code{getOption("contrasts")}) at the nodes. Note this does \emph{not} distribute calculation of p-values (e.g., when using \code{method = "PB"}) across the cluster. Use \code{args.test} for this.
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
 #'
+#'
 #' @return An object of class \code{"mixed"} (i.e., a list) with the following elements:
 #'
 #' \enumerate{
@@ -29,15 +30,40 @@
 #' \item \code{method} The \code{method} argument used when calling this function.
 #' }
 #'
-#' The following methods exist for objects of class \code{"mixed"}: \code{print} (which uses rounding and invisibly returns the output), \code{summary}, and \code{anova} (the latter two return the same data.frame).
+#' Three identical methods exist for objects of class \code{"mixed"}: \code{print}, \code{summary}, and \code{anova}. They all print a nice version of the \code{anova.table} element of the returned object (which is also invisibly returned). This methods omit some columns and nicely round the other columns. The following columns are always printed:
+#' \enumerate{
+#' \item \code{Effect} name of effect
+#' \item \code{p.value} estimated p-value for the effect
+#' }
 #'
-#' @details For an introduction to mixed-modeling for experimental designs see Barr, Levy, Scheepers, & Tily (2013; I highly recommend reading this paper if you use this function), arguments for using the Kenward-Roger approximation for obtaining p-values are given by Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). Specific recommendations on which random effects structure to specify for confirmatory tests can be found in Barr and colleagues (2013).
+#' For LMMs with \code{method="KR"} the following further columns are returned (note: the Kenward-Roger correction does two separate things: (1) it computes an effective number for the denominator df; (2) it scales the statistic by a calculated amount, see also \url{http://stackoverflow.com/a/25612960/289572}):
+#' \enumerate{
+#' \item \code{F} computed F statistic
+#' \item \code{ndf} numerator degrees of freedom (number of parameters used for the effect)
+#' \item \code{ddf} denominator degrees of freedom (effective residual degrees of freedom for testing the effect), computed from the Kenward-Roger correction using \code{pbkrtest::KRmodcomp}
+#' \item \code{F.scaling} scaling of F-statistic computing from Kenward-Roger approximation.
+#' }
+#' 
+#' For models with \code{method="LRT"} the following further columns are returned:
+#' \enumerate{
+#' \item \code{df.large} degrees of freedom (i.e., estimated paramaters) for full model (i.e., model containing the corresponding effect)
+#' \item \code{df.small} degrees of freedom (i.e., estimated paramaters) for restricted model (i.e., model without the corresponding effect)
+#' \item \code{chisq} 2 times the difference in likelihood (obtained with \code{logLik}) between full and restricted model
+#' \item \code{df} difference in degrees of freedom between full and restricted model (p-value is based on these df).
+#' }
+#' 
+#' For models with \code{method="PB"} the following further column is returned:
+#' \enumerate{
+#' \item \code{stat} 2 times the difference in likelihood (obtained with \code{logLik}) between full and restricted model (i.e., a chi-square value).
+#' }
+#'
+#' @details For an introduction to mixed-modeling for experimental designs see Barr, Levy, Scheepers, & Tily (2013; I highly recommend reading this paper if you use this function), arguments for using the Kenward-Roger approximation for obtaining p-values are given by Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). Specific recommendations on which random effects structure to specify for confirmatory tests can be found in Barr and colleagues (2013) and Barr (2013).
 #'
 #' p-values are per default calculated via methods from \pkg{pbkrtest}. When \code{method = "KR"} (the default), the Kenward-Roger approximation for degrees-of-freedom is calculated using \code{\link[pbkrtest]{KRmodcomp}}, which is only applicable to linear-mixed models. The test statistic in the output is a F-value (\code{F}).
 #'
 #' \code{method = "PB"} calculates p-values using parametric bootstrap using \code{\link[pbkrtest]{PBmodcomp}}. This can be used for linear and also generalized linear mixed models (GLMM) by specifying a \code{\link[stats]{family}} argument to \code{mixed}. Note that you should specify further arguments to \code{PBmodcomp} via \code{args.test}, especially \code{nsim} (the number of simulations to form the reference distribution) or \code{cl} (for using multiple cores). For other arguments see \code{\link[pbkrtest]{PBmodcomp}}. Note that \code{REML} (argument to \code{[g]lmer}) will be set to \code{FALSE} if method is \code{PB}.
 #'
-#' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"merMod"} objects. This is recommended by Barr et al. (2013; which did not test the other methods implemented here). Using likelihood ratio tests is only recommended for models with many levels for the random effects (> 50), but can be pretty helpful in case the othwer methods fail (due to memory and/or time limitations). The \href{http://glmm.wikidot.com/faq}{lme4 faq} also recommends the other methods over likelihood ratio tests.
+#' \code{method = "LRT"} calculates p-values via likelihood ratio tests implemented in the \code{anova} method for \code{"merMod"} objects. This is recommended by Barr et al. (2013; which did not test the other methods implemented here). Using likelihood ratio tests is only recommended for models with many levels for the random effects (> 50), but can be pretty helpful in case the other methods fail (due to memory and/or time limitations). The \href{http://glmm.wikidot.com/faq}{lme4 faq} also recommends the other methods over likelihood ratio tests.
 #' 
 #' Type 3 tests are obtained by comparing a model in which only the tested effect is excluded with the full model (containing all effects). This corresponds to the (type 3) Wald tests given by \code{car::Anova} for \code{"lmerMod"} models. The submodels in which the tested effect is excluded are obtained by manually creating a model matrix which si then fitted in \code{"lme4"}. This is done to avoid R's "feature" to not allow this behavior.
 #'
@@ -48,7 +74,7 @@
 #'
 #' @note When \code{method = "KR"}, obtaining p-values is known to crash due too insufficient memory or other computational limitations (especially with complex random effects structures). In these cases, the other methods should be used. The RAM demand is a problem especially on 32 bit Windows which only supports up to 2 or 3GB RAM (see \href{http://cran.r-project.org/bin/windows/base/rw-FAQ.html}{R Windows FAQ}). Then it is probably a good idea to use methods "LRT" or "PB".
 #'
-#' \code{"mixed"} will throw a message if numerical variables are not centered on 0, as main effects (of other variables then the numeric one) can be hard to interpret if numerical variables appear in interactions. See
+#' \code{"mixed"} will throw a message if numerical variables are not centered on 0, as main effects (of other variables then the numeric one) can be hard to interpret if numerical variables appear in interactions. See Dalal & Zickar (2012).
 #'
 #' Please report all bugs to henrik.singmann (at) psychologie.uni-freiburg.de 
 #'
@@ -63,6 +89,8 @@
 #' Baayen, R. H., Davidson, D. J., & Bates, D. M. (2008). Mixed-effects modeling with crossed random effects for subjects and items. \emph{Journal of Memory and Language}, 59(4), 390-412. doi:10.1016/j.jml.2007.12.005
 #' 
 #' Baayen, R. H., & Milin, P. (2010). Analyzing Reaction Times. \emph{International Journal of Psychological Research}, 3(2), 12-28.
+#' 
+#' Barr, D. J. (2013). Random effects structure for testing interactions in linear mixed-effects models. \emph{Frontiers in Quantitative Psychology and Measurement}, 328. doi:10.3389/fpsyg.2013.00328
 #' 
 #' Barr, D. J., Levy, R., Scheepers, C., & Tily, H. J. (2013). Random effects structure for confirmatory hypothesis testing: Keep it maximal. \emph{Journal of Memory and Language}, 68(3), 255-278. doi:10.1016/j.jml.2012.11.001
 #'
@@ -384,9 +412,10 @@ print.mixed <- function(x, ...) {
 }
 
 
-summary.mixed <- function(object, ...) object[[1]]
+#anova.mixed <- 
 
-anova.mixed <- function(object, ...) object[[1]]
+summary.mixed <- anova.mixed <- function(object, ...) print.mixed(x = object, ...)
+
 
 # is.mixed <- function(x) inherits(x, "mixed")
 
