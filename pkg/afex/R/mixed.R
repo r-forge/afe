@@ -2,9 +2,6 @@
 #'
 #' Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Roger approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}), or likelihood ratio tests (the latter two for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (the last two return the same data.frame).
 #'
-#' @usage mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"), 
-#'      per.parameter = NULL, args.test = list(), test.intercept = FALSE,
-#'      check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.
 #' @param data data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.
@@ -14,6 +11,7 @@
 #' @param args.test \code{list} of arguments passed to the function calculating the p-values. See Details.
 #' @param test.intercept logical. Whether or not the intercept should also be fitted and tested for significance. Default is \code{FALSE}. Only relevant if \code{type = 3}.
 #' @param check.contrasts \code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details.
+#' @param set.data.arg \code{logical}. Should the data argument in the slot \code{call} of the \code{merMod} object returned from \code{lmer} be set to the passed data argument? Otherwise the name will be \code{data}. Helpful if fitted objects are used afterwards (e.g., using \pkg{lsmeans}). Default is \code{TRUE}. 
 #' @param progress  if \code{TRUE}, shows progress with a text progress bar and other status messages during fitting.
 #' @param cl  A vector identifying a cluster; used for distributing the estimation of the different models using several cores. See examples. If \code{ckeck.contrasts}, mixed sets the current contrasts (\code{getOption("contrasts")}) at the nodes. Note this does \emph{not} distribute calculation of p-values (e.g., when using \code{method = "PB"}) across the cluster. Use \code{args.test} for this.
 #' @param ... further arguments (such as \code{weights}) passed to \code{\link{lmer}}.
@@ -115,7 +113,7 @@
 #' @example examples/examples.mixed.R
 #' 
 
-mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), test.intercept = FALSE, check.contrasts = TRUE, progress = TRUE, cl = NULL, ...) {
+mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.parameter = NULL, args.test = list(), test.intercept = FALSE, check.contrasts = TRUE, set.data.arg = TRUE, progress = TRUE, cl = NULL, ...) {
   if (check.contrasts) {
     #browser()
     vars.to.check <- all.vars(formula)
@@ -161,6 +159,10 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     data <- model.frame(as.formula(str_c(vars.to.check[1], "~", str_c(vars.to.check[-1], collapse = "+"))), data = data)
     m.matrix <- model.matrix(rh2, data = data)
     warning(str_c("Due to missing values, reduced number of observations to ", nrow(data)))
+    if(set.data.arg) {
+      warning("Due to missing values, set.data.arg set to FALSE.")
+      set.data.arg <- FALSE
+    }
   }
   
   # check if numerical variables are centered
@@ -270,6 +272,12 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     fits <- clusterApplyLB(cl = cl, x = formulas, eval.cl, m.call = mf, progress = progress)
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))
   }
+  ## add correct data argument to lmer calls:
+  if(set.data.arg){
+    for (i in seq_along(fits)) {
+      fits[[i]]@call[["data"]] <- mc[["data"]]
+    }
+  }
   ####################
   ### Part III: obtain p-values
   ####################
@@ -282,7 +290,7 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     fits <- fits[(max.effect.order+1):length(fits)]
   }
   names(fits) <- fixed.effects
-    ### check likelihoods of nested models:
+  ### check likelihoods of nested models:
   if (type == 3 | type == "III") {
     logLik_full <- as.numeric(logLik(full.model))
     logLik_restricted <- as.numeric(vapply(fits, logLik, 0))

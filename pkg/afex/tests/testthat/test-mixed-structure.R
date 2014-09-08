@@ -75,3 +75,19 @@ test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fittin
   expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
   expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, type=2, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
 })
+
+
+test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fitting well", {
+  data(md_16.4)
+  # F-values and p-values are relatively off:
+  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, type=2, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+})
+
+test_that("mixed: set.data.arg", {
+  data(obk.long, package = "afex")
+  suppressWarnings(m1 <- mixed(value ~ treatment*phase +(1|id), obk.long, method = "LRT", progress=FALSE))
+  suppressWarnings(m2 <- mixed(value ~ treatment*phase +(1|id), obk.long, method = "LRT", progress=FALSE, set.data.arg = FALSE))
+  expect_that(m1$full.model@call[["data"]], is_identical_to(as.name("obk.long")))
+  expect_that(m2$full.model@call[["data"]], is_identical_to(as.name("data")))
+})

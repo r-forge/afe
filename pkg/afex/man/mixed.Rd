@@ -5,8 +5,9 @@
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
 mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"),
-     per.parameter = NULL, args.test = list(), test.intercept = FALSE,
-     check.contrasts = TRUE, progress = TRUE, cl = NULL, ...)
+  per.parameter = NULL, args.test = list(), test.intercept = FALSE,
+  check.contrasts = TRUE, set.data.arg = TRUE, progress = TRUE,
+  cl = NULL, ...)
 }
 \arguments{
 \item{formula}{a formula describing the full mixed-model to be fitted. As this formula is passed to \code{lmer}, it needs at least one random term.}
@@ -24,6 +25,8 @@ mixed(formula, data, type = 3, method = c("KR", "PB", "LRT"),
 \item{test.intercept}{logical. Whether or not the intercept should also be fitted and tested for significance. Default is \code{FALSE}. Only relevant if \code{type = 3}.}
 
 \item{check.contrasts}{\code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details.}
+
+\item{set.data.arg}{\code{logical}. Should the data argument in the slot \code{call} of the \code{merMod} object returned from \code{lmer} be set to the passed data argument? Otherwise the name will be \code{data}. Helpful if fitted objects are used afterwards (e.g., using \pkg{lsmeans}). Default is \code{TRUE}.}
 
 \item{progress}{if \code{TRUE}, shows progress with a text progress bar and other status messages during fitting.}
 
