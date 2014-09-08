@@ -17,6 +17,7 @@
 #' - optimizer the \code{optimizer} function to use
 #' @param verbose print progress messages?
 #' @param maxfun number of iterations to allow for the optimization rountine.
+#' @param ... further arguments passed to \code{\link{update.merMod}} such as data.
 #' 
 #' @details Needs packages \pkg{nloptr} and \pkg{optimx} to try out all optimizers. \pkg{optimx} needs to be loaded explicitly using \code{library} or \code{require}.
 #' 
@@ -37,7 +38,7 @@
 #' !sapply(gm_all,inherits,"try-error") ## was fit OK?
 #' }
 #' 
-allFit <- function(m, meth.tab = cbind(optimizer=rep(c("bobyqa","Nelder_Mead", "optimx", "nloptwrap"),                                             c( 1, 1, 2, 2)),method= c("", "", "nlminb","L-BFGS-B","NLOPT_LN_NELDERMEAD", "NLOPT_LN_BOBYQA")),verbose=TRUE,maxfun=1e5)
+allFit <- function(m, meth.tab = cbind(optimizer=rep(c("bobyqa","Nelder_Mead", "optimx", "nloptwrap"),                                             c( 1, 1, 2, 2)),method= c("", "", "nlminb","L-BFGS-B","NLOPT_LN_NELDERMEAD", "NLOPT_LN_BOBYQA")),verbose=TRUE,maxfun=1e5, ...)
 {
   stopifnot(length(dm <- dim(meth.tab)) == 2, dm[1] >= 1, dm[2] >= 2,
             is.character(optimizer <- meth.tab[,"optimizer"]),
@@ -52,7 +53,7 @@ allFit <- function(m, meth.tab = cbind(optimizer=rep(c("bobyqa","Nelder_Mead", "
                            nloptWrap = list(algorithm= method[i]),
                            list(maxfun=maxfun))
     ctrl <- do.call(if(isGLMM(m)) glmerControl else lmerControl, ctrl)
-    tt <- system.time(rr <- tryCatch(update(m, control = ctrl), error = function(e) e))
+    tt <- system.time(rr <- tryCatch(update(m, control = ctrl, ...), error = function(e) e))
     attr(rr, "optCtrl") <- ctrl$optCtrl # contains crucial info here
     attr(rr, "time") <- tt # store timing info
     res[[i]] <- rr

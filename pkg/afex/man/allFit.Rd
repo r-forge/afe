@@ -6,7 +6,7 @@
 allFit(m, meth.tab = cbind(optimizer = rep(c("bobyqa", "Nelder_Mead",
   "optimx", "nloptwrap"), c(1, 1, 2, 2)), method = c("", "", "nlminb",
   "L-BFGS-B", "NLOPT_LN_NELDERMEAD", "NLOPT_LN_BOBYQA")), verbose = TRUE,
-  maxfun = 1e+05)
+  maxfun = 1e+05, ...)
 }
 \arguments{
 \item{m}{a fitted model with \code{lmer}}
@@ -19,6 +19,8 @@ allFit(m, meth.tab = cbind(optimizer = rep(c("bobyqa", "Nelder_Mead",
 \item{verbose}{print progress messages?}
 
 \item{maxfun}{number of iterations to allow for the optimization rountine.}
+
+\item{...}{further arguments passed to \code{\link{update.merMod}} such as data.}
 }
 \value{
 a list of fitted \code{merMod} objects

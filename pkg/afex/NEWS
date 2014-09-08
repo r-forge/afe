@@ -10,7 +10,7 @@
     o   added allFit() function (written by Ben Bolker).
     
     o   mixed() gives warning if nested model provides worse fit 
-        (logLik) than full model.
+        (logLik) than full model (when fitted with ML).
     
     o   print, summary, and anova method for mixed objects are now 
         identical.

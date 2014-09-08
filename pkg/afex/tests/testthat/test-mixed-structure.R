@@ -77,12 +77,12 @@ test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fittin
 })
 
 
-test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fitting well", {
-  data(md_16.4)
-  # F-values and p-values are relatively off:
-  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
-  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, type=2, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
-})
+# test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fitting well", {
+#   data(md_16.4)
+#   # F-values and p-values are relatively off:
+#   expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+#   expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, type=2, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+# })
 
 test_that("mixed: set.data.arg", {
   data(obk.long, package = "afex")

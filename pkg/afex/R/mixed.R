@@ -273,14 +273,56 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     if (progress) junk <- clusterEvalQ(cl = cl, cat("]"))
   }
   ## add correct data argument to lmer calls:
+
+  ####################
+  ### Part IIb: likelihood checks and refitting
+  ####################
+  
+  check_likelihood <- function(fits) {
+    if (type == 3 | type == "III") {
+      logLik_full <- as.numeric(logLik(fits[[1]]))
+      logLik_restricted <- as.numeric(vapply(fits[2:length(fits)], logLik, 0))
+      if(any(logLik_restricted > logLik_full)) return(fixed.effects[logLik_restricted > logLik_full])
+    } else if (type == 2 | type == "II") {
+      logLik_full <- as.numeric(vapply(fits[1:max.effect.order],logLik, 0))
+      logLik_restricted <- as.numeric(vapply(fits[(max.effect.order+1):length(fits)], logLik, 0))
+      warn_logLik <- c()
+      for (c in seq_along(fixed.effects)) {
+        order.c <- effect.order[c]
+        if(logLik_restricted[[c]] > logLik_full[[order.c]]) warn_logLik <- c(warn_logLik, fixed.effects[c])
+      }
+      if(length(warn_logLik)>0) return(warn_logLik)
+    }
+    return(TRUE)    
+  }
+  
+  # check for smaller likelihood of nested model and refit if test fails:
+  if (FALSE) {
+    if(!isTRUE(check_likelihood(fits))) {
+      if (progress) cat("refitting...")
+      refits <- lapply(fits, allFit, verbose=FALSE, data = data)
+      browser()
+      str(fits[[1]], 2)
+      fits[[1]]@call
+      sapply(allFit(fits[[1]], data=md_16.4b), function(y) try(logLik(y)))
+      sapply(refits, function(x) sapply(x, function(y) tryCatch(as.numeric(logLik(y)), error = function(e) as.numeric(NA))))
+      
+      fits <- lapply(refits, function(x) {
+        tmp_llk <- vapply(x, function(y) tryCatch(logLik(y), error = function(e) as.numeric(NA)), 0)
+        x[[which.min(tmp_llk)]]
+      })
+    }
+  }
+  # check again and warn 
+  if(!isREML(fits[[1]]) & !isTRUE(check_likelihood(fits))) {
+    warning(paste("Following nested model(s) provide better fit than full model:", paste(check_likelihood(fits), collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl or allFit!"))
+  }
+  
   if(set.data.arg){
     for (i in seq_along(fits)) {
       fits[[i]]@call[["data"]] <- mc[["data"]]
     }
   }
-  ####################
-  ### Part III: obtain p-values
-  ####################
   ## prepare for p-values:
   if (type == 3 | type == "III") {
     full.model <- fits[[1]]
@@ -289,22 +331,11 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     full.model <- fits[1:max.effect.order]
     fits <- fits[(max.effect.order+1):length(fits)]
   }
-  names(fits) <- fixed.effects
-  ### check likelihoods of nested models:
-  if (type == 3 | type == "III") {
-    logLik_full <- as.numeric(logLik(full.model))
-    logLik_restricted <- as.numeric(vapply(fits, logLik, 0))
-    if(any(logLik_restricted < logLik_full)) warning(paste("Following nested model(s) provide better fit than full model:", paste(fixed.effects[logLik_restricted < logLik_full], collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl!"), immediate. = TRUE)
-  } else if (type == 2 | type == "II") {
-    logLik_full <- as.numeric(vapply(full.model,logLik, 0))
-    logLik_restricted <- as.numeric(vapply(fits, logLik, 0))
-    warn_logLik <- c()
-    for (c in seq_along(fixed.effects)) {
-      order.c <- effect.order[c]
-      if(logLik_restricted[[c]] < logLik_full[[order.c]]) warn_logLik <- c(warn_logLik, fixed.effects[c])
-    }
-    if(length(warn_logLik) > 0) warning(paste("Following nested model(s) provide better fit than full model(s):", paste(warn_logLik, collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl!"), immediate. = TRUE)
-  }  
+  names(fits) <- fixed.effects  
+  
+  ####################
+  ### Part III: obtain p-values
+  ####################
   ## obtain p-values:
   #browser()
   if (method[1] == "KR") {
