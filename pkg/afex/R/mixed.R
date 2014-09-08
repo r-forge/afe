@@ -282,7 +282,22 @@ mixed <- function(formula, data, type = 3, method = c("KR", "PB", "LRT"), per.pa
     fits <- fits[(max.effect.order+1):length(fits)]
   }
   names(fits) <- fixed.effects
-  # obtain p-values:
+    ### check likelihoods of nested models:
+  if (type == 3 | type == "III") {
+    logLik_full <- as.numeric(logLik(full.model))
+    logLik_restricted <- as.numeric(vapply(fits, logLik, 0))
+    if(any(logLik_restricted < logLik_full)) warning(paste("Following nested model(s) provide better fit than full model:", paste(fixed.effects[logLik_restricted < logLik_full], collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl!"), immediate. = TRUE)
+  } else if (type == 2 | type == "II") {
+    logLik_full <- as.numeric(vapply(full.model,logLik, 0))
+    logLik_restricted <- as.numeric(vapply(fits, logLik, 0))
+    warn_logLik <- c()
+    for (c in seq_along(fixed.effects)) {
+      order.c <- effect.order[c]
+      if(logLik_restricted[[c]] < logLik_full[[order.c]]) warn_logLik <- c(warn_logLik, fixed.effects[c])
+    }
+    if(length(warn_logLik) > 0) warning(paste("Following nested model(s) provide better fit than full model(s):", paste(warn_logLik, collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl!"), immediate. = TRUE)
+  }  
+  ## obtain p-values:
   #browser()
   if (method[1] == "KR") {
     if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))

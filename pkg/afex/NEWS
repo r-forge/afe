@@ -7,6 +7,9 @@
 
     Significant User Visible Changes and New Features
 
+    o   mixed() gives warning if nested model provides worse fit 
+        (logLik) than full model.
+    
     o   print, summary, and anova method for mixed objects are now 
         identical.
         

@@ -67,3 +67,11 @@ test_that("mixed, obk.long: multicore loads lme4 and produces the same results",
   expect_that(all(vapply(cl_search, function(x) any(grepl("^package:lme4$", x)), NA)), is_true())
   expect_that(m_mc1, equals(m_mc2))
 })
+
+
+test_that("mixed, Maxell & Delaney (2004), Table 16.4, p. 842: bobyqa not fitting well", {
+  data(md_16.4)
+  # F-values and p-values are relatively off:
+  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+  expect_that(mixed(induct ~ cond*cog + (cog|room:cond), md_16.4, type=2, control=lmerControl(optimizer="bobyqa")), gives_warning("better fit"))
+})
