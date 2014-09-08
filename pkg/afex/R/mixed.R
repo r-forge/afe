@@ -105,10 +105,11 @@
 #' @S3method summary mixed
 #' @S3method anova mixed
 #' @import pbkrtest
-#' @importFrom lme4 lmer glmer nobars
+#' @importFrom lme4 lmer glmer nobars getME fixef
 #' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag
 #' @importClassesFrom Matrix Matrix
-#' @importFrom Matrix Matrix sparseMatrix
+#' @importFrom Matrix Matrix sparseMatrix rankMatrix
+#' @importFrom parallel clusterCall clusterExport clusterEvalQ clusterApplyLB
 #' @encoding UTF-8
 #' 
 #' @example examples/examples.mixed.R
