@@ -7,6 +7,8 @@
 
     Significant User Visible Changes and New Features
 
+    o   added allFit() function (written by Ben Bolker).
+    
     o   mixed() gives warning if nested model provides worse fit 
         (logLik) than full model.
     
