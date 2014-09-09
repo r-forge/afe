@@ -103,7 +103,7 @@
 #' @S3method summary mixed
 #' @S3method anova mixed
 #' @import pbkrtest
-#' @importFrom lme4 lmer glmer nobars getME fixef
+#' @importFrom lme4 lmer glmer nobars getME fixef isREML
 #' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag
 #' @importClassesFrom Matrix Matrix
 #' @importFrom Matrix Matrix sparseMatrix rankMatrix
