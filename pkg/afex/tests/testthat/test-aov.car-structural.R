@@ -10,3 +10,17 @@ test_that("non Type 3 sums give warning", {
   data(obk.long)
   expect_that(aov4(value ~ treatment * gender + (phase*hour|id), data = obk.long, observed = "gender", check.contrasts = FALSE), gives_warning("contrasts"))
 })
+
+test_that("return='aov' works", {
+  data(obk.long)
+  data(md_12.1)
+  
+  # purely within
+  test_that(ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), return = "aov"), is_a(c( "aovlist", "listof" )))
+  test_that(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"), is_a(c( "aovlist", "listof" )))
+  #purely between
+  test_that(suppressWarnings(aov.car(value ~ treatment * gender + Error(id), data = obk.long, return = "aov", )), is_a(c( "aov")))
+  test_that(suppressWarnings(aov.car(value~treatment * gender + Error(id/phase*hour), data = obk.long, return = "aov", )), is_a(c( "aov")))
+})
+
+class(aov.car(value ~ treatment * gender + Error(id), data = obk.long, return = "aov"))

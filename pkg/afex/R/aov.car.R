@@ -107,7 +107,7 @@
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", observed = NULL, args.return = list(), ...) {
   #browser()
-  return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal"))
+  return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
   indError <- attr(Terms, "specials")$Error
@@ -235,6 +235,9 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
       }
       if((type == 3 | type == "III") && (length(non_sum_contrast)>0)) warning(str_c("Calculating Type 3 sums with contrasts != 'contr.sum' for: ", paste0(non_sum_contrast, collapse=", "), "\n  Results likely bogus or not interpretable!\n  You should use check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
     }
+  }
+  if(return == "aov"){
+    return(aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret))
   }
   data.l <- list(data = tmp.dat)
   if (return == "data") return(tmp.dat)
