@@ -174,8 +174,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
       fun.aggregate <- mean
     }
   }
-  # Is Type == 3 and contrasts != contr.sum and check.contrasts == FALSE?
-  if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum" & !check.contrasts) warning(str_c("Calculating Type 3 sums with contrasts = ", options("contrasts")[[1]][1], "\n  Results likely bogus or not interpretable!\n  You should use check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
+  # Is Type == 3 and contrasts != contr.sum and check.contrasts == FALSE? (ALL MOVED BELOW):
+  # if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum" & !check.contrasts) 
   # if return = "lme4" return the (aggregated) data fitted with lmer!
   #   if (return == "lme4") {
   #     warning("lme4 return is experimental!\nAlso: Missing values and contrasts not checked for return = 'lme4'!")
@@ -221,6 +221,19 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
         }
       }
     if (!is.null(resetted)) message(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
+    } else {
+      non_sum_contrast <- c()
+      for (i in between) {
+        if (is.factor(tmp.dat[,i])) {
+          if (is.null(attr(tmp.dat[,i], "contrasts")) & (options("contrasts")[[1]][1] != "contr.sum")) {
+            non_sum_contrast <- c(non_sum_contrast, between)
+          }
+          else if (!is.null(attr(tmp.dat[,i], "contrasts")) && attr(tmp.dat[,i], "contrasts") != "contr.sum") {
+            non_sum_contrast <- c(non_sum_contrast, between)
+          }
+        }
+      }
+      if((type == 3 | type == "III") && (length(non_sum_contrast)>0)) warning(str_c("Calculating Type 3 sums with contrasts != 'contr.sum' for: ", paste0(non_sum_contrast, collapse=", "), "\n  Results likely bogus or not interpretable!\n  You should use check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
     }
   }
   data.l <- list(data = tmp.dat)
