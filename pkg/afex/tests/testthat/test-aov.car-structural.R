@@ -16,10 +16,10 @@ test_that("return='aov' works", {
   data(md_12.1)
   
   # purely within
-  test_that(ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), return = "aov"), is_a(c( "aovlist", "listof" )))
-  test_that(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"), is_a(c( "aovlist", "listof" )))
+  expect_that(ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), return = "aov"), is_a(c( "aovlist", "listof" )))
+  expect_that(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"), is_a(c( "aovlist", "listof" )))
   #purely between
-  test_that(suppressWarnings(aov.car(value ~ treatment * gender + Error(id), data = obk.long, return = "aov")), is_a(c( "aov")))
-  test_that(suppressWarnings(aov.car(value~treatment * gender + Error(id/phase*hour), data = obk.long, return = "aov")), is_a(c( "aovlist", "listof" )))
+  expect_that(suppressWarnings(aov.car(value ~ treatment * gender + Error(id), data = obk.long, return = "aov")), is_a(c( "aov")))
+  expect_that(suppressWarnings(aov.car(value~treatment * gender + Error(id/phase*hour), data = obk.long, return = "aov")), is_a(c( "aovlist", "listof" )))
 })
 
