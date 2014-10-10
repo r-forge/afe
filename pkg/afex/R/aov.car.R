@@ -31,7 +31,7 @@
 #' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
 #' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param return What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal")} (possibly abbreviated).
+#' @param return What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated).
 #' @param args.return \code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
@@ -56,6 +56,8 @@
 #' The elements of the list returned by \code{univ} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
 #' 
 #' If \code{return = "marginal"} A list with data.frames containing the marginal means for all effects. Numerical variables are ignored.
+#' 
+#' If \code{return = "aov"}, an object returned from \code{aov} with the (possibly aggregated) data fitted with \code{\link{aov}} using \code{"contr.sum"} for all factors as long as \code{check.contrasts = TRUE}. This object can be passed to \code{lsmeans::lsmeans} for post-hoc tests or \code{lsmeans::lsmip} for plotting. Note that \code{aov} is not reliably working for unbalanced data.
 #' 
 #' @details \strong{Type 3 sums of squares are default in \pkg{afex}.} Note that type 3 sums of squares are said to be dangerous and/or problematic. On the other side they are the default in in SPSS and SAS and recommended by e.g. Maxwell and Delaney (2004). For a brief discussion see \href{http://stats.stackexchange.com/q/6208/442}{here}. 
 #'
@@ -154,7 +156,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   #browser()
   new.factor.levels <- c(letters, LETTERS)
   for (within.factor in within) {
-    data[,within.factor] <- factor(as.character(data[,within.factor]), levels = unique(as.character(data[,within.factor])), labels = make.names(unique(as.character(data[,within.factor])), unique=TRUE))
+    if (is.factor(data[,within.factor])) levels(data[,within.factor]) <- make.names(levels(data[,within.factor]), unique = TRUE)
+    else data[,within.factor] <- factor(as.character(data[,within.factor]), levels = unique(as.character(data[,within.factor])), labels = make.names(unique(as.character(data[,within.factor])), unique=TRUE))
     #data[,within.factor] <- factor(as.character(data[,within.factor]))
     #levels(data[,within.factor]) <- make.names(levels(data[,within.factor]), unique=TRUE)
     #if (length(levels(data[,within.factor])) <= length(new.factor.levels)) levels(data[,within.factor]) <- new.factor.levels[seq_along(levels(data[,within.factor]))]
@@ -185,8 +188,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   #     return(lmer(as.formula(str_c("value~", rh2, if (length(within) > 0) paste0("*", f.within.new) else "", "+ (1", if (length(within) > 0) paste0("+", f.within.new) else "", "|", id, ")" , sep = "")), data = n.dat))
   #   }
   # prepare the data:
-  tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   #browser()
+  tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   # check for missing values:
   if (any(is.na(tmp.dat))) {
     missing.values <- apply(tmp.dat, 1, function(x) any(is.na(x)))
@@ -237,7 +240,11 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
     }
   }
   if(return == "aov"){
-    return(aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret))
+    if (check.contrasts) {
+      contrasts <- as.list(rep("contr.sum", length(within)+length(between)))
+      names(contrasts) <- c(within, between)
+    }
+    return(aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret, contrasts = contrasts))
   }
   data.l <- list(data = tmp.dat)
   if (return == "data") return(tmp.dat)

@@ -8,3 +8,5 @@ test_package("afex")
 
 options(error = recover)
 options(error = NULL)
+
+#install.packages("afex", dependencies = TRUE)

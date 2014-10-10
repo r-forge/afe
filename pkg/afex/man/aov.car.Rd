@@ -36,7 +36,7 @@ univ(object)
 
 \item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details.}
 
-\item{return}{What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal")} (possibly abbreviated).}
+\item{return}{What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated).}
 
 \item{observed}{\code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).}
 
@@ -79,6 +79,8 @@ For objects of class \code{"anova"} (i.e., the object returned by \code{car::Ano
 The elements of the list returned by \code{univ} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
 
 If \code{return = "marginal"} A list with data.frames containing the marginal means for all effects. Numerical variables are ignored.
+
+If \code{return = "aov"}, an object returned from \code{aov} with the (possibly aggregated) data fitted with \code{\link{aov}} using \code{"contr.sum"} for all factors as long as \code{check.contrasts = TRUE}. This object can be passed to \code{lsmeans::lsmeans} for post-hoc tests or \code{lsmeans::lsmip} for plotting. Note that \code{aov} is not reliably working for unbalanced data.
 }
 \description{
 These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s), \code{aov4} can be called with a \pkg{lme4}-like formula, and \code{ez.glm} is called specifying the factors as character vectors.
