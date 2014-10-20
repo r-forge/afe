@@ -7,8 +7,9 @@
 
     Significant User Visible Changes and New Features
 
-    o   ANOVA functions give warning in case of empty cells in the 
-		fully-crossed between-subjects design.
+    o   ANOVA functions give informative error if some parameters are 
+		not estimable (most likely due to structural missings, i.e. 
+		empty cells).
         
     Bugfixes
 	
