@@ -10,14 +10,14 @@ test_that("orig label bug", {
   data(obk.long)
   obk2 <- obk.long
   levels(obk2$phase) <- c("fup test", "post-hans", "pre tenetious")
-  expect_is(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk2, factorize=FALSE, return = "Anova"), "Anova.mlm")
+  expect_is(suppressWarnings(aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk2, factorize=FALSE, return = "Anova")), "Anova.mlm")
 })
 
 test_that("ANCOVA check bug (reported by Gang Chen), January 2013", {
   dat <- read.table('../../../../bugs/mydata.txt', header=T)
   dat$ID <- as.factor(dat$ID)
-  fm <- aov.car(Value ~ Propdd00 + Group + Gender + GAS0 + MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return = "Anova")
-  fm0 <- aov.car(Value ~ MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return='full')
+  fm <- suppressWarnings(aov.car(Value ~ Propdd00 + Group + Gender + GAS0 + MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return = "Anova"))
+  fm0 <- suppressWarnings(aov.car(Value ~ MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return='full'))
   expect_is(fm, "Anova.mlm")
   expect_is(fm0, "list")
 })

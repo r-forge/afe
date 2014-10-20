@@ -195,6 +195,10 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
     missing.values <- apply(tmp.dat, 1, function(x) any(is.na(x)))
     warning(str_c("Missing values for following ID(s):\n", str_c(tmp.dat[missing.values,1], collapse = ", "), "\nRemoving those cases from the analysis."))        
   }
+  if (length(between) > 0) {
+    n_data_points <- xtabs(as.formula(paste("~", paste(between, collapse = "+"))), data = tmp.dat)
+    if (any(n_data_points == 0)) warning("Some cells of the fully crossed between-subjects design are empty. A full model might not be estimable.")
+  }
   # marginals:
   dat.ret <- dcast(data, formula = as.formula(str_c(str_c(lh1, if (length(within) > 0) rh1 else NULL, sep = "+"), "~.")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   colnames(dat.ret)[length(colnames(dat.ret))] <- dv
