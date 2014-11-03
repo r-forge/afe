@@ -130,6 +130,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   between <- vars[!(vars %in% c(id, within))]
   effect.parts <- parts[!str_detect(parts, "^Error\\(")]
   effect.parts.no.within <- effect.parts[!str_detect(effect.parts, str_c("\\<",within,"\\>", collapse = "|"))]
+  data <- droplevels(data) #remove empty levels.
   # factorize if necessary
   if (factorize) {
     if (any(!vapply(data[, between, drop = FALSE], is.factor, TRUE))) {

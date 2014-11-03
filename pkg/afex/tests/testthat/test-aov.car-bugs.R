@@ -32,3 +32,12 @@ test_that("ANOVA: ids in multiple between.subjects conditions", {
   # should give an error
   expect_error(ez.glm("ind", "mvt.rate", data1, within = "habitat", between = "species"), "Following ids are in more than one between subjects condition:")
 })
+
+test_that("empty factors are not causing aov.cat to choke", {
+  data(sleepstudy) #Example data in lme4
+  sleepstudy$Days<-factor(sleepstudy$Days)
+  #Works with all factors
+  expect_is(ez.glm("Subject","Reaction",sleepstudy, within="Days", return = "Anova"), "Anova.mlm")
+  #If you remove a factor it fails...
+  expect_is(ez.glm("Subject","Reaction",sleepstudy[sleepstudy$Days!=9,], within="Days", return = "Anova"), "Anova.mlm")
+})

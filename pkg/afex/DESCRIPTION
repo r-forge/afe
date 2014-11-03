@@ -34,10 +34,10 @@ URL: http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex
 License: GPL (>=3)
 Encoding: latin1
 Authors@R: c(person(given="Henrik", family="Singmann",
-    email="henrik.singmann@psychologie.uni-freiburg.de", role=c("aut", "cre")),
-    person(given="Ben", family="Bolker", role=c("aut")), person(given="Søren",
-    family="Højsgaard", role=c("ctb")), person(given="John", family="Fox",
-    role=c("ctb")), person(given="Michael A.", family="Lawrence",
-    role=c("ctb")), person(given="Ulf", family="Mertens", role=c("ctb")) )
-Version: 0.12-134
-Date: 2014-10-26
+    email="singmann+afex@gmail.com", role=c("aut", "cre")), person(given="Ben",
+    family="Bolker", role=c("aut")), person(given="Søren", family="Højsgaard",
+    role=c("ctb")), person(given="John", family="Fox", role=c("ctb")),
+    person(given="Michael A.", family="Lawrence", role=c("ctb")),
+    person(given="Ulf", family="Mertens", role=c("ctb")) )
+Version: 0.12-135
+Date: 2014-11-03

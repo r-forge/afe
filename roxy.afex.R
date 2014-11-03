@@ -17,7 +17,7 @@ roxy.package(
 		Package = "afex",
 		Type = "Package",
 		Title = "Analysis of Factorial Experiments",
-		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"henrik.singmann@psychologie.uni-freiburg.de\", role=c(\"aut\", \"cre\")),
+		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", email=\"singmann+afex@gmail.com\", role=c(\"aut\", \"cre\")),
         person(given=\"Ben\", family=\"Bolker\", role=c(\"aut\")),
         person(given=\"Søren\", family=\"Højsgaard\", role=c(\"ctb\")),
         person(given=\"John\", family=\"Fox\", role=c(\"ctb\")),
