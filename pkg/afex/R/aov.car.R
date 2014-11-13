@@ -147,7 +147,10 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
       non.null <- c.ns[!abs(vapply(data[, c.ns, drop = FALSE], mean, 0)) < .Machine$double.eps ^ 0.5]
       if (length(non.null) > 0) warning(str_c("Numerical variables NOT centered on 0 (i.e., likely bogus results): ", str_c(non.null, collapse = ", ")))
     }
-  }  
+  }
+  for (i in c(between, within)) {
+    if (is.factor(data[,i]) && length(unique(data[,i])) == 1) stop(paste0("Factor \"", i, "\" consists of one level only. Remove factor from model?"))
+  }
   # make formulas
   rh2 <- if (length(between) > 0) str_c(effect.parts.no.within, collapse = "+") else "1"
   lh1 <- str_c(id, if (length(between) > 0) str_c(between, collapse = "+") else NULL, sep = "+")
@@ -155,7 +158,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   rh3 <- str_c(within, collapse = "*")
   # converting all within subject factors to factors and adding a leading charcter (x) if starting with a digit.
   #browser()
-  new.factor.levels <- c(letters, LETTERS)
+  #new.factor.levels <- c(letters, LETTERS)
   for (within.factor in within) {
     if (is.factor(data[,within.factor])) levels(data[,within.factor]) <- make.names(levels(data[,within.factor]), unique = TRUE)
     else data[,within.factor] <- factor(as.character(data[,within.factor]), levels = unique(as.character(data[,within.factor])), labels = make.names(unique(as.character(data[,within.factor])), unique=TRUE))
