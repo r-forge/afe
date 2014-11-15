@@ -21,5 +21,12 @@ test_that("return='aov' works", {
   #purely between
   expect_that(suppressWarnings(aov.car(value ~ treatment * gender + Error(id), data = obk.long, return = "aov")), is_a(c( "aov")))
   expect_that(suppressWarnings(aov.car(value~treatment * gender + Error(id/phase*hour), data = obk.long, return = "aov")), is_a(c( "aovlist", "listof" )))
+  
+  # terms within Error() are within parentheses:
+  test <- summary(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"))
+  positive  <- summary(aov(value ~ phase*hour+Error(id/(phase*hour)), data = obk.long))
+  negative  <- summary(aov(value ~ phase*hour+Error(id/phase*hour), data = obk.long))
+  expect_equal(test, positive)
+  expect_false(isTRUE(all.equal(test, negative, check.attributes = FALSE)))
 })
 

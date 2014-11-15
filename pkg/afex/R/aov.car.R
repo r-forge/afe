@@ -81,17 +81,17 @@
 #'
 #' The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 #'
-#' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors and unused levels dropped.
+#' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 #' 
 #' The workhorse is \code{aov.car}. \code{aov4} and \code{ez.glm} only construe and pass an appropriate formula to \code{aov.car}. Use \code{print.formula = TRUE} to view this formula.
+#' 
+#' In contrast to \code{\link{aov}} \code{aov.car} assumes that all factors to the right of \code{/} in the \code{Error} term are belonging together. Consequently, \code{Error(id/(a*b))} and \code{Error(id/a*b)} are identical (which is not true \code{aov}).
 #'
-#' @seealso \code{\link{nice.anova}} creats the nice ANOVA tables which are by default returned. See also there for a slightly longer discussion of effect sizes.
+#' @seealso \code{\link{nice.anova}} creats the nice ANOVA tables which are by default returned. See also there for a slightly longer discussion of the available effect sizes.
 #'
 #' \code{\link{mixed}} provides a (formula) interface for obtaining p-values for mixed-models via \pkg{lme4}.
-#'
-#' \code{\link{obk.long}} describes the long version of the \code{OBrienKaiser} dataset used in the examples.
 #'
 #' @references Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
@@ -244,7 +244,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
           }
         }
       }
-      if((type == 3 | type == "III") && (length(non_sum_contrast)>0)) warning(str_c("Calculating Type 3 sums with contrasts != 'contr.sum' for: ", paste0(non_sum_contrast, collapse=", "), "\n  Results likely bogus or not interpretable!\n  You should use check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
+      if((type == 3 | type == "III") && (length(non_sum_contrast)>0)) warning(str_c("Calculating Type 3 sums with contrasts != 'contr.sum' for: ", paste0(non_sum_contrast, collapse=", "), "\n  Results likely bogus or not interpretable!\n  You probably want check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
     }
   }
   if(return == "aov"){
@@ -292,7 +292,7 @@ aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = 3,
   if (length(barterms) > 1) stop("aov4 only allows one random effect term")
   within <- all.vars(barterms[[1]][[2]])
   id <- all.vars(barterms[[1]][[3]])
-  error <- str_c(" + Error(", id, if (length(within) > 0) "/" else "", str_c(within, collapse = " * "), ")")
+  error <- str_c(" + Error(", id, if (length(within) > 0) "/(" else "", str_c(within, collapse = " * "), if (length(within) > 0) ")" else "", ")")
   lh <- as.character(nobars(formula))
   if (length(lh) == 1) {
    dv <- lh
@@ -313,7 +313,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
   if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
   #browser()
   rh <- if (!is.null(between) || !is.null(covariate)) str_c(if (!is.null(between)) str_c(between, collapse = " * ") else NULL, covariate, sep = " + ") else "1"
-  error <- str_c(" + Error(", id, if (!is.null(within)) "/" else "", str_c(within, collapse = " * "), ")")
+  error <- str_c(" + Error(", id, if (!is.null(within)) "/(" else "", str_c(within, collapse = " * "), if (length(within) > 0) ")" else "", ")")
   formula <- str_c(dv, " ~ ", rh, error)
   if (print.formula) message(str_c("Formula send to aov.car: ", formula))
   aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, args.return = args.return, ...)

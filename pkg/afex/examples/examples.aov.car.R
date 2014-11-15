@@ -15,7 +15,7 @@ ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
 data(obk.long, package = "afex")
 
 # run univariate mixed ANOVA for the full design:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
+aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, observed = "gender")
 
 aov4(value ~ treatment * gender + (phase*hour|id), 
@@ -44,7 +44,7 @@ ez.glm("id", "value", obk.long, between = c("treatment", "gender"),
 
 
 # replicating ?Anova using aov.car:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
+aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, type = 2, return = "Anova")
 # in contrast to aov you do not need the within-subject factors outside Error()
 
@@ -75,7 +75,7 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
 # ANCOVA: adding a covariate (necessary to set factorize = FALSE)
-aov.car(value ~ treatment * gender + age + Error(id/phase*hour), 
+aov.car(value ~ treatment * gender + age + Error(id/(phase*hour)), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
 aov4(value ~ treatment * gender + age + (phase*hour|id), 
@@ -100,13 +100,13 @@ aov.car(value ~ treatment * gender + Error(id/hour2),
 # only between
 aov.car(value ~ treatment * gender + Error(id), 
         data = obk.long, observed = c("gender"))
-aov4(value ~ treatment * gender + (1|id), 
+aov4(value ~ treatment * gender + (1|id), print.formula = TRUE,
         data = obk.long, observed = c("gender"))
 ez.glm("id", "value", obk.long, c("treatment", "gender"), 
         within = NULL, print.formula = TRUE, observed = "gender")
 
 # only within
-aov.car(value ~ Error(id/phase*hour), data = obk.long, type = 2)
+aov.car(value ~ Error(id/(phase*hour)), data = obk.long, type = 2)
 
 aov4(value ~ (phase*hour|id), data = obk.long, type = 2, 
      print.formula = TRUE)
@@ -116,7 +116,7 @@ ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"),
 
 # using return = "full":
 
-str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "full"), 1)
+str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "full"), 1)
 
 ## List of 4
 ##  $ Anova:List of 14
@@ -128,10 +128,10 @@ str(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "full"), 1)
 ##  $ marginal:List of 3
 
 # use args.return arguments:
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
+aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, args.return = list(correction = "none", es = "pes"))
 
-aov.car(value ~ treatment * gender + Error(id/phase*hour), 
+aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long,observed = "gender", 
         args.return = list(correction = "none", MSE = FALSE))
 
