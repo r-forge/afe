@@ -16,6 +16,9 @@
     
     o   aov.car et al. stop with error message if a factor has only one
         level.
+        
+    o   aov.car transforms id variable to factor which ensures that 
+        return = "aov" provides equivalent results.
     
 
 
