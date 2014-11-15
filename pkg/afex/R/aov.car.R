@@ -81,7 +81,7 @@
 #'
 #' The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 #'
-#' @note Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
+#' @note The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 #' 
@@ -108,7 +108,6 @@
 #'
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = TRUE, check.contrasts = TRUE, return = "nice", observed = NULL, args.return = list(), ...) {
-  #browser()
   return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
@@ -131,6 +130,8 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   effect.parts <- parts[!str_detect(parts, "^Error\\(")]
   effect.parts.no.within <- effect.parts[!str_detect(effect.parts, str_c("\\<",within,"\\>", collapse = "|"))]
   data <- droplevels(data) #remove empty levels.
+  # make id and within variables to factors:
+  if (!(is.factor(data[,id]))) data[,id] <- factor(data[,id])
   # factorize if necessary
   if (factorize) {
     if (any(!vapply(data[, between, drop = FALSE], is.factor, TRUE))) {
@@ -157,14 +158,9 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   rh1 <- str_c(within, collapse = "+")
   rh3 <- str_c(within, collapse = "*")
   # converting all within subject factors to factors and adding a leading charcter (x) if starting with a digit.
-  #browser()
-  #new.factor.levels <- c(letters, LETTERS)
   for (within.factor in within) {
     if (is.factor(data[,within.factor])) levels(data[,within.factor]) <- make.names(levels(data[,within.factor]), unique = TRUE)
     else data[,within.factor] <- factor(as.character(data[,within.factor]), levels = unique(as.character(data[,within.factor])), labels = make.names(unique(as.character(data[,within.factor])), unique=TRUE))
-    #data[,within.factor] <- factor(as.character(data[,within.factor]))
-    #levels(data[,within.factor]) <- make.names(levels(data[,within.factor]), unique=TRUE)
-    #if (length(levels(data[,within.factor])) <= length(new.factor.levels)) levels(data[,within.factor]) <- new.factor.levels[seq_along(levels(data[,within.factor]))]
   }
   # Check if each id is in only one between subjects cell.
   between.factors <- between[vapply(data[, between, drop = FALSE], is.factor, TRUE)]
@@ -180,9 +176,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
       warning("More than one observation per cell, aggregating the data using mean (i.e, fun.aggregate = mean)!")
       fun.aggregate <- mean
     }
-  }
-  # Is Type == 3 and contrasts != contr.sum and check.contrasts == FALSE? (ALL MOVED BELOW):
-  # if ((type == 3 | type == "III") & options("contrasts")[[1]][1] != "contr.sum" & !check.contrasts) 
+  } 
   # if return = "lme4" return the (aggregated) data fitted with lmer!
   #   if (return == "lme4") {
   #     warning("lme4 return is experimental!\nAlso: Missing values and contrasts not checked for return = 'lme4'!")
@@ -192,7 +186,6 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = 3, factorize = T
   #     return(lmer(as.formula(str_c("value~", rh2, if (length(within) > 0) paste0("*", f.within.new) else "", "+ (1", if (length(within) > 0) paste0("+", f.within.new) else "", "|", id, ")" , sep = "")), data = n.dat))
   #   }
   # prepare the data:
-  #browser()
   tmp.dat <- dcast(data, formula = as.formula(str_c(lh1, if (length(within) > 0) rh1 else ".", sep = "~")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   # check for missing values:
   if (any(is.na(tmp.dat))) {

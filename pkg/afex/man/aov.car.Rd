@@ -105,7 +105,7 @@ Note that the default behavior is to return a \code{\link{nice.anova}} \code{dat
 If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
 }
 \note{
-Variables entered as within-subjects (i.e., repeated measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
+The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
 
 Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 

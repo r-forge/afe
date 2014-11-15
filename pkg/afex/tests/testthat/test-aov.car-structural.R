@@ -28,5 +28,14 @@ test_that("return='aov' works", {
   negative  <- summary(aov(value ~ phase*hour+Error(id/phase*hour), data = obk.long))
   expect_equal(test, positive)
   expect_false(isTRUE(all.equal(test, negative, check.attributes = FALSE)))
+  
+  orig1 <- aov.car(value ~ Error(id/phase*hour), data = obk.long)
+  obk.long$id <- as.numeric(obk.long$id)
+  obk.long$phase <- as.numeric(obk.long$phase)
+  obk.long$hour <- as.numeric(obk.long$hour)
+  positive2  <- summary(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"))
+  expect_equal(test, positive2)
+  positive3 <- aov.car(value ~ Error(id/phase*hour), data = obk.long)
+  expect_equal(orig1, positive3)
 })
 
