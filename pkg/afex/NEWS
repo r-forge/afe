@@ -19,6 +19,9 @@
         
     o   aov.car transforms id variable to factor which ensures that 
         return = "aov" provides equivalent results.
+        
+    o   changed regex for detecting "observed" variables to work with 
+        the new version of stringr which uses stringi.
     
 
 
