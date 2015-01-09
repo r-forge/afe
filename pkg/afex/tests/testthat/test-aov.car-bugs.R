@@ -47,3 +47,15 @@ test_that("factors have more than one level", {
   expect_error(aov.car(value ~ treatment+ Error(id/phase), data = obk.long[ obk.long$treatment == "control",]), "one level only.")
   expect_error(aov.car(value ~ treatment+ Error(id/phase), data = obk.long[ obk.long$phase == "pre",]), "one level only.")
 })
+
+
+test_that("variable names longer", {
+  data(obk.long)
+  obk.long$gender2 <- obk.long$treatment
+  orig <- aov.car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender")
+  v1 <- aov.car(value ~ gender2 * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender")
+  v2 <- aov.car(value ~ gender2 * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender2")
+  expect_identical(orig[,-1], v1[,-1])
+  expect_identical(orig[,-c(1,5)], v2[,-c(1,5)])
+})
+

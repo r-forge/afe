@@ -133,6 +133,7 @@ nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG",
   if ("ges" %in% es) {
     #browser()
     # This code is basically a copy from ezANOVA by Mike Lawrence!
+    #if (packageVersion)
     if(!is.null(observed)){
       obs <- rep(FALSE,nrow(tmp2))
       for(i in observed){
