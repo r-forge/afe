@@ -10,3 +10,6 @@ options(error = recover)
 options(error = NULL)
 
 #install.packages("afex", dependencies = TRUE)
+#devtools::build()
+devtools::build_vignettes()
+clean_vignettes(pkg = ".")

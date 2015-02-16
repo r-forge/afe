@@ -12,7 +12,11 @@ Suggests:
     parallel,
     plyr,
     optimx,
-    nloptr
+    nloptr,
+    knitr,
+    lsmeans,
+    lattice,
+    multcomp
 Imports:
     stringr,
     coin,
@@ -33,6 +37,7 @@ Description: Provides convenience functions for analyzing factorial experiments
 URL: http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex
 License: GPL (>=3)
 Encoding: latin1
+VignetteBuilder: knitr
 Authors@R: c(person(given="Henrik", family="Singmann", role=c("aut",
     "cre"), email="singmann+afex@gmail.com"), person(given="Ben",
     family="Bolker", role=c("aut")), person(given="Jake", family="Westfall",
@@ -40,5 +45,5 @@ Authors@R: c(person(given="Henrik", family="Singmann", role=c("aut",
     person(given="John", family="Fox", role=c("ctb")), person(given="Michael
     A.", family="Lawrence", role=c("ctb")), person(given="Ulf",
     family="Mertens", role=c("ctb")) )
-Version: 0.13-145
-Date: 2015-01-09
+Version: 0.14-146
+Date: 2015-02-16
