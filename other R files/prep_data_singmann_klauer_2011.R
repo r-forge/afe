@@ -54,8 +54,8 @@ str(sk2011.1)
 
 levels(sk2011.1$instruction) <- c("deductive", "probabilistic")
 sk2011.1$plausibility <- factor(ifelse(as.numeric(sk2011.1$validity) == sk2011.1$direction, "plausible", "implausible"), levels = c("plausible", "implausible"))
-sk2011.1$direction <- factor(sk2011.1$direction, 1:2, labels = c("original", "reversed"))
-sk2011.1 <- sk2011.1[,c("id", "instruction", "plausibility", "inference", "validity", "what", "direction", "response", "content")]
+sk2011.1$type <- factor(sk2011.1$direction, 1:2, labels = c("original", "reversed"))
+sk2011.1 <- sk2011.1[,c("id", "instruction", "plausibility", "inference", "validity", "what", "type", "response", "content")]
 
 str(sk2011.1)
 
