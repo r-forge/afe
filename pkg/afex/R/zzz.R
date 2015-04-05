@@ -1,3 +1,13 @@
+
+
+## set default options for afex.options:
+.afexEnv <- new.env()
+assign("method.mixed",  "KR", envir = .afexEnv)
+assign("return.aov",  "nice", envir = .afexEnv)
+#assign("es.aov",  "ges", envir = .afexEnv)
+assign("check.contrasts", TRUE, envir = .afexEnv)
+assign("type", 3, envir = .afexEnv)
+
 .onAttach <- function(libname, pkgname) {
 	#assign(".oldContrasts", options("contrasts"), envir = .GlobalEnv)
   packageStartupMessage("************\nWelcome to afex. Important notes:\n")

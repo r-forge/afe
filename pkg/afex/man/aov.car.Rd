@@ -7,19 +7,21 @@
 \alias{univ}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
-aov.car(formula, data, fun.aggregate = NULL, type = 3,
-     factorize = TRUE, check.contrasts = TRUE,
-     return = "nice", observed = NULL, args.return = list(), ...)
+aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"),
+     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
+     return = afex.options("return.aov"), observed = NULL,
+     args.return = list(), ...)
 
-aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = 3,
-     factorize = TRUE, check.contrasts = TRUE,
-     return = "nice", args.return = list(), ...,
-     print.formula = FALSE)
+aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
+     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
+     return = afex.options("return.aov"),
+     args.return = list(), ..., print.formula = FALSE)
 
 ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
-     observed = NULL, fun.aggregate = NULL, type = 3,
-     factorize = TRUE, check.contrasts = TRUE,
-     return = "nice", args.return = list(), ..., print.formula = FALSE)
+     observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
+     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
+     return = afex.options("return.aov"),
+     args.return = list(), ..., print.formula = FALSE)
 
 univ(object)
 }
@@ -30,13 +32,13 @@ univ(object)
 
 \item{fun.aggregate}{The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.}
 
-\item{type}{The type of sums of squares for the ANOVA. \strong{Defaults to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.}
+\item{type}{The type of sums of squares for the ANOVA. The default is given by \code{afex.options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.}
 
 \item{factorize}{logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).}
 
-\item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details.}
+\item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex.options("check.contrasts")}, which is initially \code{TRUE}.}
 
-\item{return}{What should be returned? If \code{"nice"} (the default) will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated).}
+\item{return}{What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.}
 
 \item{observed}{\code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).}
 

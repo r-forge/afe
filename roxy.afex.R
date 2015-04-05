@@ -2,16 +2,20 @@
 require(roxyPackage)
 require(stringr)
 
+pkg.src.dir <- "pkg/afex"
+pkg.src.dir <- "."
+
 ## Windows
 R.libs <- "C:/R/R-devel/library"
 svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" pkg/afex", intern = TRUE)[2], "[[:digit:]]+$")) + 1
+svn.number <- as.numeric(str_extract(system("\"C:/Program Files/TortoiseSVN/bin/SubWCRev.exe\" .", intern = TRUE)[2], "[[:digit:]]+$")) + 1
 
 # Linux:
 R.libs <- "./packages/library"
 svn.number <- as.numeric(substr(system("svn info", intern=TRUE)[6], 10, 15)) +1
 
 roxy.package(
-	pck.source.dir = "pkg/afex",
+	pck.source.dir = pkg.src.dir,
 	pck.version = str_c("0.14-", svn.number),
 	pck.description = data.frame(
 		Package = "afex",
@@ -20,7 +24,7 @@ roxy.package(
 		AuthorsR = "c(person(given=\"Henrik\", family=\"Singmann\", role=c(\"aut\", \"cre\"), email=\"singmann+afex@gmail.com\"),
         person(given=\"Ben\", family=\"Bolker\", role=c(\"aut\")),
         person(given=\"Jake\", family=\"Westfall\", role=c(\"aut\")),
-        person(given=\"Søren\", family=\"Højsgaard\", role=c(\"ctb\")),
+        person(given=\"S?ren\", family=\"H?jsgaard\", role=c(\"ctb\")),
         person(given=\"John\", family=\"Fox\", role=c(\"ctb\")),
         person(given=\"Michael A.\", family=\"Lawrence\", role=c(\"ctb\")),
         person(given=\"Ulf\", family=\"Mertens\", role=c(\"ctb\"))

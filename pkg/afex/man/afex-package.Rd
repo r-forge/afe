@@ -10,8 +10,8 @@ Analysis of Factorial Experiments.
 \tabular{ll}{
 Package: \tab afex\cr
 Type: \tab Package\cr
-Version: \tab 0.14-146\cr
-Date: \tab 2015-02-16\cr
+Version: \tab 0.14-147\cr
+Date: \tab 2015-04-05\cr
 Depends: \tab R (>= 3.0.0), car, lme4 (>= 1.0.5), reshape2\cr
 Encoding: \tab latin1\cr
 License: \tab GPL (>=3)\cr
@@ -21,7 +21,7 @@ URL: \tab http://www.psychologie.uni-freiburg.de/Members/singmann/R/afex\cr
 Provides convenience functions for analyzing factorial experiments using ANOVA or mixed models. ez.glm(), aov.car(), and aov4() allow convenient specification of between, within (i.e., repeated-measures), or mixed between-within (i.e., split-plot) ANOVAs for data in long format (i.e., one observation per row), potentially aggregating multiple observations per individual and cell of the design. mixed() fits a mixed model using lme4::lmer() and computes p-values for all effects using either Kenward-Roger approximation for degrees of freedom (LMM only), parametric bootstrap (LMMs and GLMMs), or likelihood ratio tests (LMMs and GLMMs). afex uses type 3 sums of squares as default (imitating commercial statistical software). compare.2.vectors() compares two vectors using a variety of tests (t, Wilcoxon, and permutation).
 }
 \author{
-Henrik Singmann, Ben Bolker, Jake Westfall, with contributions from Søren Højsgaard, John Fox, Michael A. Lawrence, Ulf Mertens
+Henrik Singmann, Ben Bolker, Jake Westfall, with contributions from S?ren H?jsgaard, John Fox, Michael A. Lawrence, Ulf Mertens
 }
 \keyword{package}
 

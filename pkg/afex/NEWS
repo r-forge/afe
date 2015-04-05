@@ -1,5 +1,5 @@
                     *************************
-                    ** afex VERSION 0.13-x **
+                    ** afex VERSION 0.14-x **
                     *************************
                     
                     Changes in afex Version 0.14-x
@@ -7,6 +7,8 @@
 
     Significant User Visible Changes and New Features
 
+    o   added afex.options() functionality for globally setting options.
+    
     o   added vignette showing how to calculate contrasts after ANOVA.
 
         

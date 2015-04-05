@@ -41,9 +41,9 @@ VignetteBuilder: knitr
 Authors@R: c(person(given="Henrik", family="Singmann", role=c("aut",
     "cre"), email="singmann+afex@gmail.com"), person(given="Ben",
     family="Bolker", role=c("aut")), person(given="Jake", family="Westfall",
-    role=c("aut")), person(given="Søren", family="Højsgaard", role=c("ctb")),
+    role=c("aut")), person(given="S?ren", family="H?jsgaard", role=c("ctb")),
     person(given="John", family="Fox", role=c("ctb")), person(given="Michael
     A.", family="Lawrence", role=c("ctb")), person(given="Ulf",
     family="Mertens", role=c("ctb")) )
-Version: 0.14-146
-Date: 2015-02-16
+Version: 0.14-147
+Date: 2015-04-05
