@@ -17,9 +17,9 @@ test_that("ANCOVA check bug (reported by Gang Chen), January 2013", {
   dat <- read.table('../../../../bugs/mydata.txt', header=T)
   dat$ID <- as.factor(dat$ID)
   fm <- suppressWarnings(aov.car(Value ~ Propdd00 + Group + Gender + GAS0 + MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return = "Anova"))
-  fm0 <- suppressWarnings(aov.car(Value ~ MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return='full'))
+  fm0 <- suppressWarnings(aov.car(Value ~ MAD0 + CPD0 + Error(ID/ROI), data=dat, factorize=FALSE, return='afex_aov'))
   expect_is(fm, "Anova.mlm")
-  expect_is(fm0, "list")
+  expect_is(fm0, "afex_aov")
 })
 
 

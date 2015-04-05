@@ -7,14 +7,19 @@
 
     Significant User Visible Changes and New Features
 
-    o   added afex.options() functionality for globally setting options.
+    o   new return argument for aov.car() et al: afex_aov. An S3 object 
+        containing both the ANOVA output from car::Anova (for correct 
+        Type 3 tests) and the model fitted with Base R's aov (which can
+        be passed to lsmeans for post-hoc tests).
+    
+    o   added afex.options() functionality for setting options globally.
     
     o   added vignette showing how to calculate contrasts after ANOVA.
 
         
     Bugfixes
     
-    o   
+    o   ANOVA: for "aov"-objects, contrasts are only set for factors.
 
     
 

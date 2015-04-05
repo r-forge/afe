@@ -4,7 +4,6 @@
 \alias{aov.car}
 \alias{aov4}
 \alias{ez.glm}
-\alias{univ}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
 aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"),
@@ -22,8 +21,6 @@ ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
      return = afex.options("return.aov"),
      args.return = list(), ..., print.formula = FALSE)
-
-univ(object)
 }
 \arguments{
 \item{formula}{A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/ )} or \code{(...|id)}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.}
@@ -38,7 +35,7 @@ univ(object)
 
 \item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex.options("check.contrasts")}, which is initially \code{TRUE}.}
 
-\item{return}{What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.}
+\item{return}{What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.}
 
 \item{observed}{\code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).}
 
@@ -57,30 +54,22 @@ univ(object)
 \item{covariate}{\code{character} vector indicating the between-subject(s) covariate(s) (i.e., column(s)) in \code{data}. Default is \code{NULL} indicating no covariates.}
 
 \item{print.formula}{\code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed.}
-
-\item{object}{An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.}
 }
 \value{
-\code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+\code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
 
-If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
+If \code{return} is \code{"nice"} a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+
+If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 
 \describe{
+  \item{"anova_table"}{A nice ANOVA table.}
+  \item{"univariate"}{Object returned from \code{summary.Anova.mlm} (for ANOVAs including within-subejct factors) or else the object returned from \code{car::Anova}. (Also returned if \code{return = "univariate"}).}
+  \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
-  \item{"data"}{the data used to fit the \code{lm} object. Also returned if \code{return = "data"}.}
-  \item{"idata"}{if within-subject factors are present, the \code{idata} argument passed to \code{Anova}.}
-  \item{"marginal"}{a list containing the marginal means (the same as when \code{return = "marginal"}).}
+  \item{"data"}{a list containing: (1) \code{long} (the possibly aggregated data in long format used for \code{aov}), \code{wide} (the data used to fit the \code{lm} object), and \code{idata} (if within-subject factors are present, the \code{idata} argument passed to \code{car::Anova}). Also returned if \code{return = "data"}.}
 }
-
-If \code{return = "univariate"} the object returned from \code{univ}.
-
-\code{univ} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
-For objects of class \code{"anova"} (i.e., the object returned by \code{car::Anova} for a purely between-subjects ANOVA) the object is returned unaltered.
-
-The elements of the list returned by \code{univ} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
-
-If \code{return = "marginal"} A list with data.frames containing the marginal means for all effects. Numerical variables are ignored.
 
 If \code{return = "aov"}, an object returned from \code{aov} with the (possibly aggregated) data fitted with \code{\link{aov}} using \code{"contr.sum"} for all factors as long as \code{check.contrasts = TRUE}. This object can be passed to \code{lsmeans::lsmeans} for post-hoc tests or \code{lsmeans::lsmip} for plotting. Note that \code{aov} is not reliably working for unbalanced data.
 }
@@ -102,7 +91,7 @@ For \code{ez.glm} either \code{between} or \code{within} must not be \code{NULL}
 
 To run an ANCOVA you need to set \code{factorize = FALSE} and make sure that all variables have the correct type (i.e., factors are factors and numeric variables are numeric and centered).
 
-Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity.
+Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non-manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity.
 
 If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
 }
@@ -232,18 +221,9 @@ aov4(value ~ (phase*hour|id), data = obk.long, type = 2,
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
         type = 2, print.formula = TRUE)
 
-# using return = "full":
+# using return = "afex_aov":
 
-str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "full"), 1)
-
-## List of 4
-##  $ Anova:List of 14
-##   ..- attr(*, "class")= chr "Anova.mlm"
-##  $ lm   :List of 11
-##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
-##  $ data :'data.frame':  16 obs. of  16 variables:
-##  $ idata:'data.frame':  15 obs. of  2 variables:
-##  $ marginal:List of 3
+str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov"), 1)
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
@@ -255,9 +235,9 @@ aov.car(value ~ treatment * gender + Error(id/(phase*hour)),
 
 }
 \author{
-\code{univ} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
+Henrik Singmann
 
-The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
+The design of these functions was influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 }
 \references{
 Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.

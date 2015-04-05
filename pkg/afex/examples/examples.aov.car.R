@@ -114,18 +114,9 @@ aov4(value ~ (phase*hour|id), data = obk.long, type = 2,
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
         type = 2, print.formula = TRUE)
 
-# using return = "full":
+# using return = "afex_aov":
 
-str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "full"), 1)
-
-## List of 4
-##  $ Anova:List of 14
-##   ..- attr(*, "class")= chr "Anova.mlm"
-##  $ lm   :List of 11
-##   ..- attr(*, "class")= chr [1:2] "mlm" "lm"
-##  $ data :'data.frame':  16 obs. of  16 variables:
-##  $ idata:'data.frame':  15 obs. of  2 variables:
-##  $ marginal:List of 3
+str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov"), 1)
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 

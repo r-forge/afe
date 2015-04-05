@@ -91,18 +91,21 @@ nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG",
   es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)
   #browser()
   if (class(object)[1] == "Anova.mlm") {
-    tmp <- suppressWarnings(univ(object))
-    t.out <- tmp[["anova"]]
+    #tmp <- suppressWarnings(univ(object))
+    tmp <- suppressWarnings(summary(object, multivariate = FALSE))
+    
+    #t.out <- tmp[["anova"]]
+    t.out <- tmp[["univariate.tests"]]
     if (correction[1] == "GG") {
-      t.out[row.names(tmp[["sphericity.correction"]]), "num Df"] <- t.out[row.names(tmp[["sphericity.correction"]]), "num Df"] * tmp[["sphericity.correction"]][,"GG eps"]
-      t.out[row.names(tmp[["sphericity.correction"]]), "den Df"] <- t.out[row.names(tmp[["sphericity.correction"]]), "den Df"] * tmp[["sphericity.correction"]][,"GG eps"]
-      t.out[row.names(tmp[["sphericity.correction"]]), "Pr(>F)"] <- tmp[["sphericity.correction"]][,"Pr(>F[GG])"]
+      t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
+      t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * tmp[["pval.adjustments"]][,"GG eps"]
+      t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[GG])"]
     } else {
       if (correction[1] == "HF") {
-        if (any(tmp[["sphericity.correction"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
-        t.out[row.names(tmp[["sphericity.correction"]]), "num Df"] <- t.out[row.names(tmp[["sphericity.correction"]]), "num Df"] * pmin(1, tmp[["sphericity.correction"]][,"HF eps"])
-        t.out[row.names(tmp[["sphericity.correction"]]), "den Df"] <- t.out[row.names(tmp[["sphericity.correction"]]), "den Df"] * pmin(1, tmp[["sphericity.correction"]][,"HF eps"])
-        t.out[row.names(tmp[["sphericity.correction"]]), "Pr(>F)"] <- tmp[["sphericity.correction"]][,"Pr(>F[HF])"]
+        if (any(tmp[["pval.adjustments"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
+        t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
+        t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
+        t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[HF])"]
       } else {
         if (correction[1] == "none") {
           TRUE
@@ -110,15 +113,17 @@ nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG",
       }
     }
     tmp.df <- t.out		
+    tmp2 <- as.data.frame(unclass(tmp.df))
   } else {
     if (class(object)[1] == "anova") {
       #browser()
       #class(object) <- "data.frame"
       tmp.df <- cbind(object[-nrow(object),], data.frame("Error SS" = object[nrow(object), "Sum Sq"], "den Df" = object[nrow(object), "Df"], check.names = FALSE))
       colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
+      tmp2 <- as.data.frame(tmp.df)
     } else stop("Non-supported object passed. Object must be of class 'Anova.mlm' or 'anova'.")
   }
-  tmp2 <- as.data.frame(tmp.df)
+  
   tmp2[,"df"] <- paste(ifelse(is.wholenumber(tmp2[,"num Df"]), tmp2[,"num Df"], formatC(tmp2[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(tmp2[,"den Df"]),tmp2[,"den Df"], formatC(tmp2[,"den Df"], digits = 2, format = "f")), sep = ", ")
   tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
   symbols.use <-  c(" +", " *", " **", " ***")

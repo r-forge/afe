@@ -18,7 +18,6 @@
 #'      return = afex.options("return.aov"), 
 #'      args.return = list(), ..., print.formula = FALSE)
 #' 
-#' univ(object)
 #'
 #' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/ )} or \code{(...|id)}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
@@ -33,31 +32,25 @@
 #' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
 #' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex.options("check.contrasts")}, which is initially \code{TRUE}.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param return What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.
+#' @param return What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.
+# Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). 
 #' @param args.return \code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).
 #' @param ... Further arguments passed to \code{fun.aggregate}.
-#' @param object An object of class \code{Anova.mlm} as returned by \code{aov.car}, \code{ez.glm}, or \code{\link[car]{Anova}}.
 #'
-#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}}, the return value is dependent on the \code{return} argument. When argument \code{return} is \code{"nice"} (the default) a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
+#' 
+#' If \code{return} is \code{"nice"} a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
 #'
-#' If \code{return = "full"} or \code{return = "all"} a list \code{list} with the following elements:
+#' If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 #'
 #' \describe{
+#'   \item{"anova_table"}{A nice ANOVA table.}
+#'   \item{"univariate"}{Object returned from \code{summary.Anova.mlm} (for ANOVAs including within-subejct factors) or else the object returned from \code{car::Anova}. (Also returned if \code{return = "univariate"}).}
+#'   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
 #'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
 #'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
-#'   \item{"data"}{the data used to fit the \code{lm} object. Also returned if \code{return = "data"}.}
-#'   \item{"idata"}{if within-subject factors are present, the \code{idata} argument passed to \code{Anova}.}
-#'   \item{"marginal"}{a list containing the marginal means (the same as when \code{return = "marginal"}).}
+#'   \item{"data"}{a list containing: (1) \code{long} (the possibly aggregated data in long format used for \code{aov}), \code{wide} (the data used to fit the \code{lm} object), and \code{idata} (if within-subject factors are present, the \code{idata} argument passed to \code{car::Anova}). Also returned if \code{return = "data"}.}
 #' }
-#'
-#' If \code{return = "univariate"} the object returned from \code{univ}.
-#' 
-#' \code{univ} returns a \code{list} of \code{data.frame}s containing the univariate results (i.e., the classical ANOVA results) from an object of class \code{"Anova.mlm"}. This is essentially the output from \code{summary.Anova.mlm} with \code{multivariate = FALSE}, e.g. \code{summary(aov.car(...), multivriate = FALSE)}, as a list instead of printed to the console.\cr
-#' For objects of class \code{"anova"} (i.e., the object returned by \code{car::Anova} for a purely between-subjects ANOVA) the object is returned unaltered.
-#'
-#' The elements of the list returned by \code{univ} are: \code{anova}, \code{mauchly}, and \code{spehricity.correction} (containing both, Greenhouse-Geisser and Hyundt-Feldt correction).
-#' 
-#' If \code{return = "marginal"} A list with data.frames containing the marginal means for all effects. Numerical variables are ignored.
 #' 
 #' If \code{return = "aov"}, an object returned from \code{aov} with the (possibly aggregated) data fitted with \code{\link{aov}} using \code{"contr.sum"} for all factors as long as \code{check.contrasts = TRUE}. This object can be passed to \code{lsmeans::lsmeans} for post-hoc tests or \code{lsmeans::lsmip} for plotting. Note that \code{aov} is not reliably working for unbalanced data.
 #' 
@@ -75,13 +68,13 @@
 #'
 #' To run an ANCOVA you need to set \code{factorize = FALSE} and make sure that all variables have the correct type (i.e., factors are factors and numeric variables are numeric and centered).
 #'
-#' Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity.
+#' Note that the default behavior is to return a \code{\link{nice.anova}} \code{data.frame}. This includes calculation of generalized eta squared for which \strong{all non-manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument. Changing the effect size to \code{"pes"} (partial eta-squared) via \code{args.return} or the return value via \code{return} removes this necessity.
 #' 
 #' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
 #'
-#' @author \code{univ} is basically a copy of \code{\link[car]{summary.Anova.mlm}} written by John Fox.\cr The other functions were written by Henrik Singmann.
+#' @author Henrik Singmann
 #'
-#' The design of these functions is heavily influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
+#' The design of these functions was influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 #'
 #' @note The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
 #'
@@ -98,8 +91,8 @@
 #' @references Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
 #' @name aov.car
-#' @aliases aov.car ez.glm univ aov4
-#' @export aov.car ez.glm univ aov4
+#' @aliases aov.car ez.glm aov4
+#' @export aov.car ez.glm aov4
 #' @import car
 #' @importFrom stringr str_c str_detect str_replace_all
 #' @importFrom reshape2 dcast
@@ -110,7 +103,7 @@
 #'
 
 aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), observed = NULL, args.return = list(), ...) {
-  return <- match.arg(return, c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov"))
+  return <- match.arg(return, c("Anova", "lm", "data", "nice", "afex_aov", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
   indError <- attr(Terms, "specials")$Error
@@ -194,23 +187,23 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
     missing.values <- apply(tmp.dat, 1, function(x) any(is.na(x)))
     warning(str_c("Missing values for following ID(s):\n", str_c(tmp.dat[missing.values,1], collapse = ", "), "\nRemoving those cases from the analysis."))        
   }
-#   if (length(between) > 0) {
-#     n_data_points <- xtabs(as.formula(paste("~", paste(between, collapse = "+"))), data = tmp.dat)
-#     if (any(n_data_points == 0)) warning("Some cells of the fully crossed between-subjects design are empty. A full model might not be estimable.")
-#   }
-  # marginals:
+  #   if (length(between) > 0) {
+  #     n_data_points <- xtabs(as.formula(paste("~", paste(between, collapse = "+"))), data = tmp.dat)
+  #     if (any(n_data_points == 0)) warning("Some cells of the fully crossed between-subjects design are empty. A full model might not be estimable.")
+  #   }
+  # marginals: (disabled in April 2015)
   dat.ret <- dcast(data, formula = as.formula(str_c(str_c(lh1, if (length(within) > 0) rh1 else NULL, sep = "+"), "~.")), fun.aggregate = fun.aggregate, ..., value.var = dv)
   colnames(dat.ret)[length(colnames(dat.ret))] <- dv
-  full.formula <- as.formula(str_c(dv, " ~ ", str_c(c(between.factors, within), collapse = "*")))
-  all.terms <- attr(terms(full.formula), "term.labels")
-  marginals.out <- lapply(all.terms, function(x) aggregate(as.formula(str_c(dv, " ~ ", x)), dat.ret, mean))
-  names(marginals.out) <- all.terms
-  grand.mean <- data.frame(mean(dat.ret[,dv]))
-  colnames(grand.mean) <- dv
-  marginals.out <- c(grand_mean = list(grand.mean), marginals.out)
-  if (return == "marginal") {
-    return(marginals.out)
-  }
+  #   full.formula <- as.formula(str_c(dv, " ~ ", str_c(c(between.factors, within), collapse = "*")))
+  #   all.terms <- attr(terms(full.formula), "term.labels")
+  #   marginals.out <- lapply(all.terms, function(x) aggregate(as.formula(str_c(dv, " ~ ", x)), dat.ret, mean))
+  #   names(marginals.out) <- all.terms
+  #   grand.mean <- data.frame(mean(dat.ret[,dv]))
+  #   colnames(grand.mean) <- dv
+  #   marginals.out <- c(grand_mean = list(grand.mean), marginals.out)
+  #   if (return == "marginal") {
+  #     return(marginals.out)
+  #   }
   if (length(between) > 0) {
     if (check.contrasts) {
       resetted <- NULL
@@ -226,7 +219,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
           }
         }
       }
-    if (!is.null(resetted)) message(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
+      if (!is.null(resetted)) message(str_c("Contrasts set to contr.sum for the following variables: ", str_c(resetted, collapse=", ")))
     } else {
       non_sum_contrast <- c()
       for (i in between) {
@@ -242,14 +235,19 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
       if((type == 3 | type == "III") && (length(non_sum_contrast)>0)) warning(str_c("Calculating Type 3 sums with contrasts != 'contr.sum' for: ", paste0(non_sum_contrast, collapse=", "), "\n  Results likely bogus or not interpretable!\n  You probably want check.contrasts = TRUE or options(contrasts=c('contr.sum','contr.poly'))"))
     }
   }
-  if(return == "aov"){
+  if (return %in% c("aov", "afex_aov")) include.aov <- TRUE
+  else include.aov <- FALSE
+  if(include.aov){
     if (check.contrasts) {
-      contrasts <- as.list(rep("contr.sum", length(within)+length(between)))
-      names(contrasts) <- c(within, between)
+      factor_vars <- vapply(dat.ret[,c(within, between)], is.factor, NA)
+      contrasts <- as.list(rep("contr.sum", sum(factor_vars)))
+      names(contrasts) <- c(within, between)[factor_vars]
     }
-    return(aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret, contrasts = contrasts))
+    #return(aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret, contrasts = contrasts))
+    aov <- aov(formula(paste(dv, "~", paste(c(between, within), collapse = "*"),  if (length(within) > 0) paste0("+Error(", id, "/(",paste(within, collapse="*"), "))") else NULL)), data=dat.ret, contrasts = contrasts)
   }
-  data.l <- list(data = tmp.dat)
+  if(return == "aov") return(aov)
+  data.l <- list(long = dat.ret, wide = tmp.dat)
   if (return == "data") return(tmp.dat)
   # branching based on type of ANOVA
   if (length(within) > 0) {  # if within-subject factors are present:
@@ -275,9 +273,23 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
     if (return == "lm") return(tmp.lm)
     Anova.out <- Anova(tmp.lm, type = type)
   }
+  if (return == "afex_aov") {
+    afex_aov <- list(
+      anova_table = do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)),
+      univariate = summary(Anova.out, multivariate = FALSE),
+      aov = aov,
+      Anova = Anova.out,
+      lm = tmp.lm,
+      data = data.l
+    )
+    class(afex_aov) <- "afex_aov"
+    return(afex_aov)
+  }
   if (return == "Anova") return(Anova.out)
-  else if ((return == "full")  | (return == "all")) return(c("Anova" = list(Anova.out), "lm" = list(tmp.lm), data.l, marginal = list(marginals.out)))
-  else if (return == "univariate") return(univ(Anova.out))
+  else if (return == "univariate") {
+    if (class(Anova.out) == "Anova.mlm") return(summary(Anova.out, multivariate = FALSE))
+    else return(Anova.out)
+  }
   else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)))
 }
 
@@ -313,89 +325,5 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
   if (print.formula) message(str_c("Formula send to aov.car: ", formula))
   aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, args.return = args.return, ...)
 }
-
-
-univ <- function(object) { 
-	if (all(class(object) == c("anova", "data.frame"))) return(object)
-	# This function is basically a cropped copy of car::summary.Anova.mlm written by John Fox returning the output as a list (instead of printing it).
-	GG <- function(SSPE, P){ # Greenhouse-Geisser correction
-		p <- nrow(SSPE)
-		if (p < 2) return(NA) 
-		lambda <- eigen(SSPE %*% solve(t(P) %*% P))$values
-		lambda <- lambda[lambda > 0]
-		((sum(lambda)/p)^2)/(sum(lambda^2)/p)
-	}
-	HF <- function(gg, error.df, p){ # Huynh-Feldt correction
-		((error.df + 1)*p*gg - 2)/(p*(error.df - p*gg))
-	}
-	mauchly <- function (SSD, P, df) {
-		# most of this function borrowed from stats:::mauchly.test.SSD
-		if (nrow(SSD) < 2) return(c(NA, NA))
-		Tr <- function (X) sum(diag(X))
-		p <- nrow(P)
-		I <- diag(p)
-		Psi <- t(P) %*% I %*% P 
-		B <- SSD 
-		pp <- nrow(SSD) 
-		U <- solve(Psi, B)
-		n <- df 
-		logW <- log(det(U)) - pp * log(Tr(U/pp))
-		rho <- 1 - (2 * pp^2 + pp + 2)/(6 * pp * n)
-		w2 <- (pp + 2) * (pp - 1) * (pp - 2) * (2 * pp^3 + 6 * pp^2 + 
-					3 * p + 2)/(288 * (n * pp * rho)^2)
-		z <- -n * rho * logW
-		f <- pp * (pp + 1)/2 - 1
-		Pr1 <- pchisq(z, f, lower.tail = FALSE)
-		Pr2 <- pchisq(z, f + 4, lower.tail = FALSE)
-		pval <- Pr1 + w2 * (Pr2 - Pr1)
-		c(statistic = c(W = exp(logW)), p.value = pval)
-	}
-	nterms <- length(object$terms)
-	error.df <- object$error.df
-	table <- matrix(0, nterms, 6)
-	table2 <- matrix(0, nterms, 4)
-	table3 <- matrix(0, nterms, 2)
-	rownames(table3) <- rownames(table2) <- rownames(table) <- object$terms
-	colnames(table) <- c("SS", "num Df", "Error SS", "den Df", "F", "Pr(>F)")
-	colnames(table2) <- c("GG eps", "Pr(>F[GG])",  "HF eps", "Pr(>F[HF])")
-	colnames(table3) <- c("Test statistic", "p-value")
-	#browser()
-	for (term in 1:nterms){
-		SSP <- object$SSP[[term]]
-		SSPE <- object$SSPE[[term]]
-		P <- object$P[[term]]
-		p <- ncol(P)
-		PtPinv <- solve(t(P) %*% P)
-		gg <- GG(SSPE, P)
-		table[term, "SS"] <- sum(diag(SSP %*% PtPinv))
-		table[term, "Error SS"] <- sum(diag(SSPE %*% PtPinv))
-		table[term, "num Df"] <- object$df[term] * p
-		table[term, "den Df"] <- error.df * p
-		table[term, "F"] <-  (table[term, "SS"]/table[term, "num Df"])/
-				(table[term, "Error SS"]/table[term, "den Df"])
-		table[term, "Pr(>F)"] <- pf(table[term, "F"], table[term, "num Df"],
-				table[term, "den Df"], lower.tail=FALSE)
-		table2[term, "GG eps"] <- gg
-		table2[term, "HF eps"] <- HF(gg, error.df, p)
-		table3[term,] <- mauchly(SSPE, P, object$error.df)
-	}
-	results <- list(anova = table)
-	table3 <- na.omit(table3)
-	if (nrow(table3) > 0){
-		table2[,"Pr(>F[GG])"] <- pf(table[,"F"], table2[,"GG eps"]*table[,"num Df"],
-				table2[,"GG eps"]*table[,"den Df"], lower.tail=FALSE)
-		table2[,"Pr(>F[HF])"] <- pf(table[,"F"], 
-				pmin(1, table2[,"HF eps"])*table[,"num Df"],
-				pmin(1, table2[,"HF eps"])*table[,"den Df"], lower.tail=FALSE)
-		table2 <- na.omit(table2)
-		if (any(table2[,"HF eps"] > 1)) 
-			warning("HF eps > 1 treated as 1")
-		attributes(table2)[["na.action"]] <- NULL
-		attributes(table3)[["na.action"]] <- NULL
-		results <- c(results, mauchly = list(table3), sphericity.correction = list(table2))
-	}
-	results
-}
-
 
 
