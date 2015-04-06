@@ -39,3 +39,15 @@ test_that("purely-within produces afex_aov objects without error", {
   expect_that(out1, is_a("afex_aov"))
 })
 
+
+test_that("afex_aov object contains the right things", {
+  data(obk.long, package = "afex")
+  out1 <- aov.car(value ~ treatment * gender + Error(id/(phase*hour)), data = obk.long, observed = "gender", return = "afex_aov")
+
+  expect_that(out1[["anova_table"]], is_a(c("anova", "data.frame")))  
+  expect_that(out1[["aov"]], is_a(c("aovlist", "listof")))  
+  expect_that(out1[["Anova"]], is_a(c("Anova.mlm")))
+  expect_that(out1[["lm"]], is_a(c("mlm", "lm")))  
+  expect_that(out1[["data"]], is_a(c("list")))  
+  expect_that(out1[["information"]], is_a(c("list")))  
+})

@@ -421,7 +421,7 @@ anova.afex_aov <- function(object, es = "ges", observed = NULL, correction = c("
 #' @method print afex_aov 
 #' @export
 print.afex_aov <- function(x, ...) {
-  out <- nice.anova(x, ...)
+  out <- nice.anova(x$anova_table, ...)
   print(out)
   invisible(out)
 }
