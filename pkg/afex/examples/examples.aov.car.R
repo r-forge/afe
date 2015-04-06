@@ -1,5 +1,5 @@
 
-# Examples from a pureyl within-design from
+# Examples from a purely within-design from
 # Maxwell & Delaney (2004, Chapter 11),
 # Table 12.5 (p. 578):
 data(md_12.1)
@@ -118,9 +118,8 @@ aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov")[[1
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
-        data = obk.long, args.return = list(correction = "none", es = "pes"))
+        data = obk.long, anova_table = list(correction = "none", es = "pes"))
 
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long,observed = "gender", 
-        args.return = list(correction = "none", MSE = FALSE))
-
+        anova_table = list(correction = "none", MSE = FALSE))

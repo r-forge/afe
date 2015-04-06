@@ -4,8 +4,9 @@
 \alias{nice.anova}
 \title{Make nice ANOVA table for printing.}
 \usage{
-nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"),
-     MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
+nice.anova(object, es = afex_options("es_aov"), observed = NULL,
+  correction = afex_options("correction_aov"), MSE = TRUE,
+  intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
 }
 \arguments{
 \item{object}{An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).}

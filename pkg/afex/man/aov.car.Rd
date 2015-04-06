@@ -63,7 +63,7 @@ If \code{return} is \code{"nice"} a nice ANOVA table is returnd (\code{\link{nic
 If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 
 \describe{
-  \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame}.}
+  \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame"}.}
   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
@@ -105,7 +105,7 @@ In contrast to \code{\link{aov}} \code{aov.car} assumes that all factors to the 
 }
 \examples{
 
-# Examples from a pureyl within-design from
+# Examples from a purely within-design from
 # Maxwell & Delaney (2004, Chapter 11),
 # Table 12.5 (p. 578):
 data(md_12.1)
@@ -224,12 +224,11 @@ aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov")[[1
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
-        data = obk.long, args.return = list(correction = "none", es = "pes"))
+        data = obk.long, anova_table = list(correction = "none", es = "pes"))
 
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long,observed = "gender", 
-        args.return = list(correction = "none", MSE = FALSE))
-
+        anova_table = list(correction = "none", MSE = FALSE))
 }
 \author{
 Henrik Singmann

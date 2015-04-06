@@ -44,7 +44,7 @@
 #' If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 #'
 #' \describe{
-#'   \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame}.}
+#'   \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame"}.}
 #'   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
 #'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
 #'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
@@ -359,14 +359,14 @@ anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL,
     tmp <- suppressWarnings(summary(object$Anova, multivariate = FALSE))
     t.out <- tmp[["univariate.tests"]]
     if (correction[1] == "GG") {
-      tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"GG eps"]),]
+      tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"GG eps"]),, drop = FALSE]
       t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
       t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * tmp[["pval.adjustments"]][,"GG eps"]
       t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[GG])"]
     } else {
       if (correction[1] == "HF") {
         if (any(tmp[["pval.adjustments"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
-        tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"HF eps"]),]
+        tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"HF eps"]),, drop = FALSE]
         t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
         t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
         t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[HF])"]

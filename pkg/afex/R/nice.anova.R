@@ -2,9 +2,6 @@
 #'
 #' These functions produce a nice ANOVA table best for prointing. \code{nice.anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{ez.glm}} or \code{\link{aov.car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
 #' 
-#' @usage nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), 
-#'      MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
-#' 
 #'
 #' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).
 #' @param es Effect Size to be reported. Default is \code{"ges"}, which reports generalized eta-squared (see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.
