@@ -107,3 +107,29 @@ summary.afex_aov <- function(object, ...) {
     return(object$anova_table)
   } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
 }
+
+
+#--------------------------------------------------------------
+### afex package - mixed objects ###
+# just need to provide an 'lsmeans' method here, assuming Henrik adds the 'data' item
+
+#' @import lsmeans
+#' @method recover.data afex_aov 
+#' @export
+recover.data.afex_aov = function(object, ...) {
+  #if (class(object[["aov"]])[1] == "aovlist") recover.data.aovlist(object$aov, ...)
+  #else if (class(object[["aov"]])[1] == "aov") recover.data.lm(object$aov, ...)
+  #else stop("non supported object passed.")
+  do.call(do.call(":::", args = list(pkg = "lsmeans", name = "recover.data.aovlist")), args = list(object = object$aov, data = object$data$long, list(...)))
+}
+
+#' @method lsm.basis afex_aov 
+#' @export
+lsm.basis.afex_aov = function(object, trms, xlev, grid, ...) {
+  #if (class(object[["aov"]])[1] == "aovlist") lsm.basis.data.aovlist(object$aov, trms, xlev, grid, ...)
+  #else if (class(object[["aov"]])[1] == "aov") lsm.basis.data.lm(object$aov, trms, xlev, grid, ...)
+  #else stop("non supported object passed.")
+  do.call(do.call(":::", args = list(pkg = "lsmeans", name = "lsm.basis.aovlist")), args = list(object = object$aov, trms = trms, xlev = xlev, grid = grid))
+  #lsm.basis(object$aov, trms, xlev, grid, ...)
+}
+
