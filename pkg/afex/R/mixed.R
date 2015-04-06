@@ -99,9 +99,6 @@
 #' Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing experiments and analyzing data: a model-comparisons perspective.} Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
 #' @export mixed
-#' @S3method print mixed
-#' @S3method summary mixed
-#' @S3method anova mixed
 #' @import pbkrtest
 #' @importFrom lme4 lmer glmer nobars getME fixef isREML
 #' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag
@@ -433,7 +430,8 @@ mixed <- function(formula, data, type = afex.options("type"), method = afex.opti
   list.out
 }
 
-
+#' @method print mixed
+#' @export
 print.mixed <- function(x, ...) {
   ntry <- function(x) tryCatch(x, error = function(e) NULL)
   
@@ -471,7 +469,13 @@ print.mixed <- function(x, ...) {
 
 #anova.mixed <- 
 
-summary.mixed <- anova.mixed <- function(object, ...) print.mixed(x = object, ...)
+#' @method summary mixed
+#' @export
+summary.mixed <- function(object, ...) print.mixed(x = object, ...)
+
+#' @method anova mixed
+#' @export
+anova.mixed <- function(object, ...) print.mixed(x = object, ...)
 
 
 # is.mixed <- function(x) inherits(x, "mixed")

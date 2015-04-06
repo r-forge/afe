@@ -6,7 +6,7 @@
 #'      MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
 #' 
 #'
-#' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}},  \code{\link{ez.glm}}, or \code{\link{aov.car}}.
+#' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).
 #' @param es Effect Size to be reported. Default is \code{"ges"}, which reports generalized eta-squared (see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.
 #' @param observed character vector referring to the observed (i.e., non manipulated) variables/effects in the design. Important for calculation of generalized eta-squared (ignored if \code{es} is not \code{"ges"}), see details.
 #' @param correction Character. Which sphericity correction on the degrees of freedom should be reported for the within-subject factors. The default \code{c("GG", "HF", "none")} corresponds to the Greenhouse-Geisser correction.
@@ -43,9 +43,9 @@
 #' ## example from Olejnik & Algina (2003)
 #' # "Repeated Measures Design" (pp. 439):
 #' data(md_12.1)
-#' # create object of class Anova:
+#' # create object of class afex_aov:
 #' rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"),
-#'               return = "Anova")
+#'               return = "afex_aov")
 #' # use different es:
 #' nice.anova(rmd, es = "pes") # noise: .82
 #' nice.anova(rmd, es = "ges") # noise: .39
@@ -53,9 +53,9 @@
 #'
 #' # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 #' data(obk.long)
-#' # create object of class Anova:
+#' # create object of class afex_aov:
 #' tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-#'              data = obk.long, return = "Anova")
+#'              data = obk.long, return = "afex_aov")
 #' 
 #' nice.anova(tmp.aov, observed = "gender")
 #' 
@@ -78,84 +78,28 @@
 nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
   # internal functions:
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
-  # 	round.ps <- function(x) {
-  # 		as.character(ifelse(x < 0.001, "<.001", substr(ifelse(x < 0.01, formatC(x, digits = 3, format = "f"), ifelse(round(x, 2) == 1, " >.99", formatC(x, digits = 2, format = "f"))), 2, 5)))
-  # 	}
   make.fs <- function(anova, symbols) {
     ifelse(anova[["Pr(>F)"]] < 0.001, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[4]), 
            ifelse(anova[["Pr(>F)"]] < 0.01, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[3]), 
                   ifelse(anova[["Pr(>F)"]] < 0.05, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[2]), 
                          ifelse(anova[["Pr(>F)"]] < 0.1, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[1]), formatC(anova[["F"]], digits = 2, format = "f")))))
   }
-  # check arguments
-  es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)
-  #browser()
-  if (class(object)[1] == "Anova.mlm") {
-    #tmp <- suppressWarnings(univ(object))
-    tmp <- suppressWarnings(summary(object, multivariate = FALSE))
-    
-    #t.out <- tmp[["anova"]]
-    t.out <- tmp[["univariate.tests"]]
-    if (correction[1] == "GG") {
-      t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
-      t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * tmp[["pval.adjustments"]][,"GG eps"]
-      t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[GG])"]
-    } else {
-      if (correction[1] == "HF") {
-        if (any(tmp[["pval.adjustments"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
-        t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
-        t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
-        t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[HF])"]
-      } else {
-        if (correction[1] == "none") {
-          TRUE
-        } else stop("None supported argument to correction.")
-      }
-    }
-    tmp.df <- t.out		
-    tmp2 <- as.data.frame(unclass(tmp.df))
-  } else {
-    if (class(object)[1] == "anova") {
-      #browser()
-      #class(object) <- "data.frame"
-      tmp.df <- cbind(object[-nrow(object),], data.frame("Error SS" = object[nrow(object), "Sum Sq"], "den Df" = object[nrow(object), "Df"], check.names = FALSE))
-      colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
-      tmp2 <- as.data.frame(tmp.df)
-    } else stop("Non-supported object passed. Object must be of class 'Anova.mlm' or 'anova'.")
-  }
-  
-  tmp2[,"df"] <- paste(ifelse(is.wholenumber(tmp2[,"num Df"]), tmp2[,"num Df"], formatC(tmp2[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(tmp2[,"den Df"]),tmp2[,"den Df"], formatC(tmp2[,"den Df"], digits = 2, format = "f")), sep = ", ")
-  tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
+  # create ANOVA table formatted as string:
+  if (class(object)[[1]] == "afex_aov") anova_table <- as.data.frame(anova(object, es = es, observed = observed, correction = correction, MSE = MSE, intercept = intercept))
+  else if (class(object)[[1]] == "anova") anova_table <- object
+  else stop("object needs to be of class 'afex_aov' or 'anova'.")
+  anova_table[,"df"] <- paste(ifelse(is.wholenumber(anova_table[,"num Df"]), anova_table[,"num Df"], formatC(anova_table[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(anova_table[,"den Df"]),anova_table[,"den Df"], formatC(anova_table[,"den Df"], digits = 2, format = "f")), sep = ", ")
   symbols.use <-  c(" +", " *", " **", " ***")
   symbols.use[seq_along(sig.symbols)] <- sig.symbols
-  df.out <- data.frame(Effect = row.names(tmp2), df = tmp2[,"df"], stringsAsFactors = FALSE)
-  if (MSE) df.out <- cbind(df.out, data.frame(MSE = formatC(tmp2[,"MSE"], digits = 2, format = "f"), stringsAsFactors = FALSE))
-  df.out <- cbind(df.out, data.frame(F = make.fs(tmp2, symbols.use), stringsAsFactors = FALSE))
-  # calculate es
-  if ("pes" %in% es) {
-    df.out <- cbind(df.out, pes = round_ps(tmp2$SS/(tmp2$SS + tmp2[,"Error SS"])), stringsAsFactors = FALSE)
-  }
-  if ("ges" %in% es) {
-    #browser()
-    # This code is basically a copy from ezANOVA by Mike Lawrence!
-    #if (packageVersion)
-    if(!is.null(observed)){
-      obs <- rep(FALSE,nrow(tmp2))
-      for(i in observed){
-        if (!any(str_detect(rownames(tmp2),str_c("\\b",i,"\\b")))) stop(str_c("Observed variable not in data: ", i))
-        obs <- obs | str_detect(rownames(tmp2),str_c("\\b",i,"\\b"))
-      }
-      obs_SSn1 <- sum(tmp2$SS*obs)
-      obs_SSn2 <- tmp2$SS*obs
-    }else{
-      obs_SSn1 <- 0
-      obs_SSn2 <- 0
-    }
-    df.out$ges <- round_ps(tmp2$SS/(tmp2$SS+sum(unique(tmp2[,"Error SS"]))+obs_SSn1-obs_SSn2))
-  }
-  df.out$p  <-  round_ps(tmp2[,"Pr(>F)"])
+  df.out <- data.frame(Effect = row.names(anova_table), df = anova_table[,"df"], stringsAsFactors = FALSE)
+  if (MSE) df.out <- cbind(df.out, data.frame(MSE = formatC(anova_table[,"MSE"], digits = 2, format = "f"), stringsAsFactors = FALSE))  
+  df.out <- cbind(df.out, data.frame(F = make.fs(anova_table, symbols.use), stringsAsFactors = FALSE))
+  if (!is.null(anova_table$ges)) df.out$ges <- round_ps(anova_table$ges)
+  if (!is.null(anova_table$pes)) df.out$pes <- round_ps(anova_table$pes)
+  df.out$p  <-  round_ps(anova_table[,"Pr(>F)"])
   if (!intercept) if (df.out[1,1] == "(Intercept)")  df.out <- df.out[-1,, drop = FALSE]
   rownames(df.out) <- NULL
   df.out
 }
+
 

@@ -8,7 +8,7 @@ nice.anova(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none
      MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
 }
 \arguments{
-\item{object}{An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}},  \code{\link{ez.glm}}, or \code{\link{aov.car}}.}
+\item{object}{An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).}
 
 \item{es}{Effect Size to be reported. Default is \code{"ges"}, which reports generalized eta-squared (see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.}
 
@@ -41,18 +41,18 @@ The default reports generalized eta squared (Olejnik & Algina, 2003), the "recom
 ## example from Olejnik & Algina (2003)
 # "Repeated Measures Design" (pp. 439):
 data(md_12.1)
-# create object of class Anova:
+# create object of class afex_aov:
 rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"),
-              return = "Anova")
+              return = "afex_aov")
 # use different es:
 nice.anova(rmd, es = "pes") # noise: .82
 nice.anova(rmd, es = "ges") # noise: .39
 
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 data(obk.long)
-# create object of class Anova:
+# create object of class afex_aov:
 tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour),
-             data = obk.long, return = "Anova")
+             data = obk.long, return = "afex_aov")
 
 nice.anova(tmp.aov, observed = "gender")
 

@@ -24,7 +24,7 @@ aov4(value ~ treatment * gender + (phase*hour|id),
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
-# both calls return the same:
+# the three calls return the same ANOVA table:
 ##                         Effect          df   MSE         F  ges      p
 ## 1                    treatment       2, 10 22.81    3.94 +  .20    .05
 ## 2                       gender       1, 10 22.81    3.66 +  .11    .08
@@ -106,17 +106,17 @@ ez.glm("id", "value", obk.long, c("treatment", "gender"),
         within = NULL, print.formula = TRUE, observed = "gender")
 
 # only within
-aov.car(value ~ Error(id/(phase*hour)), data = obk.long, type = 2)
+aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
 
-aov4(value ~ (phase*hour|id), data = obk.long, type = 2, 
+aov4(value ~ (phase*hour|id), data = obk.long, 
      print.formula = TRUE)
 
 ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
-        type = 2, print.formula = TRUE)
+        print.formula = TRUE)
 
 # using return = "afex_aov":
 
-str(aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov"), 1)
+aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov")[[1]]
 
 # use args.return arguments:
 aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 

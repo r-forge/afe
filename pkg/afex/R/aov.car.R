@@ -93,8 +93,8 @@
 #' @name aov.car
 #' @aliases aov.car ez.glm aov4
 #' @export aov.car ez.glm aov4
-#' @import car
-#' @importFrom stringr str_c str_detect str_replace_all
+#' @import car 
+#' @importFrom stringr str_c str_detect str_replace_all str_extract
 #' @importFrom reshape2 dcast
 #' @importFrom lme4 findbars nobars 
 #' @example examples/examples.aov.car.R
@@ -275,14 +275,22 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
   }
   if (return == "afex_aov") {
     afex_aov <- list(
-      anova_table = do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)),
-      univariate = summary(Anova.out, multivariate = FALSE),
+      anova_table = NULL, # do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)),
+      #univariate = summary(Anova.out, multivariate = FALSE),
       aov = aov,
       Anova = Anova.out,
       lm = tmp.lm,
-      data = data.l
+      data = data.l,
+      information = list(
+        dv = dv,
+        id = id,
+        within = within,
+        between = between,
+        type = type
+        )
     )
     class(afex_aov) <- "afex_aov"
+    afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), args.return))
     return(afex_aov)
   }
   if (return == "Anova") return(Anova.out)
@@ -290,7 +298,22 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
     if (class(Anova.out) == "Anova.mlm") return(summary(Anova.out, multivariate = FALSE))
     else return(Anova.out)
   }
-  else if (return == "nice") return(do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)))
+  else if (return == "nice") {
+     afex_aov <- list(
+      anova_table = NULL,
+      Anova = Anova.out,
+      information = list(
+        dv = dv,
+        id = id,
+        within = within,
+        between = between,
+        type = type
+        )
+    )
+    class(afex_aov) <- "afex_aov"
+    #afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), args.return))
+    return(do.call("nice.anova", args = c(object = list(afex_aov), observed = list(observed), args.return)))
+  }
 }
 
 aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), args.return = list(), ..., print.formula = FALSE) {
@@ -327,3 +350,78 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 }
 
 
+#### methods for afex_aov
+
+#' @export
+anova.afex_aov <- function(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), MSE = TRUE, intercept = FALSE, ...) {
+  # internal functions:
+  # check arguments
+  es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)
+  if (class(object$Anova)[1] == "Anova.mlm") {
+    tmp <- suppressWarnings(summary(object$Anova, multivariate = FALSE))
+    t.out <- tmp[["univariate.tests"]]
+    if (correction[1] == "GG") {
+      tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"GG eps"]),]
+      t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
+      t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * tmp[["pval.adjustments"]][,"GG eps"]
+      t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[GG])"]
+    } else {
+      if (correction[1] == "HF") {
+        if (any(tmp[["pval.adjustments"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
+        tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"HF eps"]),]
+        t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
+        t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
+        t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[HF])"]
+      } else {
+        if (correction[1] == "none") {
+          TRUE
+        } else stop("None supported argument to correction.")
+      }
+    }
+    tmp.df <- t.out  	
+    tmp2 <- as.data.frame(unclass(tmp.df))
+  } else {
+    if (class(object$Anova)[1] == "anova") {
+      #browser()
+      tmp.df <- cbind(object$Anova[-nrow(object$Anova),], data.frame("Error SS" = object$Anova[nrow(object$Anova), "Sum Sq"], "den Df" = object$Anova[nrow(object$Anova), "Df"], check.names = FALSE))
+      colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
+      tmp2 <- as.data.frame(tmp.df)
+    } else stop("Non-supported object passed. Object must be of class 'Anova.mlm' or 'anova'.")
+  }
+  tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
+  # calculate es
+  es_df <- data.frame(row.names = rownames(tmp2))
+  if ("pes" %in% es) {
+    es_df$pes <- tmp2$SS/(tmp2$SS + tmp2[,"Error SS"])
+  }
+  if ("ges" %in% es) {
+    # This code is basically a copy from ezANOVA by Mike Lawrence!
+    if(!is.null(observed)){
+      obs <- rep(FALSE,nrow(tmp2))
+      for(i in observed){
+        if (!any(str_detect(rownames(tmp2),str_c("\\b",i,"\\b")))) stop(str_c("Observed variable not in data: ", i))
+        obs <- obs | str_detect(rownames(tmp2),str_c("\\b",i,"\\b"))
+      }
+      obs_SSn1 <- sum(tmp2$SS*obs)
+      obs_SSn2 <- tmp2$SS*obs
+    }else{
+      obs_SSn1 <- 0
+      obs_SSn2 <- 0
+    }
+    es_df$ges <- tmp2$SS/(tmp2$SS+sum(unique(tmp2[,"Error SS"]))+obs_SSn1-obs_SSn2)
+  }
+  anova_table <- cbind(tmp2[,c("num Df", "den Df", "MSE", "F")], es_df, "Pr(>F)" = tmp2[,c("Pr(>F)")])
+  class(anova_table) <- c("anova", "data.frame")
+  attr(anova_table, "heading") <- c(paste0("Anova Table (Type ", object$information$type , " tests)\n"), paste("Response:", object$information$dv))
+  #browser()
+  if (!intercept) if (row.names(anova_table)[1] == "(Intercept)")  anova_table <- anova_table[-1,, drop = FALSE]
+  anova_table
+}
+
+#' @method print afex_aov 
+#' @export
+print.afex_aov <- function(x, ...) {
+  out <- nice.anova(x, ...)
+  print(out)
+  invisible(out)
+}
