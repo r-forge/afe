@@ -55,7 +55,7 @@
 #' 
 #' @details \strong{Type 3 sums of squares are default in \pkg{afex}.} While some authors argue that so-called type 3 sums of squares are dangerous and/or problematic (most notably Venables, 2000), they are the default setting in many commercial statistical application such as SPSS or SAS. Furthermore, statisticians with an applied perspective recommend type 3 tests (e.g., Maxwell and Delaney, 2004). Consequently, they are the default for the ANOVA functions described here. For a brief discussion see \href{http://stats.stackexchange.com/q/6208/442}{here}. 
 #'
-#' Furthermore, note that lower order effects (e.g., main effects) in type 3 ANOVAs are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} to obtain meaningful results. This is imposed automatically for the functions discussed here as long as \code{check.contrasts} is \code{TRUE} (the default). I nevertheless recommend to set the contrasts globally to \code{contr.sum} via running \code{\link{set_sum_contrasts()}}. For a discussion of the other (non-recommended) coding schemes see \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{here}. 
+#' Furthermore, note that lower order effects (e.g., main effects) in type 3 ANOVAs are only meaningful with \href{http://www.ats.ucla.edu/stat/mult_pkg/faq/general/effect.htm}{effects coding}. That is, contrasts should be set to \code{\link{contr.sum}} to obtain meaningful results. This is imposed automatically for the functions discussed here as long as \code{check.contrasts} is \code{TRUE} (the default). I nevertheless recommend to set the contrasts globally to \code{contr.sum} via running \code{\link{set_sum_contrasts}}. For a discussion of the other (non-recommended) coding schemes see \href{http://www.ats.ucla.edu/stat/r/library/contrast_coding.htm}{here}. 
 #' 
 #' The \code{formula}s for \code{aov.car} or \code{aov4} must contain a single \code{Error} term specifying the \code{ID} column and potential within-subject factors (you can use \code{\link{mixed}} for running mixed-effects models with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term; in other words, it is not necessary to specify them outside the \code{Error} term, see Examples).
 #'
@@ -386,7 +386,7 @@ anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL,
       tmp.df <- cbind(object$Anova[-nrow(object$Anova),], data.frame("Error SS" = object$Anova[nrow(object$Anova), "Sum Sq"], "den Df" = object$Anova[nrow(object$Anova), "Df"], check.names = FALSE))
       colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
       tmp2 <- as.data.frame(tmp.df)
-    } else stop("Non-supported object passed. Object must be of class 'Anova.mlm' or 'anova'.")
+    } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
   }
   tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
   # calculate es
@@ -424,4 +424,15 @@ print.afex_aov <- function(x, ...) {
   out <- nice.anova(x$anova_table, ...)
   print(out)
   invisible(out)
+}
+
+
+#' @method summary afex_aov 
+#' @export
+summary.afex_aov <- function(object, ...) {
+  if (class(object$Anova)[1] == "Anova.mlm") {
+    return(summary(object$Anova, multivariate = FALSE))
+  } else if (class(object$Anova)[1] == "anova") {
+    return(object$anova_table)
+  } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
 }
