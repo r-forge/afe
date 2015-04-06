@@ -9,18 +9,18 @@
 aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"),
      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
      return = afex.options("return.aov"), observed = NULL,
-     args.return = list(), ...)
+     anova_table = list(), ...)
 
 aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
      return = afex.options("return.aov"),
-     args.return = list(), ..., print.formula = FALSE)
+     anova_table = list(), ..., print.formula = FALSE)
 
 ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
      observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
      return = afex.options("return.aov"),
-     args.return = list(), ..., print.formula = FALSE)
+     anova_table = list(), ..., print.formula = FALSE)
 }
 \arguments{
 \item{formula}{A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/ )} or \code{(...|id)}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.}
@@ -39,7 +39,7 @@ ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
 
 \item{observed}{\code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).}
 
-\item{args.return}{\code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).}
+\item{anova_table}{\code{list} of further arguments passed to function producing the ANOVA table. Only relevant if \code{return} is \code{"afex_aov"} or \code{"nice"}. Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice.anova}. Note that those settings can also be changed later for \code{afex_aov} objects.}
 
 \item{...}{Further arguments passed to \code{fun.aggregate}.}
 
@@ -56,15 +56,14 @@ ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
 \item{print.formula}{\code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed.}
 }
 \value{
-\code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
+\code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers for \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
 
 If \code{return} is \code{"nice"} a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
 
 If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 
 \describe{
-  \item{"anova_table"}{A nice ANOVA table.}
-  \item{"univariate"}{Object returned from \code{summary.Anova.mlm} (for ANOVAs including within-subejct factors) or else the object returned from \code{car::Anova}. (Also returned if \code{return = "univariate"}).}
+  \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame}.}
   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
@@ -188,7 +187,6 @@ aov.car(value ~ treatment * gender + age + Error(id/(phase*hour)),
 aov4(value ~ treatment * gender + age + (phase*hour|id), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
-
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), covariate = "age", 
         observed = c("gender", "age"), factorize = FALSE)
@@ -209,8 +207,8 @@ aov.car(value ~ treatment * gender + Error(id),
         data = obk.long, observed = c("gender"))
 aov4(value ~ treatment * gender + (1|id), print.formula = TRUE,
         data = obk.long, observed = c("gender"))
-ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        within = NULL, print.formula = TRUE, observed = "gender")
+ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
+        print.formula = TRUE, observed = "gender")
 
 # only within
 aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
@@ -218,11 +216,10 @@ aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
 aov4(value ~ (phase*hour|id), data = obk.long, 
      print.formula = TRUE)
 
-ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
+ez.glm("id", "value", obk.long, within = c("phase", "hour"), 
         print.formula = TRUE)
 
 # using return = "afex_aov":
-
 aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov")[[1]]
 
 # use args.return arguments:

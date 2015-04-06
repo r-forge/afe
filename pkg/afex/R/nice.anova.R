@@ -75,7 +75,7 @@
 #' 
 #' 
 
-nice.anova <- function(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
+nice.anova <- function(object, es = afex.options("es.aov"), observed = NULL, correction = afex.options("correction.aov"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
   # internal functions:
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   make.fs <- function(anova, symbols) {

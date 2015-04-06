@@ -81,7 +81,6 @@ aov.car(value ~ treatment * gender + age + Error(id/(phase*hour)),
 aov4(value ~ treatment * gender + age + (phase*hour|id), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
-
 ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), covariate = "age", 
         observed = c("gender", "age"), factorize = FALSE)
@@ -102,8 +101,8 @@ aov.car(value ~ treatment * gender + Error(id),
         data = obk.long, observed = c("gender"))
 aov4(value ~ treatment * gender + (1|id), print.formula = TRUE,
         data = obk.long, observed = c("gender"))
-ez.glm("id", "value", obk.long, c("treatment", "gender"), 
-        within = NULL, print.formula = TRUE, observed = "gender")
+ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
+        print.formula = TRUE, observed = "gender")
 
 # only within
 aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
@@ -111,11 +110,10 @@ aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
 aov4(value ~ (phase*hour|id), data = obk.long, 
      print.formula = TRUE)
 
-ez.glm("id", "value", obk.long,  NULL, c("phase", "hour"), 
+ez.glm("id", "value", obk.long, within = c("phase", "hour"), 
         print.formula = TRUE)
 
 # using return = "afex_aov":
-
 aov.car(value ~ Error(id/(phase*hour)), data = obk.long, return = "afex_aov")[[1]]
 
 # use args.return arguments:

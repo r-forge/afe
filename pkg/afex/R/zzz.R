@@ -4,7 +4,8 @@
 .afexEnv <- new.env()
 assign("method.mixed",  "KR", envir = .afexEnv)
 assign("return.aov",  "nice", envir = .afexEnv)
-#assign("es.aov",  "ges", envir = .afexEnv)
+assign("es.aov",  "ges", envir = .afexEnv)
+assign("correction.aov",  "GG", envir = .afexEnv)
 assign("check.contrasts", TRUE, envir = .afexEnv)
 assign("type", 3, envir = .afexEnv)
 

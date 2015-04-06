@@ -5,6 +5,8 @@ require(testthat)
 #test_dir("tests/testthat")
 test_package("afex")
 
+test_package("afex", filter = "aov")
+
 options(error = recover)
 options(error = NULL)
 

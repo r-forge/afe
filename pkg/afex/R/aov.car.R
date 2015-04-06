@@ -5,18 +5,18 @@
 #' @usage aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"), 
 #'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"), 
 #'      return = afex.options("return.aov"), observed = NULL, 
-#'      args.return = list(), ...)
+#'      anova_table = list(), ...)
 #'      
 #' aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
 #'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
 #'      return = afex.options("return.aov"), 
-#'      args.return = list(), ..., print.formula = FALSE)
+#'      anova_table = list(), ..., print.formula = FALSE)
 #'
 #' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
 #'      observed = NULL, fun.aggregate = NULL, type = afex.options("type"), 
 #'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"), 
 #'      return = afex.options("return.aov"), 
-#'      args.return = list(), ..., print.formula = FALSE)
+#'      anova_table = list(), ..., print.formula = FALSE)
 #' 
 #'
 #' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/ )} or \code{(...|id)}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
@@ -34,18 +34,17 @@
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
 #' @param return What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.
 # Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). 
-#' @param args.return \code{list} of further arguments passed to the function which produces the return value. Currently only supports \code{return = "nice"} (the default) which then passes arguments to \code{\link{nice.anova}} (see examples).
+#' @param anova_table \code{list} of further arguments passed to function producing the ANOVA table. Only relevant if \code{return} is \code{"afex_aov"} or \code{"nice"}. Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice.anova}. Note that those settings can also be changed later for \code{afex_aov} objects.
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #'
-#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers to \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
+#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers for \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. The main two options are \code{"nice"} (the default) and \code{"afex_aov"}.
 #' 
 #' If \code{return} is \code{"nice"} a nice ANOVA table is returnd (\code{\link{nice.anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
 #'
 #' If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 #'
 #' \describe{
-#'   \item{"anova_table"}{A nice ANOVA table.}
-#'   \item{"univariate"}{Object returned from \code{summary.Anova.mlm} (for ANOVAs including within-subejct factors) or else the object returned from \code{car::Anova}. (Also returned if \code{return = "univariate"}).}
+#'   \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame}.}
 #'   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
 #'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
 #'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
@@ -102,7 +101,7 @@
 #' @encoding UTF-8
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), observed = NULL, args.return = list(), ...) {
+aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), observed = NULL, anova_table = list(), ...) {
   return <- match.arg(return, c("Anova", "lm", "data", "nice", "afex_aov", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
@@ -275,8 +274,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
   }
   if (return == "afex_aov") {
     afex_aov <- list(
-      anova_table = NULL, # do.call("nice.anova", args = c(object = list(Anova.out), observed = list(observed), args.return)),
-      #univariate = summary(Anova.out, multivariate = FALSE),
+      anova_table = NULL, 
       aov = aov,
       Anova = Anova.out,
       lm = tmp.lm,
@@ -290,7 +288,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
         )
     )
     class(afex_aov) <- "afex_aov"
-    afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), args.return))
+    afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), anova_table))
     return(afex_aov)
   }
   if (return == "Anova") return(Anova.out)
@@ -312,11 +310,11 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
     )
     class(afex_aov) <- "afex_aov"
     #afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), args.return))
-    return(do.call("nice.anova", args = c(object = list(afex_aov), observed = list(observed), args.return)))
+    return(do.call("nice.anova", args = c(object = list(afex_aov), observed = list(observed), anova_table)))
   }
 }
 
-aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), args.return = list(), ..., print.formula = FALSE) {
+aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), anova_table = list(), ..., print.formula = FALSE) {
   #browser()
   barterms <- findbars(formula)
   if (length(barterms) > 1) stop("aov4 only allows one random effect term")
@@ -333,12 +331,12 @@ aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = af
   }
   formula <- str_c(dv, " ~ ", rh, error)
   if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, args.return = args.return, ...)
+  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
 }
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), args.return = list(), ..., print.formula = FALSE) {
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), anova_table = list(), ..., print.formula = FALSE) {
   if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
   if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
   #browser()
@@ -346,14 +344,14 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
   error <- str_c(" + Error(", id, if (!is.null(within)) "/(" else "", str_c(within, collapse = " * "), if (length(within) > 0) ")" else "", ")")
   formula <- str_c(dv, " ~ ", rh, error)
   if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, args.return = args.return, ...)
+  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
 }
 
 
 #### methods for afex_aov
 
 #' @export
-anova.afex_aov <- function(object, es = "ges", observed = NULL, correction = c("GG", "HF", "none"), MSE = TRUE, intercept = FALSE, ...) {
+anova.afex_aov <- function(object, es = afex.options("es.aov"), observed = NULL, correction = afex.options("correction.aov"), MSE = TRUE, intercept = FALSE, ...) {
   # internal functions:
   # check arguments
   es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)
