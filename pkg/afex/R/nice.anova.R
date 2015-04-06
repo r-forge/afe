@@ -4,12 +4,12 @@
 #' 
 #'
 #' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).
-#' @param es Effect Size to be reported. Default is \code{"ges"}, which reports generalized eta-squared (see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.
+#' @param es Effect Size to be reported. The default is given by \code{afex_options("es_aov")}, which is initially set to \code{"ges"} (i.e., reporting generalized eta-squared, see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.
 #' @param observed character vector referring to the observed (i.e., non manipulated) variables/effects in the design. Important for calculation of generalized eta-squared (ignored if \code{es} is not \code{"ges"}), see details.
-#' @param correction Character. Which sphericity correction on the degrees of freedom should be reported for the within-subject factors. The default \code{c("GG", "HF", "none")} corresponds to the Greenhouse-Geisser correction.
+#' @param correction Character. Which sphericity correction of the degrees of freedom should be reported for the within-subject factors.  The default is given by \code{afex_options("correction_aov")}, which is initially set to \code{"GG"} corresponding to the Greenhouse-Geisser correction. Possible values are \code{"GG"}, \code{"HF"} (i.e., Hyunh-Feldt correction), and \code{"none"} (i.e., no correction).
 #' @param sig.symbols Character. What should be the symbols designating significance? When entering an vector with \code{length(sig.symbol) < 4} only those elements of the default (\code{c(" +", " *", " **", " ***")}) will be replaced. \code{sig.symbols = ""} will display the stars but not the \code{+}, \code{sig.symbols = rep("", 4)} will display no symbols.
 #' @param MSE logical. Should the column containing the Mean Sqaured Error (MSE) be displayed? Default is \code{TRUE}.
-#' @param intercept logical. Should intercept (if present) be printed (default is \code{FALSE} which suppresses printing of the intercept)
+#' @param intercept logical. Should intercept (if present) be included in the ANOVA table? Default is \code{FALSE} which hides the intercept.
 #'
 #' @return A \code{data.frame} with the ANOVA table consisting of characters. The columns that are always present are: \code{Effect}, \code{df} (degrees of freedom), \code{F}, and \code{p}.
 #'

@@ -44,7 +44,7 @@
 #' If \code{return = "afex_aov"} an S3 object (i.e., a list) with the following elements:
 #'
 #' \describe{
-#'   \item{"anova_table"}{An ANOVA table of class \code{"anova", "data.frame"}.}
+#'   \item{"anova_table"}{An ANOVA table of class \code{c("anova", "data.frame")}.}
 #'   \item{"aov"}{\code{aov} object returned from \code{\link{aov}} (should not be used to evaluate significance of effects, but can be passed to \code{lsmeans} for post-hoc tests).}
 #'   \item{"Anova"}{the same as \code{\link[car]{Anova}}. Usually an object of class \code{"Anova.mlm"} (with within-subjects factors) or of class \code{c("anova", "data.frame")}. Also returned if \code{return = "Anova"}.}
 #'   \item{"lm"}{the object fitted with \code{lm} and passed to \code{Anova} (i.e., an object of class \code{"lm"} or \code{"mlm"}). Also returned if \code{return = "lm"}.}
@@ -350,89 +350,3 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 }
 
 
-#### methods for afex_aov
-
-#' @export
-anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, ...) {
-  # internal functions:
-  # check arguments
-  es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)
-  if (class(object$Anova)[1] == "Anova.mlm") {
-    tmp <- suppressWarnings(summary(object$Anova, multivariate = FALSE))
-    t.out <- tmp[["univariate.tests"]]
-    if (correction[1] == "GG") {
-      tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"GG eps"]),, drop = FALSE]
-      t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
-      t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * tmp[["pval.adjustments"]][,"GG eps"]
-      t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[GG])"]
-    } else {
-      if (correction[1] == "HF") {
-        if (any(tmp[["pval.adjustments"]][,"HF eps"] > 1)) warning("HF eps > 1 treated as 1")
-        tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"HF eps"]),, drop = FALSE]
-        t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
-        t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "den Df"] * pmin(1, tmp[["pval.adjustments"]][,"HF eps"])
-        t.out[row.names(tmp[["pval.adjustments"]]), "Pr(>F)"] <- tmp[["pval.adjustments"]][,"Pr(>F[HF])"]
-      } else {
-        if (correction[1] == "none") {
-          TRUE
-        } else stop("None supported argument to correction.")
-      }
-    }
-    tmp.df <- t.out  	
-    tmp2 <- as.data.frame(unclass(tmp.df))
-  } else {
-    if (class(object$Anova)[1] == "anova") {
-      #browser()
-      tmp.df <- cbind(object$Anova[-nrow(object$Anova),], data.frame("Error SS" = object$Anova[nrow(object$Anova), "Sum Sq"], "den Df" = object$Anova[nrow(object$Anova), "Df"], check.names = FALSE))
-      colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
-      tmp2 <- as.data.frame(tmp.df)
-    } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
-  }
-  tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
-  # calculate es
-  es_df <- data.frame(row.names = rownames(tmp2))
-  if ("pes" %in% es) {
-    es_df$pes <- tmp2$SS/(tmp2$SS + tmp2[,"Error SS"])
-  }
-  if ("ges" %in% es) {
-    # This code is basically a copy from ezANOVA by Mike Lawrence!
-    if(!is.null(observed)){
-      obs <- rep(FALSE,nrow(tmp2))
-      for(i in observed){
-        if (!any(str_detect(rownames(tmp2),str_c("\\b",i,"\\b")))) stop(str_c("Observed variable not in data: ", i))
-        obs <- obs | str_detect(rownames(tmp2),str_c("\\b",i,"\\b"))
-      }
-      obs_SSn1 <- sum(tmp2$SS*obs)
-      obs_SSn2 <- tmp2$SS*obs
-    }else{
-      obs_SSn1 <- 0
-      obs_SSn2 <- 0
-    }
-    es_df$ges <- tmp2$SS/(tmp2$SS+sum(unique(tmp2[,"Error SS"]))+obs_SSn1-obs_SSn2)
-  }
-  anova_table <- cbind(tmp2[,c("num Df", "den Df", "MSE", "F")], es_df, "Pr(>F)" = tmp2[,c("Pr(>F)")])
-  class(anova_table) <- c("anova", "data.frame")
-  attr(anova_table, "heading") <- c(paste0("Anova Table (Type ", object$information$type , " tests)\n"), paste("Response:", object$information$dv))
-  #browser()
-  if (!intercept) if (row.names(anova_table)[1] == "(Intercept)")  anova_table <- anova_table[-1,, drop = FALSE]
-  anova_table
-}
-
-#' @method print afex_aov 
-#' @export
-print.afex_aov <- function(x, ...) {
-  out <- nice.anova(x$anova_table, ...)
-  print(out)
-  invisible(out)
-}
-
-
-#' @method summary afex_aov 
-#' @export
-summary.afex_aov <- function(object, ...) {
-  if (class(object$Anova)[1] == "Anova.mlm") {
-    return(summary(object$Anova, multivariate = FALSE))
-  } else if (class(object$Anova)[1] == "anova") {
-    return(object$anova_table)
-  } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
-}
