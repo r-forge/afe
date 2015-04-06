@@ -89,16 +89,17 @@
 #'
 #' @references Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 #'
-#' Venables, W.N. (2000). \emph{Exegeses on linear models}. Paper presented to the S-Plus User’s Conference, Washington DC, 8-9 October 1998, Washington, DC. Available from: \url{http://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf}
+#' Venables, W.N. (2000). \emph{Exegeses on linear models}. Paper presented to the S-Plus User's Conference, Washington DC, 8-9 October 1998, Washington, DC. Available from: \url{http://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf}
 #'
 #' @name aov.car
 #' @aliases aov.car ez.glm aov4
 #' @export aov.car ez.glm aov4
-#' @import car 
+#' @importFrom car Anova
 #' @importFrom stringr str_c str_detect str_replace_all str_extract
 #' @importFrom reshape2 dcast
 #' @importFrom lme4 findbars nobars 
 #' @example examples/examples.aov.car.R
+#' 
 #' 
 #' @encoding UTF-8
 #'

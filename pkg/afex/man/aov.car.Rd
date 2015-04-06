@@ -239,7 +239,7 @@ The design of these functions was influenced by \code{\link[ez]{ezANOVA}} from p
 \references{
 Maxwell, S. E., & Delaney, H. D. (2004). \emph{Designing Experiments and Analyzing Data: A Model-Comparisons Perspective}. Mahwah, N.J.: Lawrence Erlbaum Associates.
 
-Venables, W.N. (2000). \emph{Exegeses on linear models}. Paper presented to the S-Plus User’s Conference, Washington DC, 8-9 October 1998, Washington, DC. Available from: \url{http://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf}
+Venables, W.N. (2000). \emph{Exegeses on linear models}. Paper presented to the S-Plus User's Conference, Washington DC, 8-9 October 1998, Washington, DC. Available from: \url{http://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf}
 }
 \seealso{
 \code{\link{nice.anova}} creates the nice ANOVA tables which are by default returned. See also there for a slightly longer discussion of the available effect sizes.

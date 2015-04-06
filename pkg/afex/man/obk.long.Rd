@@ -17,6 +17,7 @@ This is the long version of the \code{OBrienKaiser} dataset from the \pkg{car} p
 }
 \examples{
 # The dataset is constructed as follows:
+data("OBrienKaiser", package = "car")
 set.seed(1)
 OBrienKaiser2 <- within(OBrienKaiser, {
 		id <- factor(1:nrow(OBrienKaiser))
