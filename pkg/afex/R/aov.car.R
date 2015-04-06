@@ -2,20 +2,20 @@
 #'
 #' These functions allow convenient access to \code{\link[car]{Anova}} (from the \pkg{car} package) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating the data if there is more than one obersvation per individuum and cell. Hence, mixed between-within ANOVAs can be calculated conveniently without using the rather unhandy format of \code{car::Anova}. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s), \code{aov4} can be called with a \pkg{lme4}-like formula, and \code{ez.glm} is called specifying the factors as character vectors.
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"), 
-#'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"), 
-#'      return = afex.options("return.aov"), observed = NULL, 
+#' @usage aov.car(formula, data, fun.aggregate = NULL, type = afex_options("type"), 
+#'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"), 
+#'      return = afex_options("return_aov"), observed = NULL, 
 #'      anova_table = list(), ...)
 #'      
-#' aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
-#'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
-#'      return = afex.options("return.aov"), 
+#' aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex_options("type"),
+#'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"),
+#'      return = afex_options("return_aov"), 
 #'      anova_table = list(), ..., print.formula = FALSE)
 #'
 #' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
-#'      observed = NULL, fun.aggregate = NULL, type = afex.options("type"), 
-#'      factorize = TRUE, check.contrasts = afex.options("check.contrasts"), 
-#'      return = afex.options("return.aov"), 
+#'      observed = NULL, fun.aggregate = NULL, type = afex_options("type"), 
+#'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"), 
+#'      return = afex_options("return_aov"), 
 #'      anova_table = list(), ..., print.formula = FALSE)
 #' 
 #'
@@ -28,11 +28,11 @@
 #' @param observed \code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).
 #' @param data A \code{data.frame} containing the data. Mandatory.
 #' @param fun.aggregate The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.
-#' @param type The type of sums of squares for the ANOVA. The default is given by \code{afex.options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
+#' @param type The type of sums of squares for the ANOVA. The default is given by \code{afex_options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
 #' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
-#' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex.options("check.contrasts")}, which is initially \code{TRUE}.
+#' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex_options("check.contrasts")}, which is initially \code{TRUE}.
 #' @param print.formula \code{ez.glm} is a wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param return What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.
+#' @param return What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex_options("return_aov")}, which is initially \code{"nice"}.
 # Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). 
 #' @param anova_table \code{list} of further arguments passed to function producing the ANOVA table. Only relevant if \code{return} is \code{"afex_aov"} or \code{"nice"}. Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice.anova}. Note that those settings can also be changed later for \code{afex_aov} objects.
 #' @param ... Further arguments passed to \code{fun.aggregate}.
@@ -101,7 +101,7 @@
 #' @encoding UTF-8
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), observed = NULL, anova_table = list(), ...) {
+aov.car <- function(formula, data, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), observed = NULL, anova_table = list(), ...) {
   return <- match.arg(return, c("Anova", "lm", "data", "nice", "afex_aov", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
@@ -314,7 +314,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex.options("ty
   }
 }
 
-aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), anova_table = list(), ..., print.formula = FALSE) {
+aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
   #browser()
   barterms <- findbars(formula)
   if (length(barterms) > 1) stop("aov4 only allows one random effect term")
@@ -336,7 +336,7 @@ aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = af
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex.options("type"), factorize = TRUE, check.contrasts = afex.options("check.contrasts"), return = afex.options("return.aov"), anova_table = list(), ..., print.formula = FALSE) {
+ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
   if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
   if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
   #browser()
@@ -351,7 +351,7 @@ ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL
 #### methods for afex_aov
 
 #' @export
-anova.afex_aov <- function(object, es = afex.options("es.aov"), observed = NULL, correction = afex.options("correction.aov"), MSE = TRUE, intercept = FALSE, ...) {
+anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, ...) {
   # internal functions:
   # check arguments
   es <- match.arg(es, c("none", "ges", "pes"), several.ok = TRUE)

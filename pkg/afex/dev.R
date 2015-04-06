@@ -6,6 +6,7 @@ require(testthat)
 test_package("afex")
 
 test_package("afex", filter = "aov")
+test_package("afex", filter = "mixed")
 
 options(error = recover)
 options(error = NULL)

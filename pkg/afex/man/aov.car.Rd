@@ -6,20 +6,20 @@
 \alias{ez.glm}
 \title{Convenience wrappers for car::Anova using either a formula or factor based interface.}
 \usage{
-aov.car(formula, data, fun.aggregate = NULL, type = afex.options("type"),
-     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
-     return = afex.options("return.aov"), observed = NULL,
+aov.car(formula, data, fun.aggregate = NULL, type = afex_options("type"),
+     factorize = TRUE, check.contrasts = afex_options("check.contrasts"),
+     return = afex_options("return_aov"), observed = NULL,
      anova_table = list(), ...)
 
-aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
-     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
-     return = afex.options("return.aov"),
+aov4(formula, data, observed = NULL, fun.aggregate = NULL, type = afex_options("type"),
+     factorize = TRUE, check.contrasts = afex_options("check.contrasts"),
+     return = afex_options("return_aov"),
      anova_table = list(), ..., print.formula = FALSE)
 
 ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
-     observed = NULL, fun.aggregate = NULL, type = afex.options("type"),
-     factorize = TRUE, check.contrasts = afex.options("check.contrasts"),
-     return = afex.options("return.aov"),
+     observed = NULL, fun.aggregate = NULL, type = afex_options("type"),
+     factorize = TRUE, check.contrasts = afex_options("check.contrasts"),
+     return = afex_options("return_aov"),
      anova_table = list(), ..., print.formula = FALSE)
 }
 \arguments{
@@ -29,13 +29,13 @@ ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL,
 
 \item{fun.aggregate}{The function for aggregating the data before running the ANOVA if there is more than one obervation per individuum and cell of the design. The default \code{NULL} issues a warning if aggregation is necessary and uses \code{\link{mean}}.}
 
-\item{type}{The type of sums of squares for the ANOVA. The default is given by \code{afex.options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.}
+\item{type}{The type of sums of squares for the ANOVA. The default is given by \code{afex_options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.}
 
 \item{factorize}{logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).}
 
-\item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex.options("check.contrasts")}, which is initially \code{TRUE}.}
+\item{check.contrasts}{\code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex_options("check.contrasts")}, which is initially \code{TRUE}.}
 
-\item{return}{What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex.options("return.aov")}, which is initially \code{"nice"}.}
+\item{return}{What should be returned? If \code{"nice"} will return a nice ANOVA table (produced by \code{\link{nice.anova}}. If \code{"afex_aov"}, an S3 object of class \code{afex_aov} containing univariate tests produced by \code{car::Anova} and an object fitted with \code{aov}. See below for more details and options. The default is given by \code{afex_options("return_aov")}, which is initially \code{"nice"}.}
 
 \item{observed}{\code{character} vector indicating which of the variables are observed (i.e, measured) as compared to experimentally manipulated. The default behavior is to return a ANOVA table with generalized eta squared effect size for which this information is necessary (see \code{\link{nice.anova}}).}
 

@@ -4,10 +4,10 @@
 \alias{mixed}
 \title{Obtain p-values for a mixed-model from lmer().}
 \usage{
-mixed(formula, data, type = afex.options("type"),
-  method = afex.options("method.mixed"), per.parameter = NULL,
+mixed(formula, data, type = afex_options("type"),
+  method = afex_options("method_mixed"), per.parameter = NULL,
   args.test = list(), test.intercept = FALSE,
-  check.contrasts = afex.options("check.contrasts"), set.data.arg = TRUE,
+  check.contrasts = afex_options("check.contrasts"), set.data.arg = TRUE,
   progress = TRUE, cl = NULL, ...)
 }
 \arguments{
@@ -15,9 +15,9 @@ mixed(formula, data, type = afex.options("type"),
 
 \item{data}{data.frame containing the data. Should have all the variables present in \code{fixed}, \code{random}, and \code{dv} as columns.}
 
-\item{type}{type of test on which effects are based. Default is to use type 3 tests, taken from \code{\link{afex.options}}.}
+\item{type}{type of test on which effects are based. Default is to use type 3 tests, taken from \code{\link{afex_options}}.}
 
-\item{method}{character vector indicating which methods for obtaining p-values should be used: \code{"KR"} corresponds to the Kenward-Roger approximation for degrees of freedom (only working with linear mixed models), \code{"PB"} calculates p-values based on parametric bootstrap, \code{"LRT"} calculates p-values via the likelihood ratio tests implemented in the \code{anova} method for \code{merMod} objects (only recommended for models with many [i.e., > 50] levels for the random factors). The default (currently \code{"KR"}) is taken from \code{\link{afex.options}}.}
+\item{method}{character vector indicating which methods for obtaining p-values should be used: \code{"KR"} corresponds to the Kenward-Roger approximation for degrees of freedom (only working with linear mixed models), \code{"PB"} calculates p-values based on parametric bootstrap, \code{"LRT"} calculates p-values via the likelihood ratio tests implemented in the \code{anova} method for \code{merMod} objects (only recommended for models with many [i.e., > 50] levels for the random factors). The default (currently \code{"KR"}) is taken from \code{\link{afex_options}}.}
 
 \item{per.parameter}{\code{character} vector specifying for which variable tests should be run for each parameter (instead for the overall effect). Can be useful e.g., for testing ordered factors. Relatively untested so results should be compared with a second run without setting this argument. Uses \code{\link{grep}} for selecting parameters among the fixed effects so regular expressions (\code{\link{regex}}) are possible. See Examples.}
 
@@ -25,7 +25,7 @@ mixed(formula, data, type = afex.options("type"),
 
 \item{test.intercept}{logical. Whether or not the intercept should also be fitted and tested for significance. Default is \code{FALSE}. Only relevant if \code{type = 3}.}
 
-\item{check.contrasts}{\code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details. The default (\code{"TRUE"}) is taken from \code{\link{afex.options}}.}
+\item{check.contrasts}{\code{logical}. Should contrasts be checked and (if necessary) changed to \code{"contr.sum"}? See Details. The default (\code{"TRUE"}) is taken from \code{\link{afex_options}}.}
 
 \item{set.data.arg}{\code{logical}. Should the data argument in the slot \code{call} of the \code{merMod} object returned from \code{lmer} be set to the passed data argument? Otherwise the name will be \code{data}. Helpful if fitted objects are used afterwards (e.g., using \pkg{lsmeans}). Default is \code{TRUE}.}
 
