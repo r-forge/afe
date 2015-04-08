@@ -86,7 +86,7 @@ nice.anova <- function(object, es = afex_options("es_aov"), observed = NULL, cor
   symbols.use <-  c(" +", " *", " **", " ***")
   symbols.use[seq_along(sig.symbols)] <- sig.symbols
   df.out <- data.frame(Effect = row.names(anova_table), df = anova_table[,"df"], stringsAsFactors = FALSE)
-  if (MSE) df.out <- cbind(df.out, data.frame(MSE = formatC(anova_table[,"MSE"], digits = 2, format = "f"), stringsAsFactors = FALSE))  
+  if (!is.null(anova_table$MSE)) df.out <- cbind(df.out, data.frame(MSE = formatC(anova_table[,"MSE"], digits = 2, format = "f"), stringsAsFactors = FALSE))  
   df.out <- cbind(df.out, data.frame(F = make.fs(anova_table, symbols.use), stringsAsFactors = FALSE))
   if (!is.null(anova_table$ges)) df.out$ges <- round_ps(anova_table$ges)
   if (!is.null(anova_table$pes)) df.out$pes <- round_ps(anova_table$pes)

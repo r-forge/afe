@@ -7,19 +7,33 @@
 
     Significant User Visible Changes and New Features
 
-    o   new return argument for aov.car() et al: afex_aov. An S3 object 
-        containing both the ANOVA output from car::Anova (for correct 
-        Type 3 tests) and the model fitted with Base R's aov (which can
-        be passed to lsmeans for post-hoc tests).
+    o   new default return argument for aov.car() et al., afex_aov, 
+        an S3 object containing the following:
+        (1) ANOVA table of class "anova", is printed via nice.anova
+        (2) ANOVA fitted with base R's aov (can be passed to lsmeans 
+            for post-hoc tests)
+        (3) ANOVA output from car::Anova (for correct Type 3 tests),
+            ANOVA table (1) is based on this model
+        (4) lm object passed to car::Anova
+        (5) data used for estimating (2) and (4)
+        
+    o   support for lsmeans: objects of class afex_aov can be used 
+        with lsmeans directly. afex now depends on lsmeans.
     
     o   added afex.options() functionality for setting options globally.
     
     o   added vignette showing how to calculate contrasts after ANOVA.
+    
+    o   afex does not depend on car package anymore, now only imported.
 
         
     Bugfixes
     
     o   ANOVA: for "aov"-objects, contrasts are only set for factors.
+    
+    o   ANOVA: MSE were calculated using the corrected-df leading to 
+        differences in MSE depending on whether or not df-correction 
+        were present. Now, MSE are always based on uncorrected df.
 
     
 
