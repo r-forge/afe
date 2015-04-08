@@ -96,6 +96,14 @@ The S3 object returned per default can be directly passed to \code{lsmeans::lsme
  A caveat regarding the use of \pkg{lsmeans} concerns the assumption of sphericity for ANOVAs including within-subjects/repeated-measures factors (with more than two levels). While the ANOVA tables per default report results using the Greenhousse-Geisser correction, no such correction is available when using \pkg{lsmeans}. This may result in anti-conservative tests.
 }
 
+\subsection{Methods for \code{afex_aov} Objects}{
+A full overview over the methods provided for \code{afex_aov} objects is provided in the corresponding help page: \code{\link{afex_aov-methods}}. The probably most important ones for end-users are \code{summary} and \code{anova}.
+
+The \code{summary} method returns, for ANOVAs containing within-subject (repeated-measures) factors with more than two levels, the complete univariate analysis: Results without df-correction, the Greenhouse-Geisser corrected results, the Hyunh-Feldt corrected results, and the results of the Mauchly test for sphericity.
+
+The \code{anova} method returns a \code{data.frame} of class \code{"anova"} containing the ANOVA table in numeric form (i.e., the one in slot \code{anova_table} of a \code{afex_aov}). This method has arguments such as \code{correction} and \code{es} and can be used to obtain an ANOVA table with different correction than the one initially specified.
+}
+
 \subsection{Details of ANOVA Specification}{
 The \code{formula}s for \code{aov.car} or \code{aov4} must contain a single \code{Error} term specifying the \code{ID} column and potential within-subject factors (you can use \code{\link{mixed}} for running mixed-effects models with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term; in other words, it is not necessary to specify them outside the \code{Error} term, see Examples).
 

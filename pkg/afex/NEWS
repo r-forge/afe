@@ -24,7 +24,7 @@
     
     o   added vignette showing how to calculate contrasts after ANOVA.
     
-    o   afex does not depend on car package anymore, now only imported.
+    o   afex does not depend on car package anymore, is is only imported.
 
         
     Bugfixes
