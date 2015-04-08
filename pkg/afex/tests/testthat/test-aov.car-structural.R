@@ -36,6 +36,7 @@ test_that("return='aov' works", {
   positive2  <- summary(aov.car(value ~ Error(id/phase*hour), data = obk.long, return = "aov"))
   expect_equal(test, positive2)
   positive3 <- aov.car(value ~ Error(id/phase*hour), data = obk.long)
-  expect_equal(orig1, positive3)
+  expect_equal(summary(orig1), summary(positive3))
+  expect_equal(summary(orig1$Anova, multivariate = FALSE), summary(positive3$Anova, multivariate = FALSE))
+  expect_equal(summary(orig1$aov), summary(positive3$aov))
 })
-

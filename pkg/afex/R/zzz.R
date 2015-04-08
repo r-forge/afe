@@ -3,7 +3,7 @@
 ## set default options for afex.options:
 .afexEnv <- new.env()
 assign("method_mixed",  "KR", envir = .afexEnv)
-assign("return_aov",  "nice", envir = .afexEnv)
+assign("return_aov",  "afex_aov", envir = .afexEnv)
 assign("es_aov",  "ges", envir = .afexEnv)
 assign("correction_aov",  "GG", envir = .afexEnv)
 assign("check.contrasts", TRUE, envir = .afexEnv)

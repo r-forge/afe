@@ -41,18 +41,15 @@
 #' # "Repeated Measures Design" (pp. 439):
 #' data(md_12.1)
 #' # create object of class afex_aov:
-#' rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"),
-#'               return = "afex_aov")
+#' rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
 #' # use different es:
 #' nice.anova(rmd, es = "pes") # noise: .82
 #' nice.anova(rmd, es = "ges") # noise: .39
-
 #'
 #' # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 #' data(obk.long)
 #' # create object of class afex_aov:
-#' tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), 
-#'              data = obk.long, return = "afex_aov")
+#' tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long)
 #' 
 #' nice.anova(tmp.aov, observed = "gender")
 #' 
