@@ -12,7 +12,7 @@
         (1) ANOVA table of class "anova", is printed via nice.anova
         (2) ANOVA fitted with base R's aov (can be passed to lsmeans 
             for post-hoc tests)
-        (3) ANOVA output from car::Anova (for correct Type 3 tests),
+        (3) output from car::Anova (for tests of effects),
             ANOVA table (1) is based on this model
         (4) lm object passed to car::Anova
         (5) data used for estimating (2) and (4)
@@ -31,9 +31,6 @@
     
     o   ANOVA: for "aov"-objects, contrasts are only set for factors.
     
-    o   ANOVA: MSE were calculated using the corrected-df leading to 
-        differences in MSE depending on whether or not df-correction 
-        were present. Now, MSE are always based on uncorrected df.
 
     
 

@@ -32,7 +32,7 @@ anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL,
     tmp <- suppressWarnings(summary(object$Anova, multivariate = FALSE))
     t.out <- tmp[["univariate.tests"]]
     #browser()
-    t.out <- cbind(t.out, orig_den_df =  t.out[, "den Df"])
+    #t.out <- cbind(t.out, orig_den_df =  t.out[, "den Df"])
     if (correction[1] == "GG") {
       tmp[["pval.adjustments"]] <- tmp[["pval.adjustments"]][!is.na(tmp[["pval.adjustments"]][,"GG eps"]),, drop = FALSE]
       t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] <- t.out[row.names(tmp[["pval.adjustments"]]), "num Df"] * tmp[["pval.adjustments"]][,"GG eps"]
@@ -57,10 +57,10 @@ anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL,
     #browser()
     tmp.df <- cbind(object$Anova[-nrow(object$Anova),], data.frame("Error SS" = object$Anova[nrow(object$Anova), "Sum Sq"], "den Df" = object$Anova[nrow(object$Anova), "Df"], check.names = FALSE))
     colnames(tmp.df)[1:3] <- c("SS", "num Df", "F")
-    tmp.df$orig_den_df <- tmp.df[, "den Df"]
+    #tmp.df$orig_den_df <- tmp.df[, "den Df"]
     tmp2 <- as.data.frame(tmp.df)
   } else stop("Non-supported object passed. Slot 'Anova' needs to be of class 'Anova.mlm' or 'anova'.")
-  tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"orig_den_df"]
+  tmp2[,"MSE"] <- tmp2[,"Error SS"]/tmp2[,"den Df"]
   # calculate es
   es_df <- data.frame(row.names = rownames(tmp2))
   if ("pes" %in% es) {
