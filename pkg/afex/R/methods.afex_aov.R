@@ -115,6 +115,7 @@ summary.afex_aov <- function(object, ...) {
 ### afex package - mixed objects ###
 # just need to provide an 'lsmeans' method here
 
+#' @rdname afex_aov-methods
 #' @importFrom lsmeans recover.data lsm.basis
 #' @method recover.data afex_aov 
 #' @export
@@ -123,6 +124,7 @@ recover.data.afex_aov = function(object, ...) {
   recover.data(object = object$aov, ...)
 }
 
+#' @rdname afex_aov-methods
 #' @method lsm.basis afex_aov 
 #' @export
 lsm.basis.afex_aov = function(object, trms, xlev, grid, ...) {
