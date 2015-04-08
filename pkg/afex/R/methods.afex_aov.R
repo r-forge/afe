@@ -4,14 +4,16 @@
 #' 
 #' @return
 #' \describe{
-#'   \item{\code{anova}}{Returns an ANOVA table of class \code{c("anova", "data.frame")}. Information such as effect size (\code{es}) or df-correction are calculated each time this function is called.}
+#'   \item{\code{anova}}{Returns an ANOVA table of class \code{c("anova", "data.frame")}. Information such as effect size (\code{es}) or df-correction are calculated each time this method is called.}
 #'   \item{\code{summary}}{For ANOVAs containing within-subject factors it returns the full output of the within-subject tests: the uncorrected results, results containing Greenhousse-Geisser and Hyunh-Feldt correction, and the results of the Mauchly test of sphericity (all achieved via \code{summary.Anova.mlm}). For other ANOVAs, the \code{anova} table is simply returned.}
 #'   \item{\code{print}}{Prints (and invisibly returns) the ANOVA table as constructed from \code{\link{nice.anova}} (i.e., as strings rounded nicely). Arguments in \code{...} are passed to \code{nice.anova} allowing to pass arguments such as \code{es} and \code{correction}.}
+#'   \item{\code{recover.data} and \code{lsm.basis}}{Provide the backbone for using \code{\link{lsmeans}} and related functions from \pkg{lsmeans} directly on \code{afex_aov} objects by returning a \code{\link{ref.grid}} object. Should not be called directly but through the functionality provided by \pkg{lsmeans}.}
 #'   
 #' }
 #'
 #' @param object,x object of class \code{afex_aov} as returned from \code{\link{aov.car}} and related functions.
 #' @param ... further arguments passed through, see description of return value for details.
+#' @param trms,xlev,grid same as for \code{\link{lsm.basis}}.
 #' 
 #' @name afex_aov-methods
 NULL
@@ -111,25 +113,20 @@ summary.afex_aov <- function(object, ...) {
 
 #--------------------------------------------------------------
 ### afex package - mixed objects ###
-# just need to provide an 'lsmeans' method here, assuming Henrik adds the 'data' item
+# just need to provide an 'lsmeans' method here
 
-#' @import lsmeans
+#' @importFrom lsmeans recover.data lsm.basis
 #' @method recover.data afex_aov 
 #' @export
 recover.data.afex_aov = function(object, ...) {
-  #if (class(object[["aov"]])[1] == "aovlist") recover.data.aovlist(object$aov, ...)
-  #else if (class(object[["aov"]])[1] == "aov") recover.data.lm(object$aov, ...)
-  #else stop("non supported object passed.")
-  do.call(do.call(":::", args = list(pkg = "lsmeans", name = "recover.data.aovlist")), args = list(object = object$aov, data = object$data$long, list(...)))
+  #do.call(do.call(":::", args = list(pkg = "lsmeans", name = "recover.data.aovlist")), args = list(object = object$aov, data = object$data$long, list(...)))
+  recover.data(object = object$aov, ...)
 }
 
 #' @method lsm.basis afex_aov 
 #' @export
 lsm.basis.afex_aov = function(object, trms, xlev, grid, ...) {
-  #if (class(object[["aov"]])[1] == "aovlist") lsm.basis.data.aovlist(object$aov, trms, xlev, grid, ...)
-  #else if (class(object[["aov"]])[1] == "aov") lsm.basis.data.lm(object$aov, trms, xlev, grid, ...)
-  #else stop("non supported object passed.")
-  do.call(do.call(":::", args = list(pkg = "lsmeans", name = "lsm.basis.aovlist")), args = list(object = object$aov, trms = trms, xlev = xlev, grid = grid))
-  #lsm.basis(object$aov, trms, xlev, grid, ...)
+  #do.call(do.call(":::", args = list(pkg = "lsmeans", name = "lsm.basis.aovlist")), args = list(object = object$aov, trms = trms, xlev = xlev, grid = grid))
+  lsm.basis(object$aov, trms, xlev, grid, ...)
 }
 
