@@ -105,6 +105,9 @@ data(obk.long, package = "afex")
 a1 <- ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
+# 1b. plot data:
+lsmip(a1, gender ~ hour | treatment+phase)
+
 # 2. obtain reference grid object:
 r1 <- lsmeans(a1, ~treatment +phase)
 r1

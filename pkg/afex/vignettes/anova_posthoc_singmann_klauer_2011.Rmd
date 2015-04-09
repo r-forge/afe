@@ -150,7 +150,7 @@ The results can be interpreted as in line with expectations. Responses are large
 
 ## Plotting
 
-Function `lsmip` from package `lsmeans` can be used for plotting the data. As said initially, we are interested in the three-way interaction of instruction with inference, plausibility, and instruction. A plot of this interaction could be the following:
+Function `lsmip` from package `lsmeans` can be used for plotting the data directly from an `afex_aov` object. As said initially, we are interested in the three-way interaction of instruction with inference, plausibility, and instruction. A plot of this interaction could be the following:
 
 
 ```{r fig.width=7.5, fig.height=4}
