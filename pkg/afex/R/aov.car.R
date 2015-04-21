@@ -101,7 +101,7 @@
 #'
 #' @note Calculation of ANOVA models via \code{aov} (which is done per default) can be comparatively slow and produce comparatively large objects for ANOVAs with many within-subjects factors or levels. To avoid this calculation set the return argument to \code{"nice"}. This can also be done globally via \code{afex_options(return_aov = "nice")}. \code{return = "nice"} also produces the default output of previous versions of afex (versions 0.13 and earlier).
 #' 
-#' The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Unused factor levels are silently dropped on all variables.
+#' The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Levels of within-subject factors are converted to valid variable names using \code{\link{make.names(...,unique=TRUE)}}. Unused factor levels are silently dropped on all variables.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 #' 
@@ -269,7 +269,7 @@ aov.car <- function(formula, data, fun.aggregate = NULL, type = afex_options("ty
   else include.aov <- FALSE
   if(include.aov){
     if (check.contrasts) {
-      factor_vars <- vapply(dat.ret[,c(within, between)], is.factor, NA)
+      factor_vars <- vapply(dat.ret[,c(within, between), drop = FALSE], is.factor, NA)
       contrasts <- as.list(rep("contr.sum", sum(factor_vars)))
       names(contrasts) <- c(within, between)[factor_vars]
     }

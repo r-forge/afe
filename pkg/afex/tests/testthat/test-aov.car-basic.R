@@ -11,20 +11,18 @@ test_that("purely within ANOVA, return='univ': Maxell & Delaney (2004), Table 12
   num_df <- c(2, 1, 2)
   den_df <- c(18, 9, 18)
   
-  suppressWarnings(md_ez_r <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), return = "univ"))
-  suppressWarnings(md_car_r <- aov.car(rt ~ 1 + Error(id/angle*noise), md_12.1, return = "univ"))
-  suppressWarnings(md_aov4_r <- aov4(rt ~ 1 + (angle*noise|id), md_12.1, return = "univ"))
+  md_ez_r <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
+  md_car_r <- aov.car(rt ~ 1 + Error(id/angle*noise), md_12.1)
+  md_aov4_r <- aov4(rt ~ 1 + (angle*noise|id), md_12.1)
   
   expect_that(md_ez_r, is_equivalent_to(md_car_r))
   expect_that(md_ez_r, is_equivalent_to(md_aov4_r))
-  expect_that(round(md_ez_r$univariate.tests[,"F"][-1], 2), is_equivalent_to(f))
-  expect_that(md_ez_r$univariate.tests[,"SS"][-1], is_equivalent_to(ss_num))  
-  expect_that(md_ez_r$univariate.tests[,"Error SS"][-1], is_equivalent_to(ss_error))
-  expect_that(md_ez_r$univariate.tests[,"num Df"][-1], is_equivalent_to(num_df))
-  expect_that(md_ez_r$univariate.tests[,"den Df"][-1], is_equivalent_to(den_df))
+  expect_that(round(md_ez_r$anova_table[,"F"], 2), is_equivalent_to(f))
+  expect_that(suppressWarnings(summary(md_ez_r$Anova)$univariate.tests[,"SS"][-1]), is_equivalent_to(ss_num))  
+  expect_that(suppressWarnings(summary(md_ez_r$Anova)$univariate.tests[,"Error SS"])[-1], is_equivalent_to(ss_error))
+  expect_that(anova(md_ez_r, correction = "none")[,"num Df"], is_equivalent_to(num_df))
+  expect_that(anova(md_ez_r, correction = "none")[,"den Df"], is_equivalent_to(den_df))
 })
-
-
 
 test_that("Analysis of Singmann & Klauer (2011, Exp. 1)", {
   data(sk2011.1, package = "afex")
