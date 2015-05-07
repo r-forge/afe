@@ -40,7 +40,7 @@ mixed(formula, data, type = afex_options("type"),
 An object of class \code{"mixed"} (i.e., a list) with the following elements:
 
 \enumerate{
-\item \code{anova.table} a data.frame containing the statistics returned from \code{\link[pbkrtest]{KRmodcomp}}. The \code{stat} column in this data.frame gives the value of the test statistic, an F-value for \code{method = "KR"} and a chi-square value for the other two methods.
+\item \code{anova_table} a data.frame containing the statistics returned from \code{\link[pbkrtest]{KRmodcomp}}. The \code{stat} column in this data.frame gives the value of the test statistic, an F-value for \code{method = "KR"} and a chi-square value for the other two methods.
 \item \code{full.model} the \code{"lmerMod"} object returned from fitting the full mixed model.
 \item \code{restricted.models} a list of \code{"lmerMod"} objects from fitting the restricted models (i.e., each model lacks the corresponding effect)
 \item \code{tests} a list of objects returned by the function for obtaining the p-values.
@@ -48,7 +48,7 @@ An object of class \code{"mixed"} (i.e., a list) with the following elements:
 \item \code{method} The \code{method} argument used when calling this function.
 }
 
-Three identical methods exist for objects of class \code{"mixed"}: \code{print}, \code{summary}, and \code{anova}. They all print a nice version of the \code{anova.table} element of the returned object (which is also invisibly returned). This methods omit some columns and nicely round the other columns. The following columns are always printed:
+Two similar methods exist for objects of class \code{"mixed"}: \code{print} and \code{anova}. They print a nice version of the \code{anova_table} element of the returned object (which is also invisibly returned). This methods omit some columns and nicely round the other columns. The following columns are always printed:
 \enumerate{
 \item \code{Effect} name of effect
 \item \code{p.value} estimated p-value for the effect
@@ -74,6 +74,8 @@ For models with \code{method="PB"} the following further column is returned:
 \enumerate{
 \item \code{stat} 2 times the difference in likelihood (obtained with \code{logLik}) between full and restricted model (i.e., a chi-square value).
 }
+
+The \code{summary} method for objects of class \code{mixed} simply calls \code{\link{summary.merMod}} on the full model.
 }
 \description{
 Fits and calculates p-values for all effects in a mixed model fitted with \code{\link[lme4]{lmer}}. The default behavior calculates type 3 like p-values using the Kenward-Roger approximation for degrees-of-freedom implemented in \code{\link[pbkrtest]{KRmodcomp}} (for LMMs only), but also allows for parametric bootstrap (\code{method = "PB"}), or likelihood ratio tests (the latter two for LMMs and GLMMs). \code{print}, \code{summary}, and \code{anova} methods for the returned object of class \code{"mixed"} are available (the last two return the same data.frame).

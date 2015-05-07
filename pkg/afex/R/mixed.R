@@ -20,7 +20,7 @@
 #' @return An object of class \code{"mixed"} (i.e., a list) with the following elements:
 #'
 #' \enumerate{
-#' \item \code{anova.table} a data.frame containing the statistics returned from \code{\link[pbkrtest]{KRmodcomp}}. The \code{stat} column in this data.frame gives the value of the test statistic, an F-value for \code{method = "KR"} and a chi-square value for the other two methods.
+#' \item \code{anova_table} a data.frame containing the statistics returned from \code{\link[pbkrtest]{KRmodcomp}}. The \code{stat} column in this data.frame gives the value of the test statistic, an F-value for \code{method = "KR"} and a chi-square value for the other two methods.
 #' \item \code{full.model} the \code{"lmerMod"} object returned from fitting the full mixed model.
 #' \item \code{restricted.models} a list of \code{"lmerMod"} objects from fitting the restricted models (i.e., each model lacks the corresponding effect)
 #' \item \code{tests} a list of objects returned by the function for obtaining the p-values.
@@ -28,7 +28,7 @@
 #' \item \code{method} The \code{method} argument used when calling this function.
 #' }
 #'
-#' Three identical methods exist for objects of class \code{"mixed"}: \code{print}, \code{summary}, and \code{anova}. They all print a nice version of the \code{anova.table} element of the returned object (which is also invisibly returned). This methods omit some columns and nicely round the other columns. The following columns are always printed:
+#' Two similar methods exist for objects of class \code{"mixed"}: \code{print} and \code{anova}. They print a nice version of the \code{anova_table} element of the returned object (which is also invisibly returned). This methods omit some columns and nicely round the other columns. The following columns are always printed:
 #' \enumerate{
 #' \item \code{Effect} name of effect
 #' \item \code{p.value} estimated p-value for the effect
@@ -55,6 +55,8 @@
 #' \item \code{stat} 2 times the difference in likelihood (obtained with \code{logLik}) between full and restricted model (i.e., a chi-square value).
 #' }
 #'
+#' The \code{summary} method for objects of class \code{mixed} simply calls \code{\link{summary.merMod}} on the full model.
+#' 
 #' @details For an introduction to mixed-modeling for experimental designs see Barr, Levy, Scheepers, & Tily (2013; I highly recommend reading this paper if you use this function), arguments for using the Kenward-Roger approximation for obtaining p-values are given by Judd, Westfall, and Kenny (2012). Further introductions to mixed-modeling for experimental designs are given by Baayen and colleagues (Baayen, 2008; Baayen, Davidson & Bates, 2008; Baayen & Milin, 2010). Specific recommendations on which random effects structure to specify for confirmatory tests can be found in Barr and colleagues (2013) and Barr (2013).
 #'
 #' p-values are per default calculated via methods from \pkg{pbkrtest}. When \code{method = "KR"} (the default), the Kenward-Roger approximation for degrees-of-freedom is calculated using \code{\link[pbkrtest]{KRmodcomp}}, which is only applicable to linear-mixed models. The test statistic in the output is a F-value (\code{F}).
@@ -425,7 +427,7 @@ mixed <- function(formula, data, type = afex_options("type"), method = afex_opti
   ####################
   ### Part IV: prepare output
   ####################
-  list.out <- list(anova.table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
+  list.out <- list(anova_table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
   class(list.out) <- "mixed"
   list.out
 }
@@ -471,7 +473,7 @@ print.mixed <- function(x, ...) {
 
 #' @method summary mixed
 #' @export
-summary.mixed <- function(object, ...) print.mixed(x = object, ...)
+summary.mixed <- function(object, ...) summary(object = if (length(object[["full.model"]]) == 1) object[["full.model"]] else object[["full.model"]][[length(object[["full.model"]])]], ...)
 
 #' @method anova mixed
 #' @export
