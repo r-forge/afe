@@ -55,7 +55,7 @@ test_that("variable names longer", {
   orig <- aov_car(value ~ treatment * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender")
   v1 <- aov_car(value ~ gender2 * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender")
   v2 <- aov_car(value ~ gender2 * gender + age + Error(id/phase*hour), data = obk.long, factorize=FALSE, observed = "gender2")
-  expect_identical(nice.anova(orig)[,-1], nice.anova(v1)[,-1])
-  expect_identical(nice.anova(orig)[,-c(1)], nice.anova(v2)[,-c(1)])
+  expect_identical(nice_anova(orig)[,-1], nice_anova(v1)[,-1])
+  expect_identical(nice_anova(orig)[,-c(1)], nice_anova(v2)[,-c(1)])
 })
 

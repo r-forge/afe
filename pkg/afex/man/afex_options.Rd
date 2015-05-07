@@ -23,7 +23,7 @@ The following arguments are currently set:
 \item \code{method_mixed}: Method used to obtain p-values in \code{\link{mixed}}, default is \code{"KR"} (which will change to \code{"LRT"} soon). (\code{mixed()} only)
 \item \code{return_aov}: Return value of the ANOVA functions (see \code{\link{aov_car}}), default is \code{"nice"}.
 \item \code{es_aov}: Effect size reported for ANOVAs (see \code{\link{aov_car}}), default is \code{"ges"} (generalized eta-squared).
-\item \code{correction_aov}: Correction used for within-subjects factors with more than two levels for ANOVAs  (see \code{\link{aov_car}} or \code{\link{nice.anova}}), default is \code{"GG"} (Greenhouse-Geisser correction). (ANOVA functions only)
+\item \code{correction_aov}: Correction used for within-subjects factors with more than two levels for ANOVAs  (see \code{\link{aov_car}} or \code{\link{nice_anova}}), default is \code{"GG"} (Greenhouse-Geisser correction). (ANOVA functions only)
 \item \code{factorize}: Should between subject factors be factorized (with note) before running the analysis? Default is \code{TRUE}. (ANOVA functions only)
 }
 }

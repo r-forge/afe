@@ -1,6 +1,6 @@
 #' Make nice ANOVA table for printing.
 #'
-#' These functions produce a nice ANOVA table best for prointing. \code{nice.anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{aov_ez}} or \code{\link{aov_car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
+#' These functions produce a nice ANOVA table best for prointing. \code{nice_anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{aov_ez}} or \code{\link{aov_car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
 #' 
 #'
 #' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov_car}}).
@@ -21,7 +21,7 @@
 #'
 #' The default reports generalized eta squared (Olejnik & Algina, 2003), the "recommended effect size for repeated measured designs" (Bakeman, 2005). Note that it is important that all measured variables (as opposed to experimentally manipulated variables), such as e.g., age, gender, weight, ..., must be declared via \code{observed} to obtain the correct effect size estimate. Partial eta squared (\code{"pes"}) does not require this.
 #'
-#' @seealso \code{\link{aov_ez}} and \code{\link{aov_car}} are the convenience functions to create the object appropriate for \code{nice.anova}.
+#' @seealso \code{\link{aov_ez}} and \code{\link{aov_car}} are the convenience functions to create the object appropriate for \code{nice_anova}.
 #'
 #' @author The code for calculating generalized eta-squared was written by Mike Lawrence.\cr Everything else was written by Henrik Singmann.
 #'
@@ -30,8 +30,8 @@
 #'
 #' Olejnik, S., & Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, 8(4), 434-447. doi:10.1037/1082-989X.8.4.434
 #' 
-#' @name nice.anova
-#' @export nice.anova
+#' @name nice_anova
+#' @export nice_anova
 #' 
 #' @encoding UTF-8
 #'
@@ -43,22 +43,22 @@
 #' # create object of class afex_aov:
 #' rmd <- aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))
 #' # use different es:
-#' nice.anova(rmd, es = "pes") # noise: .82
-#' nice.anova(rmd, es = "ges") # noise: .39
+#' nice_anova(rmd, es = "pes") # noise: .82
+#' nice_anova(rmd, es = "ges") # noise: .39
 #'
 #' # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 #' data(obk.long)
 #' # create object of class afex_aov:
 #' tmp.aov <- aov_car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long)
 #' 
-#' nice.anova(tmp.aov, observed = "gender")
+#' nice_anova(tmp.aov, observed = "gender")
 #' 
-#' nice.anova(tmp.aov, observed = "gender", sig.symbol = rep("", 4))
+#' nice_anova(tmp.aov, observed = "gender", sig.symbol = rep("", 4))
 #' 
 #' \dontrun{
 #' # use package ascii or xtable for formatting of tables ready for printing.
 #' 
-#' full <- nice.anova(tmp.aov, observed = "gender")
+#' full <- nice_anova(tmp.aov, observed = "gender")
 #' 
 #' require(ascii)
 #' print(ascii(full, include.rownames = FALSE, caption = "ANOVA 1"), type = "org")
@@ -69,7 +69,7 @@
 #' 
 #' 
 
-nice.anova <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
+nice_anova <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
   # internal functions:
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   make.fs <- function(anova, symbols) {

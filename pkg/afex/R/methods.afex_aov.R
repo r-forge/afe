@@ -6,7 +6,7 @@
 #' \describe{
 #'   \item{\code{anova}}{Returns an ANOVA table of class \code{c("anova", "data.frame")}. Information such as effect size (\code{es}) or df-correction are calculated each time this method is called.}
 #'   \item{\code{summary}}{For ANOVAs containing within-subject factors it returns the full output of the within-subject tests: the uncorrected results, results containing Greenhousse-Geisser and Hyunh-Feldt correction, and the results of the Mauchly test of sphericity (all achieved via \code{summary.Anova.mlm}). For other ANOVAs, the \code{anova} table is simply returned.}
-#'   \item{\code{print}}{Prints (and invisibly returns) the ANOVA table as constructed from \code{\link{nice.anova}} (i.e., as strings rounded nicely). Arguments in \code{...} are passed to \code{nice.anova} allowing to pass arguments such as \code{es} and \code{correction}.}
+#'   \item{\code{print}}{Prints (and invisibly returns) the ANOVA table as constructed from \code{\link{nice_anova}} (i.e., as strings rounded nicely). Arguments in \code{...} are passed to \code{nice_anova} allowing to pass arguments such as \code{es} and \code{correction}.}
 #'   \item{\code{recover.data} and \code{lsm.basis}}{Provide the backbone for using \code{\link{lsmeans}} and related functions from \pkg{lsmeans} directly on \code{afex_aov} objects by returning a \code{\link{ref.grid}} object. Should not be called directly but through the functionality provided by \pkg{lsmeans}.}
 #'   
 #' }
@@ -21,7 +21,7 @@ NULL
 #### methods for afex_aov
 
 #' @rdname afex_aov-methods
-#' @inheritParams nice.anova
+#' @inheritParams nice_anova
 #' @export
 anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, ...) {
   # internal functions:
@@ -95,7 +95,7 @@ anova.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL,
 #' @method print afex_aov 
 #' @export
 print.afex_aov <- function(x, ...) {
-  out <- nice.anova(x$anova_table, ...)
+  out <- nice_anova(x$anova_table, ...)
   print(out)
   invisible(out)
 }
