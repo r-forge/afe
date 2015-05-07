@@ -140,7 +140,7 @@
 
 
 
-aov_car <- function(formula, data, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), observed = NULL, anova_table = list(), ...) {
+aov_car <- function(formula, data, fun.aggregate = NULL, type = afex_options("type"), factorize = afex_options("factorize"), check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), observed = NULL, anova_table = list(), ...) {
   return <- match.arg(return, c("Anova", "lm", "data", "nice", "afex_aov", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
@@ -353,7 +353,7 @@ aov_car <- function(formula, data, fun.aggregate = NULL, type = afex_options("ty
   }
 }
 
-aov_4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
+aov_4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = afex_options("factorize"), check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
   #browser()
   barterms <- findbars(formula)
   if (length(barterms) > 1) stop("aov_4 only allows one random effect term")
@@ -375,7 +375,7 @@ aov_4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = a
 
 
 
-aov_ez <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
+aov_ez <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = afex_options("factorize"), check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
   if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
   if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
   #browser()
