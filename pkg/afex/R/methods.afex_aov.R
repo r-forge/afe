@@ -1,6 +1,6 @@
 #' Methods for afex_aov objects
 #' 
-#' Methods defined for objects returned from the ANOVA functions \code{\link{aov.car}} et al. of class \code{afex_aov} containing both the ANOVA fitted via \code{car::Anova} and base R's \code{aov}.
+#' Methods defined for objects returned from the ANOVA functions \code{\link{aov_car}} et al. of class \code{afex_aov} containing both the ANOVA fitted via \code{car::Anova} and base R's \code{aov}.
 #' 
 #' @return
 #' \describe{
@@ -11,7 +11,7 @@
 #'   
 #' }
 #'
-#' @param object,x object of class \code{afex_aov} as returned from \code{\link{aov.car}} and related functions.
+#' @param object,x object of class \code{afex_aov} as returned from \code{\link{aov_car}} and related functions.
 #' @param ... further arguments passed through, see description of return value for details.
 #' @param trms,xlev,grid same as for \code{\link{lsm.basis}}.
 #' 

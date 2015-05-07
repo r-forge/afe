@@ -1,8 +1,15 @@
 #' Convenient ANOVA estimation for factorial designs
 #'
-#' These functions allow convenient specification of any type of ANOVAs (i.e., purely within-subjects ANOVAs, purely between-subjects ANOVAs, and mixed between-within or split-plot ANOVAs) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating data if there is more than one observation per individual and cell of the design. The default settings reproduce results from commercial statistical packages such as SPSS or SAS. \code{aov.car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s), \code{aov4} can be called with a \pkg{lme4}-like formula, and \code{ez.glm} is called specifying the factors as character vectors. The returned object contains the ANOVA also fitted via base R's \code{\link{aov}} which can be passed to e.g., \pkg{lsmeans} for further analysis (e.g., post-hoc tests, contrasts). These functions employ \code{\link[car]{Anova}} (from the \pkg{car} package) to provide test of effects avoiding the somewhat unhandy format of \code{car::Anova}. 
+#' These functions allow convenient specification of any type of ANOVAs (i.e., purely within-subjects ANOVAs, purely between-subjects ANOVAs, and mixed between-within or split-plot ANOVAs) for data in the \strong{long} format (i.e., one observation per row), possibly aggregating data if there is more than one observation per individual and cell of the design. The default settings reproduce results from commercial statistical packages such as SPSS or SAS. \code{aov_car} can be called using a formula similar to \code{\link{aov}} specifying an error strata for the within-subject factor(s), \code{aov4} can be called with a \pkg{lme4}-like formula, and \code{aov_ez} is called specifying the factors as character vectors. The returned object contains the ANOVA also fitted via base R's \code{\link{aov}} which can be passed to e.g., \pkg{lsmeans} for further analysis (e.g., post-hoc tests, contrasts). These functions employ \code{\link[car]{Anova}} (from the \pkg{car} package) to provide test of effects avoiding the somewhat unhandy format of \code{car::Anova}. 
 #'
-#' @usage aov.car(formula, data, fun.aggregate = NULL, type = afex_options("type"), 
+#' @usage 
+#' aov_ez(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
+#'      observed = NULL, fun.aggregate = NULL, type = afex_options("type"), 
+#'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"), 
+#'      return = afex_options("return_aov"), 
+#'      anova_table = list(), ..., print.formula = FALSE)
+#'      
+#' aov_car(formula, data, fun.aggregate = NULL, type = afex_options("type"), 
 #'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"), 
 #'      return = afex_options("return_aov"), observed = NULL, 
 #'      anova_table = list(), ...)
@@ -12,14 +19,10 @@
 #'      return = afex_options("return_aov"), 
 #'      anova_table = list(), ..., print.formula = FALSE)
 #'
-#' ez.glm(id, dv, data, between = NULL, within = NULL, covariate = NULL, 
-#'      observed = NULL, fun.aggregate = NULL, type = afex_options("type"), 
-#'      factorize = TRUE, check.contrasts = afex_options("check.contrasts"), 
-#'      return = afex_options("return_aov"), 
-#'      anova_table = list(), ..., print.formula = FALSE)
+
 #' 
 #'
-#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov.car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/...)} for \code{aov.car} or \code{(...|id)} for \code{aov4}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
+#' @param formula A formula specifying the ANOVA model similar to \code{\link{aov}} (for \code{aov_car} or similar to \code{lme4:lmer} for \code{aov4}). Should include an error term (i.e., \code{Error(id/...)} for \code{aov_car} or \code{(...|id)} for \code{aov4}). Note that the within-subject factors do not need to be outside the Error term (this contrasts with \code{aov}). See Details.
 #' @param id \code{character} vector (of length 1) indicating the subject identifier column in \code{data}.
 #' @param dv \code{character} vector (of length 1) indicating the column containing the \strong{dependent variable} in \code{data}.
 #' @param between \code{character} vector indicating the \strong{between}-subject(s) factor(s)/column(s) in \code{data}. Default is \code{NULL} indicating no between-subjects factors.
@@ -31,13 +34,13 @@
 #' @param type The type of sums of squares for the ANOVA. The default is given by \code{afex_options("type")}, which is \strong{initially set to 3}. Passed to \code{\link[car]{Anova}}. Possible values are \code{"II"}, \code{"III"}, \code{2}, or \code{3}.
 #' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. Default is \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
 #' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex_options("check.contrasts")}, which is initially \code{TRUE}.
-#' @param print.formula \code{ez.glm} and \code{aov4} are wrapper for \code{aov.car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
+#' @param print.formula \code{aov_ez} and \code{aov4} are wrapper for \code{aov_car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
 #' @param return What should be returned? The default is given by \code{afex_options("return_aov")}, which is initially \code{"afex_aov"}, returning an S3 object of class \code{afex_aov} for which various \link[=afex_aov-methods]{methods} exist (see there and below for more details). To avoid the (potentially costly) computation via \code{aov} set \code{return} to \code{"nice"} in which case only the nice ANOVA table is returned (produced by \code{\link{nice.anova}}, this was the previous default return value). Other values are currently still supported for backward compatibility.
 # Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). 
 #' @param anova_table \code{list} of further arguments passed to function producing the ANOVA table.  Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice.anova}. Note that those settings can also be changed once an object of class \code{afex_aov} is created.
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #'
-#' @return \code{aov.car}, \code{aov4}, and \code{ez.glm} are wrappers for \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. Per default, an S3 object of class \code{"afex_aov"} is returned containing the following slots: 
+#' @return \code{aov_car}, \code{aov4}, and \code{aov_ez} are wrappers for \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. Per default, an S3 object of class \code{"afex_aov"} is returned containing the following slots: 
 #' 
 #' \describe{
 #'   \item{\code{"anova_table"}}{An ANOVA table of class \code{c("anova", "data.frame")}.}
@@ -52,6 +55,20 @@
 #' 
 #' @details 
 #' 
+#' \subsection{Details of ANOVA Specification}{ 
+#' The \code{formula}s for \code{aov_car} or \code{aov4} must contain a single \code{Error} term specifying the \code{ID} column and potential within-subject factors (you can use \code{\link{mixed}} for running mixed-effects models with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term; in other words, it is not necessary to specify them outside the \code{Error} term, see Examples).
+#'
+#' Suppressing the intercept (i.e, via \code{0 +} or \code{- 1}) is ignored. Specific specifications of effects (e.g., excluding terms with \code{-} or using \code{^}) could be okay but is not tested. Using the \code{\link{I}} or \code{\link{poly}} function within the formula is not tested and not supported!
+#'
+#' \code{aov_ez} will concatenate all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
+#'
+#' To run an ANCOVA you need to set \code{factorize = FALSE} and make sure that all variables have the correct type (i.e., factors are factors and numeric variables are numeric and centered).
+#'
+#' Note that the default behavior is to include calculation of the effect size generalized eta-squared for which \strong{all non-manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument to obtain correct results. When changing the effect size to \code{"pes"} (partial eta-squared) or \code{"none"} via \code{anova_table} this becomes unnecessary.
+#' 
+#' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
+#' }
+#' 
 #' \subsection{Statistical Issues}{
 #' \strong{Type 3 sums of squares are default in \pkg{afex}.} While some authors argue that so-called type 3 sums of squares are dangerous and/or problematic (most notably Venables, 2000), they are the default in many commercial statistical application such as SPSS or SAS. Furthermore, statisticians with an applied perspective recommend type 3 tests (e.g., Maxwell and Delaney, 2004). Consequently, they are the default for the ANOVA functions described here. For some more discussion on this issue see \href{http://stats.stackexchange.com/q/6208/442}{here}. 
 #'
@@ -62,7 +79,7 @@
 #' The S3 object returned per default can be directly passed to \code{lsmeans::lsmeans} for further analysis. This allows to test any type of contrasts that might be of interest independent of whether or not this contrast involves between-subject variables, within-subject variables, or a combination thereof. The general procedure to run those contrasts is the following (see Examples for a full example):
 #' 
 #'  \enumerate{
-#'    \item Estimate an \code{afex_aov} object with the function returned here. For example: \code{x <- aov.car(dv ~ a*b + (id/c), d)}
+#'    \item Estimate an \code{afex_aov} object with the function returned here. For example: \code{x <- aov_car(dv ~ a*b + (id/c), d)}
 #'    \item Obtain a \code{\link[lsmeans]{ref.grid}} object by running \code{\link[lsmeans]{lsmeans}} on the \code{afex_aov} object from step 1 using the factors involved in the contrast. For example: \code{r <- lsmeans(x, ~a:c)}
 #'    \item Create a list containing the desired contrasts on the reference grid object from step 2. For example: \code{con1 <- list(a_x = c(-1, 1, 0, 0, 0, 0), b_x = c(0, 0, -0.5, -0.5, 0, 1))}
 #'    \item Test the contrast on the reference grid using \code{\link[lsmeans]{contrast}}. For example: \code{contrast(r, con1)}
@@ -82,32 +99,19 @@
 #' The \code{anova} method returns a \code{data.frame} of class \code{"anova"} containing the ANOVA table in numeric form (i.e., the one in slot \code{anova_table} of a \code{afex_aov}). This method has arguments such as \code{correction} and \code{es} and can be used to obtain an ANOVA table with different correction than the one initially specified.
 #' }
 #' 
-#' \subsection{Details of ANOVA Specification}{ 
-#' The \code{formula}s for \code{aov.car} or \code{aov4} must contain a single \code{Error} term specifying the \code{ID} column and potential within-subject factors (you can use \code{\link{mixed}} for running mixed-effects models with multiple error terms). Factors outside the \code{Error} term are treated as between-subject factors (the within-subject factors specified in the \code{Error} term are ignored outside the \code{Error} term; in other words, it is not necessary to specify them outside the \code{Error} term, see Examples).
-#'
-#' Suppressing the intercept (i.e, via \code{0 +} or \code{- 1}) is ignored. Specific specifications of effects (e.g., excluding terms with \code{-} or using \code{^}) could be okay but is not tested. Using the \code{\link{I}} or \code{\link{poly}} function within the formula is not tested and not supported!
-#'
-#' \code{ez.glm} will concatenate all between-subject factors using \code{*} (i.e., producing all main effects and interactions) and all covariates by \code{+} (i.e., adding only the main effects to the existing between-subject factors). The within-subject factors do fully interact with all between-subject factors and covariates. This is essentially identical to the behavior of SPSS's \code{glm} function.
-#'
-#' To run an ANCOVA you need to set \code{factorize = FALSE} and make sure that all variables have the correct type (i.e., factors are factors and numeric variables are numeric and centered).
-#'
-#' Note that the default behavior is to include calculation of the effect size generalized eta-squared for which \strong{all non-manipluated (i.e., observed)} variables need to be specified via the \code{observed} argument to obtain correct results. Changing the effect size to \code{"pes"} (partial eta-squared) or \code{"none"} via \code{anova_table}.
-#' 
-#' If \code{check.contrasts = TRUE}, contrasts will be set to \code{"contr.sum"} for all between-subject factors if default contrasts are not equal to \code{"contr.sum"} or \code{attrib(factor, "contrasts") != "contr.sum"}. (within-subject factors are hard-coded \code{"contr.sum"}.)
-#' }
 #' @author Henrik Singmann
 #'
 #' The design of these functions was influenced by \code{\link[ez]{ezANOVA}} from package \pkg{ez}.
 #'
 #' @note Calculation of ANOVA models via \code{aov} (which is done per default) can be comparatively slow and produce comparatively large objects for ANOVAs with many within-subjects factors or levels. To avoid this calculation set the return argument to \code{"nice"}. This can also be done globally via \code{afex_options(return_aov = "nice")}. \code{return = "nice"} also produces the default output of previous versions of afex (versions 0.13 and earlier).
 #' 
-#' The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Levels of within-subject factors are converted to valid variable names using \code{\link{make.names(...,unique=TRUE)}}. Unused factor levels are silently dropped on all variables.
+#' The id variable and variables entered as within-subjects (i.e., repeated-measures) factors are silently converted to factors. Levels of within-subject factors are converted to valid variable names using \code{\link{make.names}(...,unique=TRUE)}. Unused factor levels are silently dropped on all variables.
 #'
 #' Contrasts attached to a factor as an attribute are probably not preserved and not supported.
 #' 
-#' The workhorse is \code{aov.car}. \code{aov4} and \code{ez.glm} only construe and pass an appropriate formula to \code{aov.car}. Use \code{print.formula = TRUE} to view this formula.
+#' The workhorse is \code{aov_car}. \code{aov4} and \code{aov_ez} only construe and pass an appropriate formula to \code{aov_car}. Use \code{print.formula = TRUE} to view this formula.
 #' 
-#' In contrast to \code{\link{aov}} \code{aov.car} assumes that all factors to the right of \code{/} in the \code{Error} term are belonging together. Consequently, \code{Error(id/(a*b))} and \code{Error(id/a*b)} are identical (which is not true \code{aov}).
+#' In contrast to \code{\link{aov}} \code{aov_car} assumes that all factors to the right of \code{/} in the \code{Error} term are belonging together. Consequently, \code{Error(id/(a*b))} and \code{Error(id/a*b)} are identical (which is not true for \code{\link{aov}}).
 #'
 #' @seealso Various methods for objects of class \code{afex_aov} are available: \code{\link{afex_aov-methods}}
 #' 
@@ -119,20 +123,23 @@
 #'
 #' Venables, W.N. (2000). \emph{Exegeses on linear models}. Paper presented to the S-Plus User's Conference, Washington DC, 8-9 October 1998, Washington, DC. Available from: \url{http://www.stats.ox.ac.uk/pub/MASS3/Exegeses.pdf}
 #'
-#' @name aov.car
-#' @aliases aov.car ez.glm aov4
-#' @export aov.car ez.glm aov4
+#' @name aov_car
+#' @aliases aov_car aov_ez aov4
+#' @export aov_car aov_ez aov4
 #' @importFrom car Anova
 #' @importFrom stringr str_c str_detect str_replace_all str_extract
 #' @importFrom reshape2 dcast
 #' @importFrom lme4 findbars nobars 
-#' @example examples/examples.aov.car.R
+#' @example examples/examples.aov_car.R
 #' 
 #' 
 #' @encoding UTF-8
 #'
 
-aov.car <- function(formula, data, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), observed = NULL, anova_table = list(), ...) {
+
+
+
+aov_car <- function(formula, data, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), observed = NULL, anova_table = list(), ...) {
   return <- match.arg(return, c("Anova", "lm", "data", "nice", "afex_aov", "univariate", "marginal", "aov"))
   # stuff copied from aov:
   Terms <- terms(formula, "Error", data = data)
@@ -361,21 +368,21 @@ aov4 <- function(formula, data, observed = NULL, fun.aggregate = NULL, type = af
     rh <- lh[3]
   }
   formula <- str_c(dv, " ~ ", rh, error)
-  if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
+  if (print.formula) message(str_c("Formula send to aov_car: ", formula))
+  aov_car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
 }
 
 
 
-ez.glm <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
+aov_ez <- function(id, dv, data, between = NULL, within = NULL, covariate = NULL, observed = NULL, fun.aggregate = NULL, type = afex_options("type"), factorize = TRUE, check.contrasts = afex_options("check.contrasts"), return = afex_options("return_aov"), anova_table = list(), ..., print.formula = FALSE) {
   if (is.null(between) & is.null(within)) stop("Either between or within need to be non-NULL!")
   if (!is.null(covariate)) covariate <- str_c(covariate, collapse = "+")
   #browser()
   rh <- if (!is.null(between) || !is.null(covariate)) str_c(if (!is.null(between)) str_c(between, collapse = " * ") else NULL, covariate, sep = " + ") else "1"
   error <- str_c(" + Error(", id, if (!is.null(within)) "/(" else "", str_c(within, collapse = " * "), if (length(within) > 0) ")" else "", ")")
   formula <- str_c(dv, " ~ ", rh, error)
-  if (print.formula) message(str_c("Formula send to aov.car: ", formula))
-  aov.car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
+  if (print.formula) message(str_c("Formula send to aov_car: ", formula))
+  aov_car(formula = as.formula(formula), data = data, fun.aggregate = fun.aggregate, type = type, return = return, factorize = factorize, check.contrasts = check.contrasts, observed = observed, anova_table = anova_table, ...)
 }
 
 

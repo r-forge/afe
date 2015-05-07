@@ -11,8 +11,8 @@ test_that("purely within ANOVA, return='univ': Maxell & Delaney (2004), Table 12
   num_df <- c(2, 1, 2)
   den_df <- c(18, 9, 18)
   
-  md_ez_r <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
-  md_car_r <- aov.car(rt ~ 1 + Error(id/angle*noise), md_12.1)
+  md_ez_r <- aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))
+  md_car_r <- aov_car(rt ~ 1 + Error(id/angle*noise), md_12.1)
   md_aov4_r <- aov4(rt ~ 1 + (angle*noise|id), md_12.1)
   
   expect_that(md_ez_r, is_equivalent_to(md_car_r))
@@ -27,7 +27,7 @@ test_that("purely within ANOVA, return='univ': Maxell & Delaney (2004), Table 12
 test_that("Analysis of Singmann & Klauer (2011, Exp. 1)", {
   data(sk2011.1, package = "afex")
 
-  out1 <-  ez.glm("id", "response", sk2011.1[ sk2011.1$what == "affirmation",], within = c("inference", "type"), between = "instruction", anova_table=(es = "pes"), fun.aggregate = mean, return = "afex_aov")
+  out1 <-  aov_ez("id", "response", sk2011.1[ sk2011.1$what == "affirmation",], within = c("inference", "type"), between = "instruction", anova_table=(es = "pes"), fun.aggregate = mean, return = "afex_aov")
   
   df_num <- rep(1, 7)
   df_den <- rep(38, 7)
@@ -48,7 +48,7 @@ test_that("Analysis of Singmann & Klauer (2011, Exp. 1)", {
 
 test_that("Data from O'Brien & Kaiser replicates their paper (p. 328, Table 8, column 'average'", {
   data(obk.long, package = "afex")
-  out1 <- aov.car(value ~ treatment * gender + Error(id/(phase*hour)), data = obk.long, observed = "gender", return = "afex_aov", anova_table = list(correction = "none"))
+  out1 <- aov_car(value ~ treatment * gender + Error(id/(phase*hour)), data = obk.long, observed = "gender", return = "afex_aov", anova_table = list(correction = "none"))
 
   expect_that(unname(unlist(out1[["anova_table"]]["treatment", c("num Df", "den Df", "F")])), equals(c(2, 10, 3.94), tolerance = 0.001))
   expect_that(unname(unlist(out1[["anova_table"]]["gender", c("num Df", "den Df", "F")])), equals(c(1, 10, 3.66), tolerance = 0.001))

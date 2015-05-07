@@ -58,10 +58,10 @@ with(sk2011.1, table(inference, id, plausibility))
 
 # ANOVA
 
-To get the full ANOVA table for the model, we simply pass it to `ez.glm` (`aov.car` or `aov4` would be alternatives producing the same results) using the design as described above. We save the returned object for further analysis.
+To get the full ANOVA table for the model, we simply pass it to `aov_ez` (`aov_car` or `aov4` would be alternatives producing the same results) using the design as described above. We save the returned object for further analysis.
 
 ```{r}
-a1 <- ez.glm("id", "response", sk2011.1, between = "instruction", 
+a1 <- aov_ez("id", "response", sk2011.1, between = "instruction", 
        within = c("inference", "plausibility"))
 a1 # the default print method prints a data.frame produced by nice.anova 
 ```
@@ -162,7 +162,7 @@ lsmip(a1, instruction ~ inference|plausibility)
 As this plot is not very helpful, we now fit a new ANOVA model in which we separate the data in affirmation and denial inferences, as done in the original manuscript and plot the data then a second time.
 
 ```{r}
-a2 <- ez.glm("id", "response", sk2011.1, between = "instruction", 
+a2 <- aov_ez("id", "response", sk2011.1, between = "instruction", 
        within = c("validity", "plausibility", "what"))
 a2
 ```

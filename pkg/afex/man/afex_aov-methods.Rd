@@ -22,7 +22,7 @@
 \method{lsm.basis}{afex_aov}(object, trms, xlev, grid, ...)
 }
 \arguments{
-\item{object,x}{object of class \code{afex_aov} as returned from \code{\link{aov.car}} and related functions.}
+\item{object,x}{object of class \code{afex_aov} as returned from \code{\link{aov_car}} and related functions.}
 
 \item{es}{Effect Size to be reported. The default is given by \code{afex_options("es_aov")}, which is initially set to \code{"ges"} (i.e., reporting generalized eta-squared, see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.}
 
@@ -48,6 +48,6 @@
 }
 }
 \description{
-Methods defined for objects returned from the ANOVA functions \code{\link{aov.car}} et al. of class \code{afex_aov} containing both the ANOVA fitted via \code{car::Anova} and base R's \code{aov}.
+Methods defined for objects returned from the ANOVA functions \code{\link{aov_car}} et al. of class \code{afex_aov} containing both the ANOVA fitted via \code{car::Anova} and base R's \code{aov}.
 }
 

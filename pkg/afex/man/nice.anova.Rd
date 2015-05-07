@@ -10,7 +10,7 @@ nice.anova(object, es = afex_options("es_aov"), observed = NULL,
   intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"))
 }
 \arguments{
-\item{object}{An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov.car}}).}
+\item{object}{An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov_car}}).}
 
 \item{es}{Effect Size to be reported. The default is given by \code{afex_options("es_aov")}, which is initially set to \code{"ges"} (i.e., reporting generalized eta-squared, see details). Also supported is partial eta-squared (\code{"pes"}) or \code{"none"}.}
 
@@ -30,7 +30,7 @@ A \code{data.frame} with the ANOVA table consisting of characters. The columns t
 \code{ges} contains the generalized eta-squared effect size measure (Bakeman, 2005), \code{pes} contains partial eta-squared (if requested).
 }
 \description{
-These functions produce a nice ANOVA table best for prointing. \code{nice.anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{ez.glm}} or \code{\link{aov.car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
+These functions produce a nice ANOVA table best for prointing. \code{nice.anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{aov_ez}} or \code{\link{aov_car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
 }
 \details{
 The returned \code{data.frame} is print-ready when adding to a document with proper methods. I recommend \pkg{ascii} and \pkg{xtable}. \pkg{ascii} provides conversion to \href{http://www.methods.co.nz/asciidoc/}{AsciiDoc} but most notably to \href{http://orgmode.org/}{org-mode} (see \code{\link[ascii]{ascii}} and \code{\link[ascii]{print-ascii}}). \pkg{xtable} converts a \code{data.frame} into LaTeX code with many possible options (e.g., allowing for \code{"longtable"} or \code{"sidewaystable"}), see \code{\link[xtable]{xtable}} and \code{\link[xtable]{print.xtable}}. See Examples.
@@ -44,7 +44,7 @@ The default reports generalized eta squared (Olejnik & Algina, 2003), the "recom
 # "Repeated Measures Design" (pp. 439):
 data(md_12.1)
 # create object of class afex_aov:
-rmd <- ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
+rmd <- aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))
 # use different es:
 nice.anova(rmd, es = "pes") # noise: .82
 nice.anova(rmd, es = "ges") # noise: .39
@@ -52,7 +52,7 @@ nice.anova(rmd, es = "ges") # noise: .39
 # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 data(obk.long)
 # create object of class afex_aov:
-tmp.aov <- aov.car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long)
+tmp.aov <- aov_car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long)
 
 nice.anova(tmp.aov, observed = "gender")
 
@@ -79,6 +79,6 @@ Bakeman, R. (2005). Recommended effect size statistics for repeated measures des
 Olejnik, S., & Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, 8(4), 434-447. doi:10.1037/1082-989X.8.4.434
 }
 \seealso{
-\code{\link{ez.glm}} and \code{\link{aov.car}} are the convenience functions to create the object appropriate for \code{nice.anova}.
+\code{\link{aov_ez}} and \code{\link{aov_car}} are the convenience functions to create the object appropriate for \code{nice.anova}.
 }
 

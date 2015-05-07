@@ -6,11 +6,11 @@
 # Example using a purely within-subjects design 
 # (Maxwell & Delaney, 2004, Chapter 12, Table 12.5, p. 578):
 data(md_12.1)
-ez.glm("id", "rt", md_12.1, within = c("angle", "noise"), 
+aov_ez("id", "rt", md_12.1, within = c("angle", "noise"), 
        anova_table=list(correction = "none", es = "none"))
 
 # Default output
-ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))       
+aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))       
 
 
 # examples using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset (car package).
@@ -18,13 +18,13 @@ ez.glm("id", "rt", md_12.1, within = c("angle", "noise"))
 data(obk.long, package = "afex")
 
 # estimate mixed ANOVA on the full design:
-aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
+aov_car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, observed = "gender")
 
 aov4(value ~ treatment * gender + (phase*hour|id), 
         data = obk.long, observed = "gender")
 
-ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
+aov_ez("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
 # the three calls return the same ANOVA table:
@@ -50,46 +50,46 @@ ez.glm("id", "value", obk.long, between = c("treatment", "gender"),
 obk.long$hour2 <- as.numeric(as.character(obk.long$hour))
 
 # gives same results as calls before
-aov.car(value ~ treatment * gender + Error(id/hour2*phase), 
+aov_car(value ~ treatment * gender + Error(id/hour2*phase), 
         data = obk.long, observed = c("gender"))
 
 
 # ANCOVA: adding a covariate (necessary to set factorize = FALSE)
-aov.car(value ~ treatment * gender + age + Error(id/(phase*hour)), 
+aov_car(value ~ treatment * gender + age + Error(id/(phase*hour)), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
 aov4(value ~ treatment * gender + age + (phase*hour|id), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
-ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
+aov_ez("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), covariate = "age", 
         observed = c("gender", "age"), factorize = FALSE)
 
 
 # aggregating over one within-subjects factor (phase), with warning:
-aov.car(value ~ treatment * gender + Error(id/hour), data = obk.long, observed = "gender")
+aov_car(value ~ treatment * gender + Error(id/hour), data = obk.long, observed = "gender")
 
-ez.glm("id", "value", obk.long, c("treatment", "gender"), "hour", observed = "gender")
+aov_ez("id", "value", obk.long, c("treatment", "gender"), "hour", observed = "gender")
 
 # aggregating over both within-subjects factors (again with warning),
 # only between-subjects factors:
-aov.car(value ~ treatment * gender + Error(id), data = obk.long, observed = c("gender"))
+aov_car(value ~ treatment * gender + Error(id), data = obk.long, observed = c("gender"))
 aov4(value ~ treatment * gender + (1|id), data = obk.long, observed = c("gender"))
-ez.glm("id", "value", obk.long, between = c("treatment", "gender"), observed = "gender")
+aov_ez("id", "value", obk.long, between = c("treatment", "gender"), observed = "gender")
 
 # only within-subject factors (ignoring between-subjects factors)
-aov.car(value ~ Error(id/(phase*hour)), data = obk.long)
+aov_car(value ~ Error(id/(phase*hour)), data = obk.long)
 aov4(value ~ (phase*hour|id), data = obk.long)
-ez.glm("id", "value", obk.long, within = c("phase", "hour"))
+aov_ez("id", "value", obk.long, within = c("phase", "hour"))
 
 ### changing defaults of ANOVA table:
 
 # no df-correction & partial eta-squared:
-aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
+aov_car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, anova_table = list(correction = "none", es = "pes"))
 
 # no df-correction and no MSE
-aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
+aov_car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long,observed = "gender", 
         anova_table = list(correction = "none", MSE = FALSE))
 
@@ -102,7 +102,7 @@ aov.car(value ~ treatment * gender + Error(id/(phase*hour)),
 data(obk.long, package = "afex")
 
 # 1. obtain afex_aov object:
-a1 <- ez.glm("id", "value", obk.long, between = c("treatment", "gender"), 
+a1 <- aov_ez("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
 # 1b. plot data:
@@ -135,8 +135,8 @@ lsmeans(a1, "treatment", contr = "pairwise")
 #######################
 data(obk.long, package = "afex")
 
-# replicating ?Anova using aov.car:
-obk_anova <- aov.car(value ~ treatment * gender + Error(id/(phase*hour)), 
+# replicating ?Anova using aov_car:
+obk_anova <- aov_car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, type = 2)
 # in contrast to aov you do not need the within-subject factors outside Error()
 

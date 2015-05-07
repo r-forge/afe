@@ -31,10 +31,10 @@
 #' data(sk2011.1)
 #' 
 #' # Table 1 (p. 264):
-#' ez.glm("id", "response", sk2011.1[ sk2011.1$what == "affirmation",], 
+#' aov_ez("id", "response", sk2011.1[ sk2011.1$what == "affirmation",], 
 #'        within = c("inference", "type"), between = "instruction", 
 #'        args.return=(es = "pes"))
-#' ez.glm("id", "response", sk2011.1[ sk2011.1$what == "denial",], 
+#' aov_ez("id", "response", sk2011.1[ sk2011.1$what == "denial",], 
 #'        within = c("inference", "type"), between = "instruction", 
 #'        args.return=(es = "pes"))
 #' 
