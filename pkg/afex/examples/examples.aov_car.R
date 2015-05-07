@@ -21,29 +21,29 @@ data(obk.long, package = "afex")
 aov_car(value ~ treatment * gender + Error(id/(phase*hour)), 
         data = obk.long, observed = "gender")
 
-aov4(value ~ treatment * gender + (phase*hour|id), 
+aov_4(value ~ treatment * gender + (phase*hour|id), 
         data = obk.long, observed = "gender")
 
 aov_ez("id", "value", obk.long, between = c("treatment", "gender"), 
         within = c("phase", "hour"), observed = "gender")
 
 # the three calls return the same ANOVA table:
-##                         Effect          df   MSE         F  ges      p
-## 1                    treatment       2, 10 22.81    3.94 +  .20    .05
-## 2                       gender       1, 10 22.81    3.66 +  .11    .08
-## 3             treatment:gender       2, 10 22.81      2.86  .18    .10
-## 4                        phase 1.60, 15.99  5.02 16.13 ***  .15  .0003
-## 5              treatment:phase 3.20, 15.99  5.02    4.85 *  .10    .01
-## 6                 gender:phase 1.60, 15.99  5.02      0.28 .003    .71
-## 7       treatment:gender:phase 3.20, 15.99  5.02      0.64  .01    .61
-## 8                         hour 1.84, 18.41  3.39 16.69 ***  .13 <.0001
-## 9               treatment:hour 3.68, 18.41  3.39      0.09 .002    .98
-## 10                 gender:hour 1.84, 18.41  3.39      0.45 .004    .63
-## 11       treatment:gender:hour 3.68, 18.41  3.39      0.62  .01    .64
-## 12                  phase:hour 3.60, 35.96  2.67      1.18  .02    .33
-## 13        treatment:phase:hour 7.19, 35.96  2.67      0.35 .009    .93
-## 14           gender:phase:hour 3.60, 35.96  2.67      0.93  .01    .45
-## 15 treatment:gender:phase:hour 7.19, 35.96  2.67      0.74  .02    .65
+##                         Effect          df   MSE         F  ges p.value
+## 1                    treatment       2, 10 22.81    3.94 +  .20     .05
+## 2                       gender       1, 10 22.81    3.66 +  .11     .08
+## 3             treatment:gender       2, 10 22.81      2.86  .18     .10
+## 4                        phase 1.60, 15.99  5.02 16.13 ***  .15   .0003
+## 5              treatment:phase 3.20, 15.99  5.02    4.85 *  .10     .01
+## 6                 gender:phase 1.60, 15.99  5.02      0.28 .003     .71
+## 7       treatment:gender:phase 3.20, 15.99  5.02      0.64  .01     .61
+## 8                         hour 1.84, 18.41  3.39 16.69 ***  .13  <.0001
+## 9               treatment:hour 3.68, 18.41  3.39      0.09 .002     .98
+## 10                 gender:hour 1.84, 18.41  3.39      0.45 .004     .63
+## 11       treatment:gender:hour 3.68, 18.41  3.39      0.62  .01     .64
+## 12                  phase:hour 3.60, 35.96  2.67      1.18  .02     .33
+## 13        treatment:phase:hour 7.19, 35.96  2.67      0.35 .009     .93
+## 14           gender:phase:hour 3.60, 35.96  2.67      0.93  .01     .45
+## 15 treatment:gender:phase:hour 7.19, 35.96  2.67      0.74  .02     .65
 
 
 # "numeric" variables are per default converted to factors (as long as factorize = TRUE):
@@ -58,7 +58,7 @@ aov_car(value ~ treatment * gender + Error(id/hour2*phase),
 aov_car(value ~ treatment * gender + age + Error(id/(phase*hour)), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
-aov4(value ~ treatment * gender + age + (phase*hour|id), 
+aov_4(value ~ treatment * gender + age + (phase*hour|id), 
         data = obk.long, observed = c("gender", "age"), factorize = FALSE)
 
 aov_ez("id", "value", obk.long, between = c("treatment", "gender"), 
@@ -74,12 +74,12 @@ aov_ez("id", "value", obk.long, c("treatment", "gender"), "hour", observed = "ge
 # aggregating over both within-subjects factors (again with warning),
 # only between-subjects factors:
 aov_car(value ~ treatment * gender + Error(id), data = obk.long, observed = c("gender"))
-aov4(value ~ treatment * gender + (1|id), data = obk.long, observed = c("gender"))
+aov_4(value ~ treatment * gender + (1|id), data = obk.long, observed = c("gender"))
 aov_ez("id", "value", obk.long, between = c("treatment", "gender"), observed = "gender")
 
 # only within-subject factors (ignoring between-subjects factors)
 aov_car(value ~ Error(id/(phase*hour)), data = obk.long)
-aov4(value ~ (phase*hour|id), data = obk.long)
+aov_4(value ~ (phase*hour|id), data = obk.long)
 aov_ez("id", "value", obk.long, within = c("phase", "hour"))
 
 ### changing defaults of ANOVA table:

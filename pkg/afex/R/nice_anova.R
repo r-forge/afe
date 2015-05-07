@@ -90,7 +90,7 @@ nice_anova <- function(object, es = afex_options("es_aov"), observed = NULL, cor
   df.out <- cbind(df.out, data.frame(F = make.fs(anova_table, symbols.use), stringsAsFactors = FALSE))
   if (!is.null(anova_table$ges)) df.out$ges <- round_ps(anova_table$ges)
   if (!is.null(anova_table$pes)) df.out$pes <- round_ps(anova_table$pes)
-  df.out$p  <-  round_ps(anova_table[,"Pr(>F)"])
+  df.out$p.value  <-  round_ps(anova_table[,"Pr(>F)"])
   if (!intercept) if (df.out[1,1] == "(Intercept)")  df.out <- df.out[-1,, drop = FALSE]
   rownames(df.out) <- NULL
   df.out
