@@ -40,17 +40,17 @@ test_that("mixed, obk.long: type 2 and LRTs", {
   extract_anova <- function(anova) unlist(anova)[c("Df1", "Df2", "Chisq2", "Chi Df2", "Pr(>Chisq)2" )]
   
   expect_that(
-    unlist(t2$anova.table[3,c(3, 2, 4:6)])
+    unlist(t2$anova_table[3,c(3, 2, 4:6)])
     , is_equivalent_to(
       extract_anova(anova(a2.h, a2.f))
     ))
   expect_that(
-    unlist(t2$anova.table[2,c(3, 2, 4:6)])
+    unlist(t2$anova_table[2,c(3, 2, 4:6)])
     , is_equivalent_to(
       extract_anova(anova(a2.t, a2.h))
     ))
   expect_that(
-    unlist(t2$anova.table[1,c(3, 2, 4:6)])
+    unlist(t2$anova_table[1,c(3, 2, 4:6)])
     , is_equivalent_to(
       extract_anova(anova(a2.p, a2.h))
     ))

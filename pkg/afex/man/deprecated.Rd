@@ -5,6 +5,7 @@
 \alias{aov.car}
 \alias{aov4}
 \alias{ez.glm}
+\alias{nice.anova}
 \title{Deprecated functions}
 \usage{
 aov.car(...)
@@ -12,6 +13,8 @@ aov.car(...)
 ez.glm(...)
 
 aov4(...)
+
+nice.anova(...)
 }
 \arguments{
 \item{...}{arguments passed from the old functions of the style

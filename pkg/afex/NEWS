@@ -17,14 +17,23 @@
         (4) lm object passed to car::Anova
         (5) data used for estimating (2) and (4)
         
-    o   support for lsmeans: objects of class afex_aov can be used 
-        with lsmeans directly. afex now depends on lsmeans.
+    o   added support for lsmeans: objects of class afex_aov can be 
+        passed to lsmeans directly. afex now depends on lsmeans.
     
     o   added afex.options() functionality for setting options globally.
     
     o   added vignette showing how to calculate contrasts after ANOVA.
     
-    o   afex does not depend on car package anymore, is is only imported.
+    o   afex does not depend on car package anymore, it is only imported.
+    
+    o   ANOVA functions renamed to aov_car, aov_ez, and aov_4. Likewise,
+        nice.anova renamed to nice_anova. Old  functions are now 
+        deprecated.
+    
+    o   first element in mixed object renamed to anova_table.
+    
+    o   summary method for mixed objects now calls summary.merMod on 
+        full model.
 
         
     Bugfixes
