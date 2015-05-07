@@ -19,3 +19,9 @@ ez.glm <- function(...) {
   .Deprecated("aov_ez", "afex", "ez.glm was renamed to aov_ez and is now deprecated.")
   aov_ez(...)
 }
+#' @rdname deprecated
+#' @export
+aov4 <- function(...) {
+  .Deprecated("aov_4", "afex", "aov4 was renamed to aov_4 and is now deprecated.")
+  aov_4(...)
+}

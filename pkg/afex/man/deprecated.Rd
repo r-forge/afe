@@ -3,12 +3,15 @@
 \name{aov.car}
 \alias{afex-deprecated}
 \alias{aov.car}
+\alias{aov4}
 \alias{ez.glm}
 \title{Deprecated functions}
 \usage{
 aov.car(...)
 
 ez.glm(...)
+
+aov4(...)
 }
 \arguments{
 \item{...}{arguments passed from the old functions of the style

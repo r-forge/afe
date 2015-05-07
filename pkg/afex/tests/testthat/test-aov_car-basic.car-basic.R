@@ -13,10 +13,10 @@ test_that("purely within ANOVA, return='univ': Maxell & Delaney (2004), Table 12
   
   md_ez_r <- aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))
   md_car_r <- aov_car(rt ~ 1 + Error(id/angle*noise), md_12.1)
-  md_aov4_r <- aov4(rt ~ 1 + (angle*noise|id), md_12.1)
+  md_aov_4_r <- aov_4(rt ~ 1 + (angle*noise|id), md_12.1)
   
   expect_that(md_ez_r, is_equivalent_to(md_car_r))
-  expect_that(md_ez_r, is_equivalent_to(md_aov4_r))
+  expect_that(md_ez_r, is_equivalent_to(md_aov_4_r))
   expect_that(round(md_ez_r$anova_table[,"F"], 2), is_equivalent_to(f))
   expect_that(suppressWarnings(summary(md_ez_r$Anova)$univariate.tests[,"SS"][-1]), is_equivalent_to(ss_num))  
   expect_that(suppressWarnings(summary(md_ez_r$Anova)$univariate.tests[,"Error SS"])[-1], is_equivalent_to(ss_error))

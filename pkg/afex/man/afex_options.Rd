@@ -7,7 +7,7 @@
 afex_options(...)
 }
 \arguments{
-\item{...}{One of three: (1) nothing, then returns all options; (2) a name of an option element, then returns its' value; (3) a name-value pair which sets the corresponding option to the new value.}
+\item{...}{One of three: (1) nothing, then returns all options; (2) a name of an option element, then returns its' value; (3) a name-value pair which sets the corresponding option to the new value (and returns nothing).}
 }
 \value{
 depends on input, see above.
@@ -17,13 +17,14 @@ Global afex options are used, for example, by \code{\link{aov_car}} (et al.) and
 }
 \details{
 The following arguments are currently set:
-\enumerate{
-\item \code{return_aov} the return value of the ANOVA functions (see \code{\link{aov_car}}), default is \code{"nice"}.
-\item \code{es_aov} effect size reported for ANOVAs (see \code{\link{aov_car}}), default is \code{"ges"} (generalized eta-squared).
-\item \code{correction_aov} correction used for within-subjects factors with more than two levels for ANOVAs  (see \code{\link{aov_car}} or \code{\link{nice.anova}}), default is \code{"GG"} (Greenhouse-Geisser correction).
-\item \code{method_mixed} the method used to obtain p-values in \code{\link{mixed}}, default is \code{"KR"} (which will change to \code{"LRT"} soon).
+\itemize{
 \item \code{check.contrasts} should contrasts be checked and changed to sum-to-zero contrasts? Default is \code{TRUE}.
 \item \code{type} type of sums-of-squares to be used for testing effects, default is 3 which reports Type 3 tests.
+\item \code{method_mixed}: Method used to obtain p-values in \code{\link{mixed}}, default is \code{"KR"} (which will change to \code{"LRT"} soon). (\code{mixed()} only)
+\item \code{return_aov}: Return value of the ANOVA functions (see \code{\link{aov_car}}), default is \code{"nice"}.
+\item \code{es_aov}: Effect size reported for ANOVAs (see \code{\link{aov_car}}), default is \code{"ges"} (generalized eta-squared).
+\item \code{correction_aov}: Correction used for within-subjects factors with more than two levels for ANOVAs  (see \code{\link{aov_car}} or \code{\link{nice.anova}}), default is \code{"GG"} (Greenhouse-Geisser correction). (ANOVA functions only)
+\item \code{factorize}: Should between subject factors be factorized (with note) before running the analysis? Default is \code{TRUE}. (ANOVA functions only)
 }
 }
 \examples{
