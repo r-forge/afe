@@ -37,20 +37,20 @@ test_that("mixed, obk.long: type 2 and LRTs", {
   a2.h <- lmer(value ~ treatment+phase +(1|id), data = obk.long, REML=FALSE)
   a2.t <- lmer(value ~ treatment +(1|id), data = obk.long, REML=FALSE)
   a2.p <- lmer(value ~ phase +(1|id), data = obk.long, REML=FALSE)
-  extract_anova <- function(anova) unlist(anova)[c("Df1", "Df2", "Chisq2", "Chi Df2", "Pr(>Chisq)2" )]
+  extract_anova <- function(anova) unlist(anova)[c("Df1", "Chisq2", "Chi Df2", "Pr(>Chisq)2" )]
   
   expect_that(
-    unlist(t2$anova_table[3,c(3, 2, 4:6)])
+    unlist(t2$anova_table[3,])
     , is_equivalent_to(
       extract_anova(anova(a2.h, a2.f))
     ))
   expect_that(
-    unlist(t2$anova_table[2,c(3, 2, 4:6)])
+    unlist(t2$anova_table[2,])
     , is_equivalent_to(
       extract_anova(anova(a2.t, a2.h))
     ))
   expect_that(
-    unlist(t2$anova_table[1,c(3, 2, 4:6)])
+    unlist(t2$anova_table[1,])
     , is_equivalent_to(
       extract_anova(anova(a2.p, a2.h))
     ))

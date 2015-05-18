@@ -350,13 +350,15 @@ mixed <- function(formula, data, type = afex_options("type"), method = afex_opti
     }
     if (progress) cat("]\n")
     names(tests) <- fixed.effects
-    df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-    df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
-    FtestU <- vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))
-    row.names(FtestU) <- str_c(row.names(FtestU), ".U")
-    df.out <- cbind(df.out, t(FtestU))
-    rownames(df.out) <- NULL
-    colnames(df.out)[2] <- "F"
+    #df.out <- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
+    anova_table <- data.frame(t(vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))))
+    #FtestU <- vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))
+    #row.names(FtestU) <- str_c(row.names(FtestU), ".U")
+    #anova_table <- cbind(anova_table, t(FtestU))
+    rownames(anova_table) <- fixed.effects
+    colnames(anova_table) <- c("F", "num Df", "den Df", "F.scaling", "Pr(>F)")
+    anova_table <- anova_table[, c("num Df", "den Df", "F.scaling", "F", "Pr(>F)")]
+    anova_tab_addition <- NULL
   } else if (method[1] == "PB") {
     if (progress) cat(str_c("Obtaining ", length(fixed.effects), " p-values:\n["))
     tests <- vector("list", length(fixed.effects))
@@ -371,13 +373,16 @@ mixed <- function(formula, data, type = afex_options("type"), method = afex_opti
     if (progress) cat("]\n")
     names(tests) <- fixed.effects
     #browser()
-    df.out<- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
-    df.out <- cbind(df.out, t(vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))))
-    df.out <- df.out[,-3]
+    #df.out<- data.frame(Effect = fixed.effects, stringsAsFactors = FALSE)
+    anova_table <- data.frame(t(vapply(tests, function(x) unlist(x[["test"]][2,]), unlist(tests[[1]][["test"]][2,]))))
+    anova_table <- anova_table[,-2]
     LRT <- vapply(tests, function(x) unlist(x[["test"]][1,]), unlist(tests[[1]][["test"]][1,]))
     row.names(LRT) <- str_c(row.names(LRT), ".LRT")
-    df.out <- cbind(df.out, t(LRT))
-    rownames(df.out) <- NULL
+    anova_table <- cbind(anova_table, t(LRT))
+    rownames(anova_table) <- fixed.effects
+    anova_table <- anova_table[, c("stat", "df.LRT", "p.value.LRT", "p.value")]
+    colnames(anova_table) <- c("Chisq", "Chi Df", "Pr(>Chisq)", "Pr(>PB)")
+    anova_tab_addition <- NULL
   } else if (method[1] == "LRT") {
     tests <- vector("list", length(fixed.effects))
     for (c in seq_along(fixed.effects)) {
@@ -394,8 +399,16 @@ mixed <- function(formula, data, type = afex_options("type"), method = afex_opti
     chisq  <- vapply(tests, function(x) x[["Chisq"]][2], 0)
     df  <- vapply(tests, function(x) x[["Chi Df"]][2], 0)
     p.value  <- vapply(tests, function(x) x[["Pr(>Chisq)"]][2], 0)
-    df.out <- data.frame(Effect = fixed.effects, df.large, df.small, chisq, df, p.value, stringsAsFactors = FALSE)
-    rownames(df.out) <- NULL
+    anova_table <- data.frame(Df = df.small, Chisq = chisq, "Chi Df" = df, "Pr(>Chisq)"=p.value, stringsAsFactors = FALSE, check.names = FALSE)
+    rownames(anova_table) <- fixed.effects
+    if (type == 3) anova_tab_addition <- paste0("Df full model: ", df.large[1])
+    else anova_tab_addition <- paste0("Df full model(s): ", df.large)
+    
+    # 
+    # attr(anova_table, "heading") <- c(paste0("Mixed Model Anova Table (Type ", type , " tests)\n"), paste0("Response: ", dv)
+    #title <- "Analysis of Variance Table\n"
+    #topnote <- paste("Model ", format(1L:nmodels), ": ", variables, 
+    #    sep = "", collapse = "\n")
   } else if (method[1] == "F") {
     #browser()
     tests <- vector("list", length(fixed.effects))
@@ -427,33 +440,20 @@ mixed <- function(formula, data, type = afex_options("type"), method = afex_opti
   ####################
   ### Part IV: prepare output
   ####################
-  list.out <- list(anova_table = df.out, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
+  class(anova_table) <- c("anova", "data.frame")
+  attr(anova_table, "heading") <- c(
+    paste0("Mixed Model Anova Table (Type ", type , " tests)\n"), 
+    paste0("Model: ", deparse(formula.f)),
+    paste0("Data: " ,mc[["data"]]),
+    anova_tab_addition
+    )
+  list.out <- list(anova_table = anova_table, full.model = full.model, restricted.models = fits, tests = tests, type = type, method = method[[1]])
   class(list.out) <- "mixed"
   list.out
 }
 
-#' @method print mixed
-#' @export
-print.mixed <- function(x, ...) {
+get_mixed_warnings <- function(x) {
   ntry <- function(x) tryCatch(x, error = function(e) NULL)
-  
-  if (x[["method"]] == "KR") {
-    tmp <- x[[1]][,1:6]
-    tmp[,"F"] <- formatC(tmp[,"F"], format = "f", digits = 2)
-    tmp[,"ddf"] <- prettyNum(tmp[,"ddf"], digits = 2, nsmall = 2)
-    tmp[,"F.scaling"] <- prettyNum(tmp[,"F.scaling"], digits = 2, nsmall = 2)
-    
-  } else if (x[["method"]] == "PB") {
-    tmp <- x[[1]][,1:3]
-    tmp[,2] <- formatC(tmp[,2], format = "f", digits = 2)
-  } else if (x[["method"]] == "LRT") {
-    tmp <- x[[1]]
-    tmp[,"chisq"] <- formatC(tmp[,"chisq"], format = "f", digits = 2)
-  } else {
-    tmp <- x[[1]]
-    tmp[,2] <- formatC(tmp[,2], format = "f", digits = 2)
-  }
-  tmp[,"p.value"] <- round_ps(tmp[,"p.value"])
   if (is.list(x$full)) {
     warnings1 <- c(full = lapply(x[[2]], function(y) y@optinfo$warnings), lapply(x[[3]], function(y) y@optinfo$warnings))  
     warnings2 <- c(full = lapply(x[[2]], function(y) ntry(y@optinfo$conv$lme4$messages)), lapply(x[[3]], function(y) ntry(y@optinfo$conv$lme4$messages)))
@@ -464,6 +464,34 @@ print.mixed <- function(x, ...) {
   warnings <- mapply(function(x, y) c(unlist(x), y), warnings1, warnings2, SIMPLIFY=FALSE)  
   warn <- vapply(warnings, function(y) !length(y)==0, NA)
   for (i in names(warn)[warn]) warning("lme4 reported (at least) the following warnings for '", i, "':\n  * ", paste(warnings[[i]], collapse = "\n  * "))
+}
+
+check_likelihood <- function(object) {
+  if (object$type == 3) {
+    logLik_full <- as.numeric(logLik(object[["full.model"]]))
+    logLik_restricted <- as.numeric(vapply(object[["restricted.models"]], logLik, 0))
+    if(any(logLik_restricted > logLik_full)) return(rownames(object$anova_table)[logLik_restricted > logLik_full])
+  } else if (object$type == 2) {
+    NULL
+#     logLik_full <- as.numeric(vapply(fits[1:max.effect.order],logLik, 0))
+#     logLik_restricted <- as.numeric(vapply(fits[(max.effect.order+1):length(fits)], logLik, 0))
+#     warn_logLik <- c()
+#     for (c in seq_along(fixed.effects)) {
+#       order.c <- effect.order[c]
+#       if(logLik_restricted[[c]] > logLik_full[[order.c]]) warn_logLik <- c(warn_logLik, fixed.effects[c])
+#     }
+#     if(length(warn_logLik)>0) return(warn_logLik)
+  }
+  return(TRUE)    
+}
+
+#' @method print mixed
+#' @export
+print.mixed <- function(x, ...) {
+  if(!isREML(x[["full.model"]]) && !isTRUE(check_likelihood(x))) 
+    warning(paste("Following nested model(s) provide better fit than full model:", paste(check_likelihood(x), collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl or allFit!"))
+  get_mixed_warnings(x)
+  tmp <- nice.mixed(x, ...)
   print(tmp)
   invisible(tmp)
 }
@@ -477,7 +505,12 @@ summary.mixed <- function(object, ...) summary(object = if (length(object[["full
 
 #' @method anova mixed
 #' @export
-anova.mixed <- function(object, ...) print.mixed(x = object, ...)
+anova.mixed <- function(object, ...) {
+  if(!isREML(object[["full.model"]]) && !isTRUE(check_likelihood(object))) 
+    warning(paste("Following nested model(s) provide better fit than full model:", paste(check_likelihood(object), collapse = ", "), "\n  It is highly recommended to try different optimizer via lmerControl or allFit!"))
+  get_mixed_warnings(object)
+  object$anova_table
+}
 
 
 # is.mixed <- function(x) inherits(x, "mixed")

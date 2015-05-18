@@ -5,7 +5,6 @@
 \alias{aov.car}
 \alias{aov4}
 \alias{ez.glm}
-\alias{nice.anova}
 \title{Deprecated functions}
 \usage{
 aov.car(...)
@@ -13,8 +12,6 @@ aov.car(...)
 ez.glm(...)
 
 aov4(...)
-
-nice.anova(...)
 }
 \arguments{
 \item{...}{arguments passed from the old functions of the style
@@ -23,7 +20,8 @@ nice.anova(...)
 \description{
 These functions have been renamed and deprecated in \pkg{afex}:
 \code{aov.car()} (use \code{\link{aov_car}()}),
-\code{ez.glm()} (use \code{\link{aov_ez}()}).
+\code{ez.glm()} (use \code{\link{aov_ez}()}),
+\code{aov4()} (use \code{\link{aov_4}()}).
 }
 \keyword{internal}
 

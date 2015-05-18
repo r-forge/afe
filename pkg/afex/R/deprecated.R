@@ -2,7 +2,8 @@
 #'
 #' These functions have been renamed and deprecated in \pkg{afex}:
 #' \code{aov.car()} (use \code{\link{aov_car}()}), 
-#' \code{ez.glm()} (use \code{\link{aov_ez}()}).
+#' \code{ez.glm()} (use \code{\link{aov_ez}()}),
+#' \code{aov4()} (use \code{\link{aov_4}()}).
 #' @rdname deprecated
 #' @keywords internal
 #' @aliases afex-deprecated
@@ -25,9 +26,4 @@ aov4 <- function(...) {
   .Deprecated("aov_4", "afex", "aov4 was renamed to aov_4 and is now deprecated.")
   aov_4(...)
 }
-#' @rdname deprecated
-#' @export
-nice.anova <- function(...) {
-  .Deprecated("nice_anova", "afex", "nice.anova was renamed to nice_anova and is now deprecated.")
-  nice_anova(...)
-}
+

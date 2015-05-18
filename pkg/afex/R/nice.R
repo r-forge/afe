@@ -1,6 +1,6 @@
 #' Make nice ANOVA table for printing.
 #'
-#' These functions produce a nice ANOVA table best for prointing. \code{nice_anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{aov_ez}} or \code{\link{aov_car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
+#' This generic function produces a nice ANOVA table for printin for objects of class. \code{nice_anova} takes an object from \code{\link[car]{Anova}} possible created by the convenience functions \code{\link{aov_ez}} or \code{\link{aov_car}}. When within-subject factors are present, either sphericity corrected or uncorrected degrees of freedom can be reported.
 #' 
 #'
 #' @param object An object of class \code{"Anova.mlm"} or \code{"anova"} as returned from \code{\link[car]{Anova}} or the \pkg{afex} ANOVA functions (see \code{\link{aov_car}}).
@@ -10,6 +10,7 @@
 #' @param sig.symbols Character. What should be the symbols designating significance? When entering an vector with \code{length(sig.symbol) < 4} only those elements of the default (\code{c(" +", " *", " **", " ***")}) will be replaced. \code{sig.symbols = ""} will display the stars but not the \code{+}, \code{sig.symbols = rep("", 4)} will display no symbols.
 #' @param MSE logical. Should the column containing the Mean Sqaured Error (MSE) be displayed? Default is \code{TRUE}.
 #' @param intercept logical. Should intercept (if present) be included in the ANOVA table? Default is \code{FALSE} which hides the intercept.
+#' @param ... currently ignored.
 #'
 #' @return A \code{data.frame} with the ANOVA table consisting of characters. The columns that are always present are: \code{Effect}, \code{df} (degrees of freedom), \code{F}, and \code{p}.
 #'
@@ -30,8 +31,8 @@
 #'
 #' Olejnik, S., & Algina, J. (2003). Generalized Eta and Omega Squared Statistics: Measures of Effect Size for Some Common Research Designs. \emph{Psychological Methods}, 8(4), 434-447. doi:10.1037/1082-989X.8.4.434
 #' 
-#' @name nice_anova
-#' @export nice_anova
+#' @name nice
+#' @export nice
 #' 
 #' @encoding UTF-8
 #'
@@ -43,22 +44,22 @@
 #' # create object of class afex_aov:
 #' rmd <- aov_ez("id", "rt", md_12.1, within = c("angle", "noise"))
 #' # use different es:
-#' nice_anova(rmd, es = "pes") # noise: .82
-#' nice_anova(rmd, es = "ges") # noise: .39
+#' nice(rmd, es = "pes") # noise: .82
+#' nice(rmd, es = "ges") # noise: .39
 #'
 #' # exampel using obk.long (see ?obk.long), a long version of the OBrienKaiser dataset from car.
 #' data(obk.long)
 #' # create object of class afex_aov:
 #' tmp.aov <- aov_car(value ~ treatment * gender + Error(id/phase*hour), data = obk.long)
 #' 
-#' nice_anova(tmp.aov, observed = "gender")
+#' nice(tmp.aov, observed = "gender")
 #' 
-#' nice_anova(tmp.aov, observed = "gender", sig.symbol = rep("", 4))
+#' nice(tmp.aov, observed = "gender", sig.symbol = rep("", 4))
 #' 
 #' \dontrun{
 #' # use package ascii or xtable for formatting of tables ready for printing.
 #' 
-#' full <- nice_anova(tmp.aov, observed = "gender")
+#' full <- nice(tmp.aov, observed = "gender")
 #' 
 #' require(ascii)
 #' print(ascii(full, include.rownames = FALSE, caption = "ANOVA 1"), type = "org")
@@ -68,8 +69,21 @@
 #' }
 #' 
 #' 
+nice <- function(object, ...) UseMethod("nice", object)
 
-nice_anova <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***")) {
+
+#' @rdname nice
+#' @method nice afex_aov
+#' @export
+nice.afex_aov <- function(object, es = afex_options("es_aov"), observed = NULL, correction = afex_options("correction_aov"), MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"), ...) { 
+  anova_table <- as.data.frame(anova(object, es = es, observed = observed, correction = correction, MSE = MSE, intercept = intercept))
+  nice.anova(anova_table, MSE = MSE, intercept = intercept, sig.symbols = sig.symbols)
+}
+
+#' @rdname nice
+#' @method nice anova
+#' @export
+nice.anova <- function(object, MSE = TRUE, intercept = FALSE, sig.symbols = c(" +", " *", " **", " ***"), ...) {
   # internal functions:
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   make.fs <- function(anova, symbols) {
@@ -78,10 +92,7 @@ nice_anova <- function(object, es = afex_options("es_aov"), observed = NULL, cor
                   ifelse(anova[["Pr(>F)"]] < 0.05, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[2]), 
                          ifelse(anova[["Pr(>F)"]] < 0.1, str_c(formatC(anova[["F"]], digits = 2, format = "f"), symbols[1]), formatC(anova[["F"]], digits = 2, format = "f")))))
   }
-  # create ANOVA table formatted as string:
-  if (class(object)[[1]] == "afex_aov") anova_table <- as.data.frame(anova(object, es = es, observed = observed, correction = correction, MSE = MSE, intercept = intercept))
-  else if (class(object)[[1]] == "anova") anova_table <- object
-  else stop("object needs to be of class 'afex_aov' or 'anova'.")
+  anova_table <- object
   anova_table[,"df"] <- paste(ifelse(is.wholenumber(anova_table[,"num Df"]), anova_table[,"num Df"], formatC(anova_table[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(anova_table[,"den Df"]),anova_table[,"den Df"], formatC(anova_table[,"den Df"], digits = 2, format = "f")), sep = ", ")
   symbols.use <-  c(" +", " *", " **", " ***")
   symbols.use[seq_along(sig.symbols)] <- sig.symbols
@@ -96,4 +107,34 @@ nice_anova <- function(object, es = afex_options("es_aov"), observed = NULL, cor
   df.out
 }
 
+make.stat <- function(anova, stat, symbols) {
+  ifelse(anova[[paste0("Pr(>", stat,")")]] < 0.001, str_c(formatC(anova[[stat]], digits = 2, format = "f"), symbols[4]), 
+         ifelse(anova[[paste0("Pr(>", stat,")")]] < 0.01, str_c(formatC(anova[[stat]], digits = 2, format = "f"), symbols[3]), 
+                ifelse(anova[[paste0("Pr(>", stat,")")]] < 0.05, str_c(formatC(anova[[stat]], digits = 2, format = "f"), symbols[2]), 
+                       ifelse(anova[[paste0("Pr(>", stat,")")]] < 0.1, str_c(formatC(anova[[stat]], digits = 2, format = "f"), symbols[1]), formatC(anova[[stat]], digits = 2, format = "f")))))
+}
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
 
+
+#' @rdname nice
+#' @method nice mixed
+#' @export
+nice.mixed <- function(object, sig.symbols = c(" +", " *", " **", " ***"), ...) {
+  anova_table <- object$anova_table
+  symbols.use <-  c(" +", " *", " **", " ***")
+  symbols.use[seq_along(sig.symbols)] <- sig.symbols
+  if (object$method == "KR") {
+    anova_table[,"df"] <- paste(ifelse(is.wholenumber(anova_table[,"num Df"]), anova_table[,"num Df"], formatC(anova_table[,"num Df"], digits = 2, format = "f")),  ifelse(is.wholenumber(anova_table[,"den Df"]),anova_table[,"den Df"], formatC(anova_table[,"den Df"], digits = 2, format = "f")), sep = ", ")
+
+    df.out <- data.frame(Effect = row.names(anova_table), df = anova_table[,"df"], "F.scaling" = anova_table[,"F.scaling"], stringsAsFactors = FALSE, check.names = FALSE)
+    df.out <- cbind(df.out, data.frame(F = make.stat(anova_table, stat = "F", symbols.use), stringsAsFactors = FALSE))
+    df.out$p.value  <-  round_ps(anova_table[,"Pr(>F)"])
+  } else if (object$method == "PB") {
+    anova_table[,"Pr(>Chisq)"] <- anova_table[,"Pr(>PB)"]
+    df.out <- data.frame(Effect = row.names(anova_table), df = anova_table[,"Chi Df"], Chisq = make.stat(anova_table, stat = "Chisq", symbols.use), p.value = round_ps(anova_table[,"Pr(>Chisq)"]), stringsAsFactors = FALSE, check.names = FALSE)
+  } else if (object$method == "LRT") {
+    df.out <- data.frame(Effect = row.names(anova_table), df = anova_table[,"Chi Df"], Chisq = make.stat(anova_table, stat = "Chisq", symbols.use), p.value = round_ps(anova_table[,"Pr(>Chisq)"]), stringsAsFactors = FALSE, check.names = FALSE)
+  } else stop("method of mixed object not supported.")
+  rownames(df.out) <- NULL
+  return(df.out)
+}

@@ -36,9 +36,9 @@
 #' @param factorize logical. Should between subject factors be factorized (with note) before running the analysis. he default is given by \code{afex_options("factorize")}, which is initially \code{TRUE}. If one wants to run an ANCOVA, needs to be set to \code{FALSE} (in which case centering on 0 is checked on numeric variables).
 #' @param check.contrasts \code{logical}. Should contrasts for between-subject factors be checked and (if necessary) changed to be \code{"contr.sum"}. See details. The default is given by \code{afex_options("check.contrasts")}, which is initially \code{TRUE}.
 #' @param print.formula \code{aov_ez} and \code{aov_4} are wrapper for \code{aov_car}. This boolean argument indicates whether the formula in the call to \code{car.aov} should be printed. 
-#' @param return What should be returned? The default is given by \code{afex_options("return_aov")}, which is initially \code{"afex_aov"}, returning an S3 object of class \code{afex_aov} for which various \link[=afex_aov-methods]{methods} exist (see there and below for more details). To avoid the (potentially costly) computation via \code{aov} set \code{return} to \code{"nice"} in which case only the nice ANOVA table is returned (produced by \code{\link{nice_anova}}, this was the previous default return value). Other values are currently still supported for backward compatibility.
+#' @param return What should be returned? The default is given by \code{afex_options("return_aov")}, which is initially \code{"afex_aov"}, returning an S3 object of class \code{afex_aov} for which various \link[=afex_aov-methods]{methods} exist (see there and below for more details). To avoid the (potentially costly) computation via \code{aov} set \code{return} to \code{"nice"} in which case only the nice ANOVA table is returned (produced by \code{\link{nice}}, this was the previous default return value). Other values are currently still supported for backward compatibility.
 # Possible values are \code{c("Anova", "lm", "data", "nice", "full", "all", "univariate", "marginal", "aov")} (possibly abbreviated). 
-#' @param anova_table \code{list} of further arguments passed to function producing the ANOVA table.  Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice_anova}. Note that those settings can also be changed once an object of class \code{afex_aov} is created by invoking the \code{anova} method directly.
+#' @param anova_table \code{list} of further arguments passed to function producing the ANOVA table.  Arguments such as \code{es} (effect size) or \code{correction}  are passed to either \code{anova.afex_aov} or \code{nice}. Note that those settings can also be changed once an object of class \code{afex_aov} is created by invoking the \code{anova} method directly.
 #' @param ... Further arguments passed to \code{fun.aggregate}.
 #'
 #' @return \code{aov_car}, \code{aov_4}, and \code{aov_ez} are wrappers for \code{\link[car]{Anova}} and \code{\link{aov}}, the return value is dependent on the \code{return} argument. Per default, an S3 object of class \code{"afex_aov"} is returned containing the following slots: 
@@ -52,7 +52,7 @@
 #'   \item{\code{"information"}}{A list containing information such as name of dependent variable and id variable.}
 #' }
 #' 
-#' The \link[=afex_aov-methods]{print} method for \code{afex_aov} objects (invisibly) returns (and prints) the same as if \code{return} is \code{"nice"}: a nice ANOVA table (produced by \code{\link{nice_anova}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
+#' The \link[=afex_aov-methods]{print} method for \code{afex_aov} objects (invisibly) returns (and prints) the same as if \code{return} is \code{"nice"}: a nice ANOVA table (produced by \code{\link{nice}}) with the following columns: \code{Effect}, \code{df}, \code{MSE} (mean-squared errors), \code{F} (potentially with significant symbols), \code{ges} (generalized eta-squared), \code{p}.
 #' 
 #' @details 
 #' 
@@ -117,7 +117,7 @@
 #'
 #' @seealso Various methods for objects of class \code{afex_aov} are available: \code{\link{afex_aov-methods}}
 #' 
-#' \code{\link{nice_anova}} creates the nice ANOVA tables which is by default printed. See also there for a slightly longer discussion of the available effect sizes.
+#' \code{\link{nice}} creates the nice ANOVA tables which is by default printed. See also there for a slightly longer discussion of the available effect sizes.
 #'
 #' \code{\link{mixed}} provides a (formula) interface for obtaining p-values for mixed-models via \pkg{lme4}.
 #'
@@ -350,7 +350,7 @@ aov_car <- function(formula, data, fun.aggregate = NULL, type = afex_options("ty
     )
     class(afex_aov) <- "afex_aov"
     #afex_aov$anova_table <- do.call("anova", args = c(object = list(afex_aov), observed = list(observed), args.return))
-    return(do.call("nice_anova", args = c(object = list(afex_aov), observed = list(observed), anova_table)))
+    return(do.call("nice", args = c(object = list(afex_aov), observed = list(observed), anova_table)))
   }
 }
 

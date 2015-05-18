@@ -112,8 +112,8 @@ data(md_15.1)
 # to also replicate exact parameters use treatment.contrasts and the last level as base level:
 contrasts(md_15.1$timecat) <- contr.treatment(4, base = 4)
 (t15.4b <- mixed(iq ~ timecat + (1+time|id),data=md_15.1, check.contrasts=FALSE))
-summary(t15.4a$full.model)  # gives "wrong" parameters extimates
-summary(t15.4b$full.model)  # identical parameters estimates
+summary(t15.4a)  # gives "wrong" parameters extimates
+summary(t15.4b)  # identical parameters estimates
 
 # for more examples from chapter 15 see ?md_15.1
 
@@ -142,7 +142,7 @@ str(md_16.4)
 # whereas M&W's p-values are based on uncorrected df.)
 
 # again, to obtain identical parameter and t-values, use treatment contrasts:
-summary(mixed2$full.model) # not identical
+summary(mixed2) # not identical
 
 # prepare new data.frame with contrasts:
 md_16.4b <- within(md_16.4, cond <- C(cond, contr.treatment, base = 2))
@@ -159,7 +159,7 @@ summary(mixed2_orig$full.model) # replicates parameters
 
 # however, parameters are perfectly recovered when using the original contrasts:
 mixed3_orig <- mixed(induct ~ cond + skill + (1|room:cond), md_16.4b, check.contrasts=FALSE)
-summary(mixed3_orig$full.model)
+summary(mixed3_orig)
 
 
 
@@ -173,7 +173,7 @@ md_16.4b$cog <- scale(md_16.4b$cog, scale=FALSE)
 (mixed4_orig <- mixed(induct ~ cond*cog + (cog|room:cond), md_16.4b, check.contrasts=FALSE))
 
 # parameters are again almost perfectly recovered:
-summary(mixed4_orig$full.model)
+summary(mixed4_orig)
 
 
 
